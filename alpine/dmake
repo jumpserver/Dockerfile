@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# coding: utf-8
+# Copyright (c) 2018
+# Gmail: liuzheng712
+#
+
+set -ex
+
+if [ -z "$1" ]; then
+  echo "Usage: dmake `name`"
+  echo " Then name is your image name you want"
+  exit 0
+fi
+
+# run prepare.sh 
+if [ -f prepare.sh ]; then
+  bash ./prepare.sh
+fi
+
+
+
+network='cicd'
+
+docker network create ${network} || true
+
+nginx=`docker run -d --network ${network} -v $(pwd):/usr/share/nginx/html/ nginx:alpine`
+
+nginxip=`docker inspect --format '{{ .NetworkSettings.Networks.'${network}'.IPAddress }}' ${nginx}`
+
+docker build  --build-arg=nginxip=$nginxip  --no-cache=true --network ${network} -t $1  .
+
+docker rm -f $nginx
+
+

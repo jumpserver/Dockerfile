@@ -1,0 +1,11 @@
+Python_dist=Python-3.6.1.tar.xz
+Python_URL=https://www.python.org/ftp/python/3.6.1/${Python_dist}
+
+Jumpserver_dist=jumpserver.zip
+Jumpserver_URL=https://github.com/jumpserver/jumpserver/archive/master.zip
+
+Coco_dist=coco.zip
+Coco_URL=https://github.com/jumpserver/coco/archive/dev.zip
+
+Luna_dist=luna.tar.gz
+Luna_URL=https://github.com/jumpserver/luna/releases/download/0.5-beta-2/luna.tar.gz 
