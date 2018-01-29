@@ -1,0 +1,21 @@
+[mysqld]
+datadir=/opt/mysql/data
+socket=/opt/mysql/mysql.sock
+# Disabling symbolic-links is recommended to prevent assorted security risks
+symbolic-links=0
+language=/usr/share/mysql/english
+# Settings user and group are ignored when systemd is used.
+# If you need to run mysqld under a different user or group,
+# customize your systemd unit file for mariadb according to the
+# instructions in http://fedoraproject.org/wiki/Systemd
+
+[mysqld_safe]
+datadir=/opt/mysql/data
+socket=/opt/mysql/mysql.sock
+log-error=/opt/mysql/error.log
+pid-file=/opt/mysql/mysqld.pid
+
+#
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
