@@ -24,7 +24,7 @@ RUN source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r 
 # 6. 创建数据库
 COPY mysql_security.sql /opt/mysql/mysql_security.sql
 RUN /usr/bin/mysqld_safe --default-file=/etc/my.cnf
-RUN mysql < /opt/mysql/mysql_security.sql
+RUN mysql -uroot -h127.0.0.1 < /opt/mysql/mysql_security.sql
 
 # 7. 准备文件
 COPY nginx.conf /etc/nginx/nginx.conf
