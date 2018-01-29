@@ -35,17 +35,12 @@ pip install -r /opt/jumpserver-master/requirements/requirements.txt
 pip install -r /opt/coco-dev/requirements/requirements.txt
 
 
-mkdir -p /opt/nginx/log && chmod 777 /opt/nginx/log/
-mkdir -p /opt/mysql/log /opt/mysql/data /opt/mysql/plugin 
-ln -s /opt/mysql/mysql.sock  /var/lib/mysql/mysql.sock
-curl -o /etc/nginx/nginx.conf http://${nginxip}/nginx.conf
-curl -o /etc/supervisord.conf http://${nginxip}/supervisord.conf 
+curl -o /opt/mysql/mysql_security.sql http://${nginxip}/mysql_security.sql
 curl -o /etc/my.cnf http://${nginxip}/mysql.cnf
-curl -o /opt/mysql/share/mysql/errmsg.sys http://${nginxip}/errmsg.sys 
-curl -o /opt/mysql/mysql_security.sql http://${nginxip}/mysql_security.sql 
-curl -o /opt/jumpserver-master/config.py http://${nginxip}/jumpserver_conf.py
-curl -o /opt/security.sh http://${nginxip}/security.sh
+curl -o /opt/mysql/share/mysql/errmsg.sys http://${nginxip}/errmsg.sys
 
-mysql_install_db
-chown -R mysql:mysql /opt/mysql
-/usr/bin/mysqld_safe --default-file=/etc/my.cnf 
+curl -o /etc/nginx/nginx.conf http://${nginxip}/nginx.conf
+curl -o /etc/supervisord.conf http://${nginxip}/supervisord.conf
+curl -o /opt/jumpserver/config.py http://${nginxip}/jumpserver_conf.py
+curl -o /opt/start_jms.sh http://${nginxip}/start_jms.sh
+
