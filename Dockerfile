@@ -21,11 +21,7 @@ RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && y
 # 5. 安装pip依赖
 RUN source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt &&  pip install -r /opt/coco/requirements/requirements.txt
 
-VOLUME /var/lib/mysql
 VOLUME /opt/coco/keys
-
-# 6. 创建数据库
-COPY run_mysql.sh /opt/run_mysql.sh
 
 # 7. 准备文件
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -34,8 +30,6 @@ COPY jumpserver_conf.py /opt/jumpserver/config.py
 COPY coco_conf.py /opt/coco/conf.py
 COPY start_jms.sh /opt/start_jms.sh
 
-ENV MYSQL_DATABASE=jumpserver  MYSQL_USER=jumpserver MYSQL_PASSWORD=jumpserver
-ENV DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=jumpserver DB_PASSWORD=weakPassword DB_NAME=jumpserver
 ENV REDIS_HOST=127.0.0.1 REDIS_PORT=6379
 
 EXPOSE 2222 80

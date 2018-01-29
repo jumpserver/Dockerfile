@@ -18,7 +18,8 @@ start() {
             echo "Wait for next time for migrations"
             sleep 1
         fi
-    source /opt/py3/bin/active && python /opt/jumpserver/run_server.py
+    done
+    source /opt/py3/bin/activate && python /opt/jumpserver/run_server.py all
 }
 
 
