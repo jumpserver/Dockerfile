@@ -81,7 +81,5 @@ check_mysql
 /usr/bin/supervisord &
 initial_DB
 make_migrations
-while :
-do
-sleep 2000
-done
+
+supervisord

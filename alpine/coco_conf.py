@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(__file__)
 
 class Config:
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
-    CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8000'
+    CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
 
     # 启动时绑定的ip, 默认 0.0.0.0
     # BIND_HOST = '0.0.0.0'
