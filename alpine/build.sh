@@ -23,6 +23,9 @@ tar xf ${Python_dist}
 unzip ${Jumpserver_dist}
 unzip ${Coco_dist}
 tar xzf ${Luna_dist}
+mv coco-dev coco
+mv jumpserver-dev jumpserver
+
 
 cd /opt/Python* && ./configure && make && make install
 cd /opt/
@@ -34,7 +37,7 @@ yum -y install $(cat /opt/jumpserver-master/requirements/rpm_requirements.txt)
 pip install -r /opt/jumpserver-master/requirements/requirements.txt
 pip install -r /opt/coco-dev/requirements/requirements.txt
 
-
+mkdir -p /opt/mysql/ /opt/mysql/share/mysql/ /etc/nginx/
 curl -o /opt/mysql/mysql_security.sql http://${nginxip}/mysql_security.sql
 curl -o /etc/my.cnf http://${nginxip}/mysql.cnf
 curl -o /opt/mysql/share/mysql/errmsg.sys http://${nginxip}/errmsg.sys
