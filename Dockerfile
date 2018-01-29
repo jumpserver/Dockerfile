@@ -1,5 +1,5 @@
 FROM centos:7
-RUN yum update -y && yum install epel-release -y && yum update -y && yum install wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server -y
+RUN yum update -y && yum install epel-release -y && yum update -y && yum install wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor -y
 WORKDIR /opt/
 RUN wget https://github.com/jumpserver/jumpserver/archive/master.zip -O /opt/jumpserver.zip
 RUN wget https://github.com/jumpserver/coco/archive/dev.zip -O /opt/coco.zip
@@ -11,7 +11,6 @@ RUN yum -y install $(cat /opt/jumpserver-master/requirements/rpm_requirements.tx
 RUN python3 -m venv py3
 RUN source /opt/py3/bin/activate && pip install -r /opt/jumpserver-master/requirements/requirements.txt &&  pip install -r /opt/coco-dev/requirements/requirements.txt 
 RUN tar xzf /opt/luna.tar.gz
-RUN yum install supervisor -y
 RUN mkdir -p /opt/nginx/log && chmod 777 /opt/nginx/log/
 RUN mkdir -p /opt/mysql/log /opt/mysql/data /opt/mysql/plugin 
 RUN ln -s /opt/mysql/mysql.sock  /var/lib/mysql/mysql.sock

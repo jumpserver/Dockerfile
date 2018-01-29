@@ -28,8 +28,8 @@ We provide two docker images, same function different size.
 该项目提供两种docker镜像，同样的功能，只是镜像大小的区别。
 
 ```bash
-docker run -p 8080:80 -p 2222:2222 jumpserver:0.5
+docker run -p 8080:80 -p 2222:2222 jumpserver:v0.5-beta-2
 OR
-docker run -p 8080:80 -p 2222:2222 jumpserver:0.5-alpine
+docker run -p 8080:80 -p 2222:2222 jumpserver:v0.5-beta-2-alpine
 ```
 
