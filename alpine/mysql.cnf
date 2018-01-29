@@ -15,7 +15,7 @@ datadir=/opt/mysql/data
 plugin-dir=/opt/mysql/plugin
 user=mysql
 socket=/opt/mysql/mysql.sock
-log-error=/opt/mysql/error.log
+log-error=/opt/mysql/log/error.log
 pid-file=/opt/mysql/mysqld.pid
 port=3306
 

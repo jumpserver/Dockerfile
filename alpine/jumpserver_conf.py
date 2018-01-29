@@ -24,7 +24,7 @@ class Config:
     DEBUG = True
 
     # DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
-    LOG_LEVEL = 'DEBUG'
+    LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'DEBUG'
     LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
     # Database setting, Support sqlite3, mysql, postgres ....
@@ -32,11 +32,11 @@ class Config:
 
     # MySQL or postgres setting like:
     DB_ENGINE = 'mysql'
-    DB_HOST = '127.0.0.1'
-    DB_PORT = 3306
-    DB_USER = 'jumpserver'
-    DB_PASSWORD = 'weakPassword'
-    DB_NAME = 'jumpserver'
+    DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
+    DB_PORT = os.environ.get("DB_PORT") or 3306
+    DB_USER = os.environ.get("DB_USER") or 'jumpserver'
+    DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
+    DB_NAME = os.environ.get("DB_NAME") or 'jumpserver'
 
     # When Django start it will bind this host and port
     # ./manage.py runserver 127.0.0.1:8080
@@ -44,9 +44,9 @@ class Config:
     HTTP_LISTEN_PORT = 8080
 
     # Use Redis as broker for celery and web socket
-    REDIS_HOST = '127.0.0.1'
-    REDIS_PORT = 6379
-    REDIS_PASSWORD = ''
+    REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
+    REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+    REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
     BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
         'password': REDIS_PASSWORD,
         'host': REDIS_HOST,
