@@ -21,24 +21,15 @@ RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && y
 echo -e "# 5. 安装pip依赖\n"
 source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt &&  pip install -r /opt/coco/requirements/requirements.txt
 
-echo -e "# 6. 准备目录\n"
-RUN mkdir -p /opt/nginx/log && chmod 777 /opt/nginx/log/
-RUN mkdir -p /opt/mysql/log /opt/mysql/data /opt/mysql/plugin
-RUN ln -s /opt/mysql/mysql.sock  /var/lib/mysql/mysql.sock
+echo -e "# 6. 安装mysql\n"
+cp mysql_security.sql /tmp/mysql_security.sql
+service mariadb start && mysql < /tmp/mysql_security.sql
 
-echo -e "# 7. mysql基本表结构\n"
-mysql_install_db
-chown -R mysql:mysql /opt/mysql
-cp mysql_security.sql /opt/mysql/mysql_security.sql
-service mariadb start && mysql < /opt/mysql/mysql_security.sql
-
-echo -e "# 8. 准备配置文件\n"
+echo -e "# 7. 准备配置文件\n"
 cp nginx.conf /etc/nginx/nginx.conf
 cp supervisord.conf /etc/supervisord.conf
-cp mysql.cnf /etc/my.cnf
-cp errmsg.sys /opt/mysql/share/mysql/errmsg.sys
 cp jumpserver_conf.py /opt/jumpserver/config.py
 
-echo -e "# 9. # 准备启动jms的脚本\n"
+echo -e "# 8. # 准备启动jms的脚本\n"
 cp start_jms.sh /opt/start_jms.sh
 chmod +x /opt/start_jms.sh
