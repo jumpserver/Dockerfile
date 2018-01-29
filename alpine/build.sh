@@ -32,10 +32,10 @@ cd /opt/
 python3 -m venv py3
 source /opt/py3/bin/activate
 
-yum -y install $(cat /opt/jumpserver-master/requirements/rpm_requirements.txt)
+yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt)
 
-pip install -r /opt/jumpserver-master/requirements/requirements.txt
-pip install -r /opt/coco-dev/requirements/requirements.txt
+pip install -r /opt/jumpserver/requirements/requirements.txt
+pip install -r /opt/coco/requirements/requirements.txt
 
 mkdir -p /opt/mysql/ /opt/mysql/share/mysql/ /etc/nginx/
 curl -o /opt/mysql/mysql_security.sql http://${nginxip}/mysql_security.sql
