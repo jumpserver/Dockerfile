@@ -25,10 +25,7 @@ VOLUME /var/lib/mysql
 VOLUME /opt/coco/keys
 
 # 6. 创建数据库
-COPY mysql_security.sql /opt/mysql/mysql_security.sql
-COPY init_mysql.sh /opt/mysql/init_mysql.sh
-RUN mysql_install_db && chown -R mysql:mysql /var/lib/mysql
-RUN bash /opt/mysql/init_mysql.sh
+COPY run_mysql.sh /opt/run_mysql.sh
 
 # 7. 准备文件
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -37,6 +34,7 @@ COPY jumpserver_conf.py /opt/jumpserver/config.py
 COPY coco_conf.py /opt/coco/conf.py
 COPY start_jms.sh /opt/start_jms.sh
 
+ENV MYSQL_DATABASE=jumpserver  MYSQL_USER=jumpserver MYSQL_PASSWORD=jumpserver
 ENV DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=jumpserver DB_PASSWORD=weakPassword DB_NAME=jumpserver
 ENV REDIS_HOST=127.0.0.1 REDIS_PORT=6379
 
