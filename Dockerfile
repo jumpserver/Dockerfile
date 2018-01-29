@@ -25,9 +25,10 @@ VOLUME /var/lib/mysql
 VOLUME /opt/coco/keys
 
 # 6. 创建数据库
-RUN mysql_install_db && chown -R mysql:mysql /var/lib/mysql && /usr/bin/mysqld_safe --defaults-file=/etc/my.cnf &
 COPY mysql_security.sql /opt/mysql/mysql_security.sql
-RUN mysql < /opt/mysql/mysql_security.sql
+COPY init_mysql.sh /opt/mysql/init_mysql.sh
+RUN mysql_install_db && chown -R mysql:mysql /var/lib/mysql
+RUN bash /opt/mysql/init_mysql.sh
 
 # 7. 准备文件
 COPY nginx.conf /etc/nginx/nginx.conf
