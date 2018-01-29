@@ -23,6 +23,6 @@ COPY mysql_security.sql /opt/mysql/
 RUN chown -R mysql:mysql /opt/mysql
 COPY jumpserver_conf.py /opt/jumpserver-master/config.py
 RUN /usr/bin/mysqld_safe --default-file=/etc/my.cnf 
-COPY ./security.sh /opt/security.sh
+COPY ./start.sh /opt/start.sh
 EXPOSE 2222 80
-CMD ["/usr/bin/supervisord"]
+CMD ["/opt/start.sh"]
