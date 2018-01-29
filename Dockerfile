@@ -5,13 +5,13 @@ RUN yum update -y && yum install epel-release -y && yum update -y && yum install
 WORKDIR /opt/
 
 RUN echo "2. 准备python"
+RUN wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz -O /opt/Python-3.6.1.tar.xz
 RUN tar xf Python-3.6.1.tar.xz  && cd Python-3.6.1 && ./configure && make && make install
 RUN python3 -m venv py3
 
 RUN echo "3. 下载包并解压"
 RUN wget https://github.com/jumpserver/jumpserver/archive/dev.zip -O /opt/jumpserver.zip
 RUN wget https://github.com/jumpserver/coco/archive/dev.zip -O /opt/coco.zip
-RUN wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz -O /opt/Python-3.6.1.tar.xz
 RUN wget https://github.com/jumpserver/luna/releases/download/0.5-beta-2/luna.tar.gz -O /opt/luna.tar.gz
 RUN unzip coco.zip && mv coco-dev coco && unzip jumpserver.zip && mv jumpserver-dev jumpserver && tar xzf luna.tar.gz
 
