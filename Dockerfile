@@ -21,10 +21,13 @@ RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && y
 # 5. 安装pip依赖
 RUN source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt &&  pip install -r /opt/coco/requirements/requirements.txt
 
+VOLUME /var/lib/mysql
+VOLUME /opt/coco/keys
+
 # 6. 创建数据库
+RUN mysql_install_db && chown -R mysql:mysql /var/lib/mysql && /usr/bin/mysqld_safe --default-file=/etc/my.cnf
 COPY mysql_security.sql /opt/mysql/mysql_security.sql
-RUN /usr/bin/mysqld_safe --default-file=/etc/my.cnf
-RUN mysql -uroot -h127.0.0.1 < /opt/mysql/mysql_security.sql
+RUN mysql < /opt/mysql/mysql_security.sql
 
 # 7. 准备文件
 COPY nginx.conf /etc/nginx/nginx.conf
