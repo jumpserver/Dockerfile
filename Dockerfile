@@ -26,6 +26,8 @@ RUN ln -s /opt/mysql/mysql.sock  /var/lib/mysql/mysql.sock
 # mysql基本表结构
 RUN mysql_install_db
 RUN chown -R mysql:mysql /opt/mysql
+COPY mysql_security.sql /opt/mysql/mysql_security.sql
+RUN service mariadb start && mysql < /opt/mysql/mysql_security.sql
 
 # 准备配置文件
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -34,9 +36,12 @@ COPY mysql.cnf /etc/my.cnf
 COPY errmsg.sys /opt/mysql/share/mysql/errmsg.sys
 COPY jumpserver_conf.py /opt/jumpserver/config.py
 
-ENV DB_HOST=localhost DB_PORT=3306 DB_USER=jumpserver DB_PASSWORD=weakPassword DB_NAME=jumpserver
-ENV REDIS_HOST=localhost REDIS_PORT=6379
+ENV DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=jumpserver DB_PASSWORD=weakPassword DB_NAME=jumpserver
+ENV REDIS_HOST=127.0.0.1 REDIS_PORT=6379
 
-COPY ./start.sh /opt/start.sh
+# 准备启动jms的脚本
+COPY ./start_jms.sh /opt/start_jms.sh
+RUN chmod +x /opt/start_jms.sh
+
 EXPOSE 2222 80
-CMD ["/opt/start.sh"]
+CMD ["/usr/bin/supervisord"]
