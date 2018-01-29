@@ -33,5 +33,5 @@ COPY alpine/jumpserver_conf.py /opt/jumpserver/config.py
 COPY alpine/coco_conf.py /opt/coco/conf.py
 COPY alpine/start_jms.sh /opt/start_jms.sh
 
-EXPOSE 2222 80
+EXPOSE 2222 80 443
 CMD ["/opt/start_jms.sh"]
