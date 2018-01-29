@@ -1,5 +1,5 @@
 FROM centos:7
-RUN yum update -y && yum install epel-release -y && yum update -y && yum install -y wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor
+RUN yum update -y && yum install epel-release -y && yum update -y && yum install wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor -y
 WORKDIR /opt/
 
 # 下载包并解压
@@ -19,7 +19,6 @@ RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && y
 # 安装pip依赖
 RUN source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt &&  pip install -r /opt/coco/requirements/requirements.txt
 
-# 准备目录
 RUN mkdir -p /opt/nginx/log && chmod 777 /opt/nginx/log/
 RUN mkdir -p /opt/mysql/log /opt/mysql/data /opt/mysql/plugin 
 RUN ln -s /opt/mysql/mysql.sock  /var/lib/mysql/mysql.sock
@@ -38,5 +37,6 @@ COPY jumpserver_conf.py /opt/jumpserver/config.py
 ENV DB_HOST=localhost DB_PORT=3306 DB_USER=jumpserver DB_PASSWORD=weakPassword DB_NAME=jumpserver
 ENV REDIS_HOST=localhost REDIS_PORT=6379
 
+COPY ./start.sh /opt/start.sh
 EXPOSE 2222 80
-CMD ["/usr/bin/supervisord"]
+CMD ["/opt/start.sh"]
