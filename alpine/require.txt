@@ -9,3 +9,5 @@ Coco_URL=https://github.com/jumpserver/coco/archive/dev.zip
 
 Luna_dist=luna.tar.gz
 Luna_URL=https://github.com/jumpserver/luna/releases/download/0.5-beta-2/luna.tar.gz 
+
+nginxip=https://raw.githubusercontent.com/jumpserver/Dockerfile/mysql/alpine/
