@@ -33,7 +33,7 @@ class Config:
     # MySQL or postgres setting like:
     DB_ENGINE = os.environ.get("DB_ENGINE") or 'sqlite3'
     DB_HOST = os.environ.get("DB_HOST") or '127.0.0.1'
-    DB_PORT = os.environ.get("DB_PORT") or 3306
+    DB_PORT = int(os.environ.get("DB_PORT")) or 3306
     DB_USER = os.environ.get("DB_USER") or 'jumpserver'
     DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
     DB_NAME = os.environ.get("DB_NAME") or os.path.join(BASE_DIR, "db.sqlite3")
@@ -45,7 +45,7 @@ class Config:
 
     # Use Redis as broker for celery and web socket
     REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
-    REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
+    REDIS_PORT = int(os.environ.get("REDIS_PORT")) or 6379
     REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
     BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
         'password': REDIS_PASSWORD,
