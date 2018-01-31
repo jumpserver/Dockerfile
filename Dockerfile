@@ -22,6 +22,7 @@ RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && y
 RUN source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt &&  pip install -r /opt/coco/requirements/requirements.txt
 
 VOLUME /opt/coco/keys
+VOLUME /opt/jumpserver/data
 
 # 7. 准备文件
 COPY nginx.conf /etc/nginx/nginx.conf
