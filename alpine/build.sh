@@ -46,4 +46,5 @@ curl -SLo /etc/nginx/nginx.conf  ${nginxip}/nginx.conf
 curl -SLo /etc/supervisord.conf  ${nginxip}/supervisord.conf
 curl -SLo /opt/jumpserver/config.py  ${nginxip}/jumpserver_conf.py
 curl -SLo /opt/start_jms.sh  ${nginxip}/start_jms.sh
+chmod +x /opt/start_jms.sh
 
