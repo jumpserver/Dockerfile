@@ -14,10 +14,10 @@ yum install wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-deve
 source /dev/stdin <<<  "$(curl https://raw.githubusercontent.com/jumpserver/Dockerfile/mysql/alpine/require.txt)" 
 
 cd /opt/ 
-curl -o ${Python_dist}  ${Python_URL}
-curl -o ${Jumpserver_dist}  ${Jumpserver_URL}
-curl -o ${Coco_dist} ${Coco_URL}
-curl -o ${Luna_dist} ${Luna_URL} 
+curl -SLo ${Python_dist}  ${Python_URL}
+curl -SLo ${Jumpserver_dist}  ${Jumpserver_URL}
+curl -SLo ${Coco_dist} ${Coco_URL}
+curl -SLo ${Luna_dist} ${Luna_URL} 
 
 tar xf ${Python_dist}
 unzip ${Jumpserver_dist}
@@ -38,12 +38,12 @@ pip install -r /opt/jumpserver/requirements/requirements.txt
 pip install -r /opt/coco/requirements/requirements.txt
 
 mkdir -p /opt/mysql/ /opt/mysql/share/mysql/ /etc/nginx/
-curl -o /opt/mysql/mysql_security.sql  ${nginxip}/mysql_security.sql
-curl -o /etc/my.cnf  ${nginxip}/mysql.cnf
-curl -o /opt/mysql/share/mysql/errmsg.sys  ${nginxip}/errmsg.sys
+curl -SLo /opt/mysql/mysql_security.sql  ${nginxip}/mysql_security.sql
+curl -SLo /etc/my.cnf  ${nginxip}/mysql.cnf
+curl -SLo /opt/mysql/share/mysql/errmsg.sys  ${nginxip}/errmsg.sys
 
-curl -o /etc/nginx/nginx.conf  ${nginxip}/nginx.conf
-curl -o /etc/supervisord.conf  ${nginxip}/supervisord.conf
-curl -o /opt/jumpserver/config.py  ${nginxip}/jumpserver_conf.py
-curl -o /opt/start_jms.sh  ${nginxip}/start_jms.sh
+curl -SLo /etc/nginx/nginx.conf  ${nginxip}/nginx.conf
+curl -SLo /etc/supervisord.conf  ${nginxip}/supervisord.conf
+curl -SLo /opt/jumpserver/config.py  ${nginxip}/jumpserver_conf.py
+curl -SLo /opt/start_jms.sh  ${nginxip}/start_jms.sh
 
