@@ -32,17 +32,18 @@ docker run -p 8080:80 -p 2222:2222 jumpserver:0.5.0-beta2
 
 使用外置mysql数据库和redis:
 
-设置环境变量：
-DB_ENGINE = mysql
-DB_HOST = mysql_host
-DB_PORT = 3306
-DB_USER = xxx
-DB_PASSWORD = xxxx
-DB_NAME = jumpserver
+**设置环境变量：**
 
-REDIS_HOST = ''
-REDIS_PORT = ''
-REDIS_PASSWORD = ''
+- DB_ENGINE = mysql
+- DB_HOST = mysql_host
+- DB_PORT = 3306
+- DB_USER = xxx
+- DB_PASSWORD = xxxx
+- DB_NAME = jumpserver
+
+- REDIS_HOST = ''
+- REDIS_PORT = ''
+- REDIS_PASSWORD = ''
 
 
 ```bash
