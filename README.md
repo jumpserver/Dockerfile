@@ -1,7 +1,5 @@
 # Dockerfile
 
-<h1>NOT Finish yet!!! 没有完成!!!</h1>
-
 Jumpserver all in one Dockerfile
 
 This project is only for Docker image build, this docker image we do not suggest you build in a product environment.
@@ -28,8 +26,27 @@ We provide two docker images, same function different size.
 该项目提供两种docker镜像，同样的功能，只是镜像大小的区别。
 
 ```bash
-docker run -p 8080:80 -p 2222:2222 jumpserver:v0.5-beta-2
-OR
-docker run -p 8080:80 -p 2222:2222 jumpserver:v0.5-beta-2-alpine
+docker run -p 8080:80 -p 2222:2222 jumpserver:0.5.0-beta2
+
+```
+
+使用外置mysql数据库和redis:
+
+**设置环境变量：**
+
+- DB_ENGINE = mysql
+- DB_HOST = mysql_host
+- DB_PORT = 3306
+- DB_USER = xxx
+- DB_PASSWORD = xxxx
+- DB_NAME = jumpserver
+
+- REDIS_HOST = ''
+- REDIS_PORT = ''
+- REDIS_PASSWORD = ''
+
+
+```bash
+docker run -p 8080:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  jumpserver:0.5.0-beta2
 ```
 
