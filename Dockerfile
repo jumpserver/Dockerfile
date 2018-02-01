@@ -29,9 +29,10 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisord.conf
 COPY jumpserver_conf.py /opt/jumpserver/config.py
 COPY coco_conf.py /opt/coco/conf.py
-COPY start_jms.sh /opt/start_jms.sh
+COPY entrypoint.sh /bin/entrypoint.sh
+RUN chmod +x /bin/entrypoint.sh
 
 ENV REDIS_HOST=127.0.0.1 REDIS_PORT=6379
 
 EXPOSE 2222 80
-CMD ["/usr/bin/supervisord"]
+ENTRYPOINT ["entrypoint.sh"]
