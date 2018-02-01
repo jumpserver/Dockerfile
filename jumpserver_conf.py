@@ -36,7 +36,7 @@ class Config:
     DB_PORT = os.environ.get("DB_PORT") or 3306
     DB_USER = os.environ.get("DB_USER") or 'jumpserver'
     DB_PASSWORD = os.environ.get("DB_PASSWORD") or 'weakPassword'
-    DB_NAME = os.environ.get("DB_NAME") or os.path.join(BASE_DIR, "db.sqlite3")
+    DB_NAME = os.environ.get("DB_NAME") or os.path.join(BASE_DIR, "data", "db.sqlite3")
 
     # When Django start it will bind this host and port
     # ./manage.py runserver 127.0.0.1:8080
