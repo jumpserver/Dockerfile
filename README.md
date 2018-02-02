@@ -1,3 +1,6 @@
+[![Docker Build Status](https://img.shields.io/docker/build/jumpserver/allinone.svg?style=for-the-badge)](https://hub.docker.com/r/jumpserver/allinone/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jumpserver/allinone.svg?style=for-the-badge)](https://hub.docker.com/r/jumpserver/allinone/)
+
 # Dockerfile
 
 Jumpserver all in one Dockerfile
