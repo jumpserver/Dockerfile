@@ -7,7 +7,7 @@ make_migrations() {
   source /opt/py3/bin/activate
   while :;do
     if [ ! -f /opt/finish ]; then
-      bash make_migrations.sh  && bash init_db.sh && touch /opt/finish
+      bash make_migrations.sh && touch /opt/finish
     else
       touch /opt/finish
       break
