@@ -9,6 +9,8 @@ This project is only for Docker image build, this docker image we do not suggest
 
 该项目仅仅是Jumpserver项目的docker镜像生成代码，我们不建议在生产环境下使用该镜像。
 
+原因：<https://gist.github.com/snakevil/0b47072fcb626b87f4bd4ab80f7d8946>
+
 The main reasons are:
 
    - the database is in the docker too, and we suggest you use your own database by docker env.
