@@ -10,8 +10,8 @@ RUN tar xf Python-3.6.1.tar.xz  && cd Python-3.6.1 && ./configure && make && mak
 RUN python3 -m venv py3
 
 # 3. 下载包并解压
-RUN wget https://github.com/jumpserver/jumpserver/archive/dev.zip -O /opt/jumpserver.zip
-RUN wget https://github.com/jumpserver/coco/archive/dev.zip -O /opt/coco.zip
+RUN wget https://github.com/jumpserver/jumpserver/archive/master.zip -O /opt/jumpserver.zip
+RUN wget https://github.com/jumpserver/coco/archive/master.zip -O /opt/coco.zip
 RUN wget https://github.com/jumpserver/luna/releases/download/0.5.1/luna.tar.gz -O /opt/luna.tar.gz
 RUN unzip coco.zip && mv coco-dev coco && unzip jumpserver.zip && mv jumpserver-dev jumpserver && tar xzf luna.tar.gz
 
