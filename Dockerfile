@@ -13,7 +13,7 @@ RUN python3 -m venv py3
 RUN wget https://github.com/jumpserver/jumpserver/archive/master.zip -O /opt/jumpserver.zip
 RUN wget https://github.com/jumpserver/coco/archive/master.zip -O /opt/coco.zip
 RUN wget https://github.com/jumpserver/luna/releases/download/0.5.1/luna.tar.gz -O /opt/luna.tar.gz
-RUN unzip coco.zip && mv coco-dev coco && unzip jumpserver.zip && mv jumpserver-dev jumpserver && tar xzf luna.tar.gz
+RUN unzip coco.zip && mv coco-master coco && unzip jumpserver.zip && mv jumpserver-master jumpserver && tar xzf luna.tar.gz
 
 # 4. 安装yum依赖
 RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt)
