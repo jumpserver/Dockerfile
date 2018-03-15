@@ -8,8 +8,8 @@ set -ex
 
 echo "0. 系统的一些配置"
 setenforce 0 || true
-systemctl stop iptables.service
-systemctl stop firewalld.service
+systemctl stop iptables.service || true
+systemctl stop firewalld.service || true
 
 localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
 export LC_ALL=zh_CN.UTF-8
