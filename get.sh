@@ -7,7 +7,7 @@
 set -ex
 
 echo "0. 系统的一些配置"
-setenforce 0 
+setenforce 0 || true
 systemctl stop iptables.service
 systemctl stop firewalld.service
 
