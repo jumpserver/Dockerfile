@@ -37,6 +37,7 @@ echo "5. 安装pip依赖"
 source /opt/py3/bin/activate && pip install --upgrade pip && pip install -r /opt/jumpserver/requirements/requirements.txt &&  pip install -r /opt/coco/requirements/requirements.txt
 
 echo "6. 创建数据库"
+mkdir -p /opt/mysql/share/mysql/
 wget https://github.com/jumpserver/Dockerfile/blob/mysql/alpine/mysql_security.sql?raw=true -O /opt/mysql/mysql_security.sql
 wget https://github.com/jumpserver/Dockerfile/blob/mysql/alpine/mysql.cnf?raw=true -O /etc/my.cnf
 wget https://github.com/jumpserver/Dockerfile/blob/mysql/alpine/errmsg.sys?raw=true -O /opt/mysql/share/mysql/errmsg.sys
