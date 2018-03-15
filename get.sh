@@ -59,6 +59,7 @@ echo "9. 安装guacamole"
 host_ip=`python -c "import socket;print([(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])"`
 
 docker run --name jms_guacamole -d \
+  --restart always \
   -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
   -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
   -e JUMPSERVER_SERVER=http://$host_ip:8080 \
@@ -112,6 +113,7 @@ server {
 
 EOF
 
+mkdir -p /opt/nginx && chmod 777 /opt/nginx
 systemctl restart nginx
 systemctl enable nginx
 
