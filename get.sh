@@ -21,8 +21,8 @@ cd /opt/
 
 echo "2. 准备python"
 wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz -O /opt/Python-3.6.1.tar.xz
-RUN tar xf Python-3.6.1.tar.xz  && cd Python-3.6.1 && ./configure && make && make install
-RUN python3 -m venv py3
+tar xf Python-3.6.1.tar.xz  && cd Python-3.6.1 && ./configure && make && make install
+python3 -m venv py3
 
 echo "3. 下载包并解压"
 wget https://github.com/jumpserver/jumpserver/archive/1.0.0.zip -O /opt/jumpserver.zip
