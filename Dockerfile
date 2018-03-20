@@ -1,7 +1,7 @@
 FROM centos:7
 
 # 1. 安装基本依赖
-RUN yum update -y && yum install epel-release -y && yum update -y && yum install wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor -y
+RUN yum update -y && yum install epel-release -y && yum update -y && yum install ansible wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor -y
 WORKDIR /opt/
 
 # 2. 准备python
