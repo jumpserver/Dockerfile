@@ -26,7 +26,7 @@ We provide two docker images, same function different size.
 该项目提供两种docker镜像，同样的功能，只是镜像大小的区别。
 
 ```bash
-docker run -p 8080:80 -p 2222:2222 jumpserver/jumpserver:0.5.0-beta2
+docker run -p 8080:80 -p 2222:2222 registry.jumpserver.org/public/jumpserver:1.0.0
 
 ```
 
