@@ -13,11 +13,11 @@ systemctl stop firewalld.service || true
 
 localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
 export LC_ALL=zh_CN.UTF-8
-echo 'LANG=zh_CN.UTF-8' > /etc/sysconfig/i18n
+echo 'LANG=zh_CN.UTF-8' > /etc/locale.conf
 
 echo "1. 安装基本依赖"
 {
-yum update -y && yum install epel-release -y && yum update -y && yum install wget unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor -y
+yum update -y && yum install epel-release -y && yum update -y && yum install wget zip unzip epel-release nginx sqlite-devel xz gcc automake zlib-devel openssl-devel redis mariadb mariadb-devel mariadb-server supervisor -y
 } || {
 echo "yum出错，请更换源重新运行"
 exit 1
@@ -108,29 +108,8 @@ wget https://github.com/jumpserver/Dockerfile/blob/mysql/alpine/start_jms.sh?raw
 echo "下载配置文件出错，请尝试手工执行，如手工操作成功，请注释上述代码再运行本脚本"
 exit 1
 }
-echo "8. 安装docker"
-yum check-update
-{
-curl -fsSL https://get.docker.com/ | sh
-} || {
-echo "安装docker 出错，请尝试手工执行，如手工操作成功，请注释上述代码再运行本脚本"
-exit 1
-}
 
-systemctl start docker
-systemctl enable docker
-
-echo "9. 安装guacamole"
-host_ip=`python -c "import socket;print([(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])"`
-
-docker run --name jms_guacamole -d \
-  --restart always \
-  -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
-  -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
-  -e JUMPSERVER_SERVER=http://$host_ip:8080 \
-  registry.jumpserver.org/public/guacamole:1.0.0
-
-echo "10. 配置nginx"
+echo "8. 配置nginx"
 cat << EOF > /etc/nginx/conf.d/jumpserver.conf
 server {
     listen 80;
@@ -191,5 +170,29 @@ echo "请检查nginx的启动命令"
 exit 1
 }
 
+echo "jumpserver安装完成，请运行/opt/start_jms.sh启动jumpserver"
 
-echo " 安装完成，请运行/opt/start_jms.sh启动jumpserver"
+echo "下面开始安装windows组件guacamole，如果不需要管理windows资产，可以取消继续安装"
+sleep 10s
+
+echo "9. 安装docker"
+yum check-update
+{
+curl -fsSL https://get.docker.com/ | sh
+} || {
+echo "安装docker 出错，请尝试手工执行，如手工操作成功，请注释上述代码再运行本脚本"
+exit 1
+}
+
+systemctl start docker
+systemctl enable docker
+
+echo "10. 安装guacamole"
+host_ip=`python -c "import socket;print([(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1])"`
+
+docker run --name jms_guacamole -d \
+  --restart always \
+  -p 8081:8080 -v /opt/guacamole/key:/config/guacamole/key \
+  -e JUMPSERVER_KEY_DIR=/config/guacamole/key \
+  -e JUMPSERVER_SERVER=http://$host_ip:8080 \
+  registry.jumpserver.org/public/guacamole:1.0.0
