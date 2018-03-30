@@ -39,7 +39,7 @@ echo "解压或编译python出错，请尝试使用上面的命令手工解压�
 exit 1
 }
 {
-python3 -m venv py3
+python3 -m venv /opt/py3
 } || {
 echo "建立python虚拟环境出错，请尝试手工执行，如手工操作成功，请注释上述代码再运行本脚本"
 exit 1
