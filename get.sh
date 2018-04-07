@@ -44,6 +44,7 @@ python3 -m venv /opt/py3
 echo "建立python虚拟环境出错，请尝试手工执行，如手工操作成功，请注释上述代码再运行本脚本"
 exit 1
 }
+cd /opt/
 
 echo "3. 下载包并解压"
 {
