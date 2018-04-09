@@ -1,5 +1,9 @@
 FROM centos:7
 
+RUN yum -y install epel-release && \
+    yum -y install gcc wget unzip nginx supervisor
+    yum clean all
+
 # 官方程序
 RUN wget https://github.com/jumpserver/jumpserver/archive/master.zip -O /opt/jumpserver.zip && \
     wget https://github.com/jumpserver/coco/archive/master.zip -O /opt/coco.zip && \
@@ -11,9 +15,7 @@ RUN wget https://github.com/jumpserver/jumpserver/archive/master.zip -O /opt/jum
     rm -f /opt/coco.zip /opt/jumpserver.zip /opt/luna.tar.gz
 
 # 基础依赖
-RUN yum -y install epel-release && \
-    yum -y install gcc wget unzip nginx supervisor && \
-    yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && \
+RUN yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) && \
     yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt) && \
     yum clean all
 
