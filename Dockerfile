@@ -1,7 +1,7 @@
 FROM centos:7
 
 RUN yum -y install epel-release && \
-    yum -y install gcc wget unzip nginx supervisor
+    yum -y install gcc wget unzip nginx supervisor && \
     yum clean all
 
 # 官方程序
