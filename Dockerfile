@@ -29,7 +29,8 @@ RUN mkdir -p /opt/ && \
     rm -f /opt/Python-3.6.1.tar.xz && rm -rf /opt/Python-3.6.1
 
 # python依赖
-RUN python3 -m venv py3 && \
+RUN cd /opt/ && \
+    python3 -m venv py3 && \
     source /opt/py3/bin/activate && \
     pip3 install --upgrade pip && \
     pip3 install -r /opt/jumpserver/requirements/requirements.txt && \
