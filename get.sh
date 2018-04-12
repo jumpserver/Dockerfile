@@ -174,7 +174,6 @@ exit 1
 echo "jumpserver安装完成，请运行/opt/start_jms.sh启动jumpserver"
 
 echo "下面开始安装windows组件guacamole，如果不需要管理windows资产，可以取消继续安装"
-sleep 10s
 
 echo "9. 安装docker"
 yum check-update
