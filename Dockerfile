@@ -13,14 +13,12 @@ RUN wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
 RUN tar xvf luna.tar.gz
 RUN chown -R root:root luna
 
-COPY luna luna
 COPY config.py jumpserver/config.py
 COPY conf.py coco/conf.py
 
-RUN yum -y install redis nginx supervisor
+RUN yum -y install redis nginx 
 RUN systemctl enable redis && \
-    systemctl enable nginx && \
-    systemctl enable supervisord
+    systemctl enable nginx
 
 RUN cd /opt/jumpserver/requirements && \
     yum -y install $(cat rpm_requirements.txt)
@@ -46,7 +44,6 @@ RUN rm -rf Python*
 RUN rm -rf luna.tar.gz
 
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY supervisord.conf /etc/supervisord.conf
 COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
 

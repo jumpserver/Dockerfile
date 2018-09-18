@@ -1,30 +1,15 @@
 #!/bin/bash
 #
 
-function make_migrations(){
-    cd /opt/jumpserver/utils
-    source /opt/py3/bin/activate
-    bash make_migrations.sh
-}
+nohup /usr/bin/redis-server > /etc/redis.log 2>&1 &
 
+source /opt/py3/bin/activate
+cd /opt/jumpserver/utils 
+sh make_migrations.sh
 
-function make_migrations_if_need(){
-    sentinel=/opt/jumpserver/data/inited
+cd /opt/jumpserver && ./jms start all -d
+cd /opt/coco && ./cocod start -d
 
-    if [ -f ${sentinel} ];then
-        echo "Database have been inited"
-    else
-        make_migrations && echo "Database init success" && touch $sentinel
-    fi
-}
+/usr/sbin/nginx
 
-function start() {
-    make_migrations_if_need
-    supervisord
-}
-
-
-case $1 in
-    init) make_migrations;;
-    *) start;;
-esac
+ping 127.0.0.1
