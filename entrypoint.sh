@@ -3,6 +3,7 @@
 
 function make_migrations(){
     cd /opt/jumpserver/utils
+    source /opt/py3/bin/activate
     bash make_migrations.sh
 }
 
