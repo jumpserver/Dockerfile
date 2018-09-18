@@ -1,40 +1,51 @@
-FROM ubuntu:18.04
+FROM centos:7.5.1804
 WORKDIR /opt
-ARG DEBIAN_FRONTEND=noninteractive
-COPY sources.list /etc/apt/sources.list
-RUN apt-get -y update && \
-    apt-get -y upgrade
+RUN yum update -y
+RUN localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 && \
+    export LC_ALL=zh_CN.UTF-8 && \
+    echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
+RUN yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git make
 
-RUN apt-get -y install tzdata apt-utils language-pack-zh-hans
-RUN apt-get -y install wget libkrb5-dev libsqlite3-dev gcc \
-    make automake libssl-dev zlib1g-dev libmysqlclient-dev \
-    libffi-dev git xz-utils supervisor sshpass
-RUN echo 'LANG="zh_CN.UTF-8"' > /etc/default/locale
+RUN git clone https://github.com/jumpserver/jumpserver.git
+RUN git clone https://github.com/jumpserver/coco.git
+RUN wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
 
-COPY jumpserver jumpserver
-COPY coco coco
+RUN tar xvf luna.tar.gz
+RUN chown -R root:root luna
+
 COPY luna luna
+COPY config.py jumpserver/config.py
+COPY conf.py coco/conf.py
+
+RUN yum -y install redis nginx supervisor
+RUN systemctl enable redis && \
+    systemctl enable nginx && \
+    systemctl enable supervisord
 
 RUN cd /opt/jumpserver/requirements && \
-    apt-get -y install $(cat deb_requirements.txt)
+    yum -y install $(cat rpm_requirements.txt)
 
-COPY Python-3.6.1.tar.xz Python-3.6.1.tar.xz
+RUN cd /opt/coco/requirements && \
+    yum -y install $(cat rpm_requirements.txt)
+
+RUN wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
 RUN tar xf Python-3.6.1.tar.xz
 RUN cd Python-3.6.1/ && ./configure && make && make install
+
 RUN python3 -m venv /opt/py3
 
-RUN apt-get -y install redis-server nginx
-
-RUN /opt/py3/bin/pip install -r jumpserver/requirements/requirements.txt && \
-    /opt/py3/bin/pip install -r coco/requirements/requirements.txt
+RUN source /opt/py3/bin/activate && \
+    pip install -r jumpserver/requirements/requirements.txt && \
+    pip install -r coco/requirements/requirements.txt
 
 VOLUME /opt/luna
 VOLUME /opt/coco/keys
 VOLUME /opt/jumpserver/data
 
 RUN rm -rf Python*
+RUN rm -rf luna.tar.gz
 
-COPY default /etc/nginx/sites-enabled/default
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisord.conf
 COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
