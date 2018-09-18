@@ -9,10 +9,10 @@ This project is only for Docker image build, this docker image we do not suggest
 The main reasons are:
 
    - the database is in the docker too, and we suggest you use your own database by docker env.
-   - lack of scalability 
+   - lack of scalability
    - NO HA plan
    - some unknown problems
-   
+
 主要原因是：
 
    - 数据库在docker内，建议通过docker的环境变量去使用外部数据库
@@ -26,7 +26,7 @@ We provide two docker images, same function different size.
 该项目提供两种docker镜像，同样的功能，只是镜像大小的区别。
 
 ```bash
-docker run -p 8080:80 -p 2222:2222 registry.jumpserver.org/public/jumpserver:1.0.0
+docker run -p 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:1.4.1
 
 ```
 
@@ -47,6 +47,5 @@ docker run -p 8080:80 -p 2222:2222 registry.jumpserver.org/public/jumpserver:1.0
 
 
 ```bash
-docker run -p 8080:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  jumpserver/jumpserver:0.5.0-beta2
+docker run -p 8080:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.1
 ```
-
