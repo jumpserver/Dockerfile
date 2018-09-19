@@ -10,7 +10,7 @@ RUN git clone https://github.com/jumpserver/jumpserver.git
 RUN git clone https://github.com/jumpserver/coco.git
 RUN wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
 
-RUN tar xvf luna.tar.gz
+RUN tar xf luna.tar.gz
 RUN chown -R root:root luna
 
 COPY config.py jumpserver/config.py
