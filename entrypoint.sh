@@ -1,10 +1,10 @@
 #!/bin/bash
 #
 
-nohup /usr/bin/redis-server > /etc/redis.log 2>&1 &
+redis-server &
 
 source /opt/py3/bin/activate
-cd /opt/jumpserver/utils 
+cd /opt/jumpserver/utils
 sh make_migrations.sh
 
 cd /opt/jumpserver && ./jms start all -d

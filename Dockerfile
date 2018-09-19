@@ -16,7 +16,7 @@ RUN chown -R root:root luna
 COPY config.py jumpserver/config.py
 COPY conf.py coco/conf.py
 
-RUN yum -y install redis nginx 
+RUN yum -y install redis nginx
 RUN systemctl enable redis && \
     systemctl enable nginx
 
@@ -52,7 +52,7 @@ ENV DB_ENGINE=mysql \
     DB_PORT=3306 \
     DB_USER=jumpserver \
     DB_PASSWORD=weakPassword \
-    DB_NAME=jms
+    DB_NAME=jumpserver
 
 ENV REDIS_HOST=127.0.0.1 \
     REDIS_PORT=6379 \
