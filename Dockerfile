@@ -1,47 +1,40 @@
-FROM centos:7.5.1804
+FROM wojiushixiaobai/python3.6.1:latest
 WORKDIR /opt
-RUN yum update -y
+
 RUN localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 && \
     export LC_ALL=zh_CN.UTF-8 && \
     echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf
 RUN yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git make
 
-RUN git clone https://github.com/jumpserver/jumpserver.git
-RUN git clone https://github.com/jumpserver/coco.git
-RUN wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz
-
-RUN tar xf luna.tar.gz
-RUN chown -R root:root luna
+RUN git clone https://github.com/jumpserver/jumpserver.git && \
+    git clone https://github.com/jumpserver/coco.git && \
+    wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz && \
+    tar xf luna.tar.gz && \
+    RUN chown -R root:root luna
 
 COPY config.py jumpserver/config.py
 COPY conf.py coco/conf.py
 
-RUN yum -y install redis nginx
-RUN systemctl enable redis && \
+RUN yum -y install redis nginx && \
+    systemctl enable redis && \
     systemctl enable nginx
 
 RUN cd /opt/jumpserver/requirements && \
+    yum -y install $(cat rpm_requirements.txt) && \
+    cd /opt/coco/requirements && \
     yum -y install $(cat rpm_requirements.txt)
 
-RUN cd /opt/coco/requirements && \
-    yum -y install $(cat rpm_requirements.txt)
-
-RUN wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
-RUN tar xf Python-3.6.1.tar.xz
-RUN cd Python-3.6.1/ && ./configure && make && make install
-
-RUN python3 -m venv /opt/py3
-
-RUN source /opt/py3/bin/activate && \
+RUN python3 -m venv /opt/py3 && \
+    source /opt/py3/bin/activate && \
     pip install -r jumpserver/requirements/requirements.txt && \
     pip install -r coco/requirements/requirements.txt
 
-VOLUME /opt/luna
 VOLUME /opt/coco/keys
 VOLUME /opt/jumpserver/data
 
-RUN rm -rf Python*
-RUN rm -rf luna.tar.gz
+RUN rm -rf luna.tar.gz && \
+    yum clean all && \
+    rm -rf /var/cache/yum/*
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY entrypoint.sh /bin/entrypoint.sh
