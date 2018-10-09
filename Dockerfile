@@ -8,7 +8,7 @@ RUN yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel ep
 
 RUN git clone https://github.com/jumpserver/jumpserver.git && \
     git clone https://github.com/jumpserver/coco.git && \
-    wget https://github.com/jumpserver/luna/releases/download/1.4.1/luna.tar.gz && \
+    wget https://github.com/jumpserver/luna/releases/download/1.4.2/luna.tar.gz && \
     tar xf luna.tar.gz && \
     chown -R root:root luna
 
@@ -29,9 +29,6 @@ RUN python3 -m venv /opt/py3 && \
     pip install -r jumpserver/requirements/requirements.txt && \
     pip install -r coco/requirements/requirements.txt
 
-VOLUME /opt/coco/keys
-VOLUME /opt/jumpserver/data
-
 RUN rm -rf luna.tar.gz && \
     yum clean all && \
     rm -rf /var/cache/yum/*
@@ -39,6 +36,7 @@ RUN rm -rf luna.tar.gz && \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
+RUN mkdir -p /opt/coco/keys
 
 ENV DB_ENGINE=mysql \
     DB_HOST=127.0.0.1 \
