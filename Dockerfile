@@ -38,6 +38,9 @@ COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
 RUN mkdir -p /opt/coco/keys
 
+VOLUME /opt/coco/keys
+VOLUME /opt/jumpserver/data
+
 ENV DB_ENGINE=mysql \
     DB_HOST=127.0.0.1 \
     DB_PORT=3306 \
