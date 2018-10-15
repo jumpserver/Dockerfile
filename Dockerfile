@@ -8,7 +8,7 @@ RUN yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel ep
 
 RUN git clone https://github.com/jumpserver/jumpserver.git && \
     git clone https://github.com/jumpserver/coco.git && \
-    wget https://github.com/jumpserver/luna/releases/download/1.4.2/luna.tar.gz && \
+    wget https://github.com/jumpserver/luna/releases/download/1.4.3/luna.tar.gz && \
     tar xf luna.tar.gz && \
     chown -R root:root luna
 

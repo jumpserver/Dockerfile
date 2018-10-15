@@ -26,7 +26,7 @@ We provide two docker images, same function different size.
 该项目提供两种docker镜像，同样的功能，只是镜像大小的区别。
 
 ```bash
-docker run --name jms_server -dp 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=127.0.0.1 -e DB_PORT=3306 -e DB_USER=jumpserver -e DB_PASSWORD=weakPassword -e DB_NAME=jumpserver -e REDIS_HOST=127.0.0.1 -e REDIS_PORT=6379  wojiushixiaobai/jumpserver:1.4.1
+docker run --name jms_server -dp 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=127.0.0.1 -e DB_PORT=3306 -e DB_USER=jumpserver -e DB_PASSWORD=weakPassword -e DB_NAME=jumpserver -e REDIS_HOST=127.0.0.1 -e REDIS_PORT=6379  wojiushixiaobai/jumpserver:1.4.3
 
 ```
 
@@ -47,5 +47,5 @@ docker run --name jms_server -dp 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOS
 
 
 ```bash
-docker run --name jms_server -dp 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.1
+docker run --name jms_server -dp 80:80 -p 2222:2222 -e DB_ENGINE=mysql -e DB_HOST=192.168.1.1 -e DB_PORT=3306 -e DB_USER=root -e DB_PASSWORD=xxx -e DB_NAME=jumpserver  wojiushixiaobai/jumpserver:1.4.3
 ```
