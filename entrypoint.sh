@@ -32,4 +32,4 @@ esac
 
 cd /opt/jumpserver && ./jms start all -d
 cd /opt/coco && ./cocod start -d
-ping 127.0.0.1
+tail -f /opt/jumpserver/logs/jumpserver.log

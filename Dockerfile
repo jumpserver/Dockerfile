@@ -1,4 +1,5 @@
 FROM wojiushixiaobai/python3.6.1:latest
+LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 RUN localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 && \
@@ -36,7 +37,8 @@ RUN rm -rf luna.tar.gz && \
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
-RUN mkdir -p /opt/coco/keys
+RUN mkdir -p /opt/coco/keys && \
+    mkdir -p /opt/coco/logs
 
 VOLUME /opt/coco/keys
 VOLUME /opt/jumpserver/data
