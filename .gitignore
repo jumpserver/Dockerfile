@@ -42,3 +42,7 @@ logs/*
 host_rsa_key
 sessions/*
 coco.pid
+jumpserver
+coco
+luna.tar.gz
+docker-guacamole

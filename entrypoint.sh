@@ -31,5 +31,7 @@ case $1 in
 esac
 
 cd /opt/jumpserver && ./jms start all -d
+/etc/init.d/guacd start
+cd /config/tomcat8/bin && ./startup.sh
 cd /opt/coco && ./cocod start -d
-tail -f /opt/jumpserver/logs/jumpserver.log
+tail -f /opt/readme.txt
