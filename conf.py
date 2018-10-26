@@ -8,7 +8,13 @@ BASE_DIR = os.path.dirname(__file__)
 
 
 class Config:
+    """
+    Coco config file, coco also load config from server update setting below
+    """
     # 项目名称, 会用来向Jumpserver注册, 识别而已, 不能重复
+    NAME = "coco"
+
+    # Jumpserver项目的url, api请求注册会使用
     CORE_HOST = os.environ.get("CORE_HOST") or 'http://127.0.0.1:8080'
 
     # 启动时绑定的ip, 默认 0.0.0.0
@@ -31,7 +37,7 @@ class Config:
     # SECRET_KEY = None
 
     # 设置日志级别 ['DEBUG', 'INFO', 'WARN', 'ERROR', 'FATAL', 'CRITICAL']
-    LOG_LEVEL = os.environ.get("LOG_LEVEL") or 'DEBUG'
+    LOG_LEVEL = 'ERROR'
 
     # 日志存放的目录
     # LOG_DIR = os.path.join(BASE_DIR, 'logs')
@@ -43,21 +49,34 @@ class Config:
     # ASSET_LIST_SORT_BY = 'ip'
 
     # 登录是否支持密码认证
-    # SSH_PASSWORD_AUTH = True
+    # PASSWORD_AUTH = True
 
     # 登录是否支持秘钥认证
-    # SSH_PUBLIC_KEY_AUTH = True
+    # PUBLIC_KEY_AUTH = True
+
+    # SSH白名单
+    # ALLOW_SSH_USER = 'all'  # ['test', 'test2']
+
+    # SSH黑名单, 如果用户同时在白名单和黑名单，黑名单优先生效
+    # BLOCK_SSH_USER = []
 
     # 和Jumpserver 保持心跳时间间隔
     # HEARTBEAT_INTERVAL = 5
 
     # Admin的名字，出问题会提示给用户
-    # ADMINS = 'm
+    # ADMINS = ''
+    COMMAND_STORAGE = {
+        "TYPE": "server"
+    }
+    REPLAY_STORAGE = {
+        "TYPE": "server"
+    }
 
-    # 命令存储
-    # COMMAND_STORAGE = {
-    #     "TYPE": "server"
-    # }
+    # SSH连接超时时间 (default 15 seconds)
+    # SSH_TIMEOUT = 15
+
+    # 语言 = en
+    LANGUAGE_CODE = 'zh'
 
 
 config = Config()

@@ -1,1 +1,10 @@
-alpine/
+.git
+logs/*
+data/*
+.github
+tmp/*
+django.db
+celerybeat.pid
+.git
+logs/*
+keys/*
