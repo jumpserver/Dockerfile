@@ -8,7 +8,7 @@ This project is only for Docker image build, this docker image we do not suggest
 
 The main reasons are:
 
-   - the database is in the docker too, and we suggest you use your own database by docker env.
+   - Unintegrated database, and we suggest you use your own database by docker env.
    - lack of scalability
    - NO HA plan
    - some unknown problems
