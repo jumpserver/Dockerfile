@@ -55,10 +55,8 @@ RUN set -ex \
     && yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt) \
     && python3 -m venv /opt/py3 \
     && source /opt/py3/bin/activate \
-    && pip install jms-storage==0.0.19 \
-    && pip install jumpserver-python-sdk==0.0.50 \
-    && pip install -r /opt/jumpserver/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ || pip install -r /opt/jumpserver/requirements/requirements.txt \
-    && pip install -r /opt/coco/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ || pip install -r /opt/coco/requirements/requirements.txt \
+    && pip install -r /opt/jumpserver/requirements/requirements.txt \
+    && pip install -r /opt/coco/requirements/requirements.txt \
     && rm -rf /opt/luna.tar.gz \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
@@ -90,6 +88,7 @@ ENV REDIS_HOST=127.0.0.1 \
 
 ENV JUMPSERVER_KEY_DIR=/config/guacamole/keys \
     GUACAMOLE_HOME=/config/guacamole \
+    JUMPSERVER_ENABLE_DRIVE=true \
     JUMPSERVER_SERVER=http://127.0.0.1:8080
 
 EXPOSE 2222 80
