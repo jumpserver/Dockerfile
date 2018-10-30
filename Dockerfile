@@ -49,7 +49,7 @@ RUN cd /opt/docker-guacamole && \
 RUN git clone https://github.com/jumpserver/jumpserver.git && \
     git clone https://github.com/jumpserver/coco.git && \
     git clone https://github.com/jumpserver/docker-guacamole.git && \
-    wget https://github.com/jumpserver/luna/releases/download/1.4.3/luna.tar.gz && \
+    wget https://github.com/jumpserver/luna/releases/download/1.4.3/luna.tar.gz
 
 # #
 # COPY jumpserver jumpserver
