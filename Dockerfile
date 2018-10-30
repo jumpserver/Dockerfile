@@ -54,10 +54,11 @@ RUN git clone https://github.com/jumpserver/jumpserver.git && \
 # #
 # COPY jumpserver jumpserver
 # COPY coco coco
-# COPY config.py jumpserver/config.py
-# COPY conf.py coco/conf.py
 # COPY luna.tar.gz luna.tar.gz
 # #
+
+COPY config.py jumpserver/config.py
+COPY conf.py coco/conf.py
 
 RUN tar xf luna.tar.gz && \
     chown -R root:root luna && \
