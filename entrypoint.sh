@@ -1,7 +1,14 @@
 #!/bin/bash
 #
 
-redis-server &
+if [ $DB_HOST == 127.0.0.1 ]; then
+    mysqld_safe &
+fi
+
+if [ $REDIS_HOST == 127.0.0.1 ]; then
+    redis-server &
+fi
+
 /usr/sbin/nginx &
 
 source /opt/py3/bin/activate
