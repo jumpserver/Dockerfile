@@ -88,7 +88,6 @@ RUN chmod +x /bin/entrypoint.sh
 VOLUME /opt/coco/keys
 VOLUME /config/guacamole/keys
 VOLUME /opt/jumpserver/data
-VOLUME /var/lib/mysql
 
 ENV DB_ENGINE=mysql \
     DB_HOST=127.0.0.1 \
