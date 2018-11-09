@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+export LANG=zh_CN.UTF-8
+
 if [ $DB_HOST == 127.0.0.1 ]; then
     mysqld_safe &
 fi
@@ -8,8 +10,6 @@ fi
 if [ $REDIS_HOST == 127.0.0.1 ]; then
     redis-server &
 fi
-
-/usr/sbin/nginx &
 
 source /opt/py3/bin/activate
 
@@ -38,6 +38,7 @@ case $1 in
 esac
 
 cd /opt/jumpserver && ./jms start all -d
+/usr/sbin/nginx &
 /etc/init.d/guacd start
 cd /config/tomcat8/bin && ./startup.sh
 cd /opt/coco && ./cocod start -d

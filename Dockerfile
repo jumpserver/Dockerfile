@@ -1,4 +1,4 @@
-FROM wojiushixiaobai/python3.6.1:latest
+FROM centos:7.5.1804
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
@@ -6,7 +6,8 @@ RUN set -ex \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && export LC_ALL=zh_CN.UTF-8 \
     && echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf \
-    && yum -y install wget sqlite-devel xz gcc automake zlib-devel openssl-devel epel-release git make \
+    && yum -y install wget gcc epel-release git \
+    && yum -y install python36 python36-devel \
     && yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
     && rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro \
     && rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm \
@@ -59,9 +60,9 @@ RUN set -ex \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt) \
-    && python3 -m venv /opt/py3 \
+    && python3.6 -m venv /opt/py3 \
     && source /opt/py3/bin/activate \
-    && pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/ \
+    && pip install --upgrade pip setuptools -i https://mirrors.aliyun.com/pypi/simple/ \
     && pip install -r /opt/jumpserver/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
     && pip install -r /opt/coco/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
     && rm -rf /opt/luna.tar.gz \
