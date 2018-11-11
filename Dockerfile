@@ -24,10 +24,10 @@ RUN set -ex \
 RUN set -ex \
     && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions \
-    && wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.tar.gz \
-    && tar xf apache-tomcat-8.5.34.tar.gz -C /config \
-    && rm -rf apache-tomcat-8.5.34.tar.gz \
-    && mv /config/apache-tomcat-8.5.34 /config/tomcat8 \
+    && wget http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz \
+    && tar xf apache-tomcat-8.5.35.tar.gz -C /config \
+    && rm -rf apache-tomcat-8.5.35.tar.gz \
+    && mv /config/apache-tomcat-8.5.35 /config/tomcat8 \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml` \
     && sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties` \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat8/conf/logging.properties \
@@ -55,16 +55,16 @@ RUN set -ex \
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \
     && git clone https://github.com/jumpserver/coco.git \
-    && wget https://github.com/jumpserver/luna/releases/download/1.4.3/luna.tar.gz \
+    && wget https://github.com/jumpserver/luna/releases/download/1.4.4/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
     && source /opt/py3/bin/activate \
-    && pip install --upgrade pip setuptools -i https://mirrors.aliyun.com/pypi/simple/ \
-    && pip install -r /opt/jumpserver/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
-    && pip install -r /opt/coco/requirements/requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ \
+    && pip install --upgrade pip setuptools \
+    && pip install -r /opt/jumpserver/requirements/requirements.txt \
+    && pip install -r /opt/coco/requirements/requirements.txt \
     && rm -rf /opt/luna.tar.gz \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
