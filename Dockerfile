@@ -31,6 +31,11 @@ RUN set -ex \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml` \
     && sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties` \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat8/conf/logging.properties \
+    && cd /config \
+    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
+    && tar xf linux-amd64.tar.gz -C /bin/ \
+    && chmod +x /bin/ssh-forward \
+    && rm -rf /config/linux-amd64.tar.gz \
     && yum clean all \
     && rm -rf /var/cache/yum/*
 
