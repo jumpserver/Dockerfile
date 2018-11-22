@@ -3,6 +3,7 @@ LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 RUN set -ex \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && export LC_ALL=zh_CN.UTF-8 \
     && echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf \
@@ -12,12 +13,10 @@ RUN set -ex \
     && rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro \
     && rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm \
     && yum install -y java-1.8.0-openjdk libtool \
+    && mkdir /usr/local/lib/freerdp/ \
+    && ln -s /usr/local/lib/freerdp /usr/lib64/freerdp \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel \
-    && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript \
-    && ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/ \
-    && ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/ \
-    && ln -s /usr/local/lib/freerdp/guacai.so /usr/lib64/freerdp/ \
-    && ln -s /usr/local/lib/freerdp/guacsvc.so /usr/lib64/freerdp/ \
+    && yum install -y ffmpeg-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript \
     && yum clean all \
     && rm -rf /var/cache/yum/*
 
@@ -63,6 +62,7 @@ RUN set -ex \
     && wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
+    && sed -i "s/START_TIMEOUT = 15/START_TIMEOUT = 30/g" /opt/jumpserver/jms \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
