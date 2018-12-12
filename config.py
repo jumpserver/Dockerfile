@@ -74,7 +74,7 @@ class Config:
     REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
     REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
     REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
-    REDIS_DB_CELERY = os.environ.get('REDIS_DB') or 3
+    REDIS_DB_CELERY_BROKER = os.environ.get('REDIS_DB') or 3
     REDIS_DB_CACHE = os.environ.get('REDIS_DB') or 4
 
     # Use OpenID authorization
