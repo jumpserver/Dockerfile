@@ -59,10 +59,9 @@ RUN set -ex \
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \
     && git clone https://github.com/jumpserver/coco.git \
-    && wget https://github.com/jumpserver/luna/releases/download/v1.4.4/luna.tar.gz \
+    && wget https://github.com/jumpserver/luna/releases/download/1.4.4/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
-    && sed -i "s/START_TIMEOUT = 15/START_TIMEOUT = 30/g" /opt/jumpserver/jms \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && yum -y install $(cat /opt/coco/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
@@ -95,6 +94,8 @@ VOLUME /opt/jumpserver/data
 VOLUME /opt/coco/keys
 VOLUME /config/guacamole/keys
 VOLUME /var/lib/mysql
+
+ENV BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
 
 ENV DB_ENGINE=mysql \
     DB_HOST=127.0.0.1 \
