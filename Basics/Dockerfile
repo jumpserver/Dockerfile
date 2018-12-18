@@ -21,7 +21,7 @@ RUN set -ex \
     && yum install -y ffmpeg-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript \
     && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions \
-    && wget http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz \
+    && wget https://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz \
     && tar xf apache-tomcat-8.5.35.tar.gz -C /config \
     && rm -rf apache-tomcat-8.5.35.tar.gz \
     && mv /config/apache-tomcat-8.5.35 /config/tomcat8 \
