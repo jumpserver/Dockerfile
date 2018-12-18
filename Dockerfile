@@ -1,60 +1,8 @@
-FROM centos:7.5.1804
+FROM wojiushixiaobai/basics:latest
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
-RUN set -ex \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
-    && export LC_ALL=zh_CN.UTF-8 \
-    && echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf \
-    && yum -y install wget gcc epel-release git \
-    && yum -y install python36 python36-devel \
-    && yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm https://download1.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
-    && rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro \
-    && rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm \
-    && yum install -y java-1.8.0-openjdk libtool \
-    && mkdir /usr/local/lib/freerdp/ \
-    && ln -s /usr/local/lib/freerdp /usr/lib64/freerdp \
-    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel \
-    && yum install -y ffmpeg-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript \
-    && yum clean all \
-    && rm -rf /var/cache/yum/*
-
-RUN set -ex \
-    && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
-    && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions \
-    && wget http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz \
-    && tar xf apache-tomcat-8.5.35.tar.gz -C /config \
-    && rm -rf apache-tomcat-8.5.35.tar.gz \
-    && mv /config/apache-tomcat-8.5.35 /config/tomcat8 \
-    && sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml` \
-    && sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties` \
-    && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat8/conf/logging.properties \
-    && cd /config \
-    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
-    && tar xf linux-amd64.tar.gz -C /bin/ \
-    && chmod +x /bin/ssh-forward \
-    && rm -rf /config/linux-amd64.tar.gz \
-    && yum clean all \
-    && rm -rf /var/cache/yum/*
-
-RUN set -ex \
-    && git clone https://github.com/jumpserver/docker-guacamole.git \
-    && cd /opt/docker-guacamole \
-    && tar -xzf guacamole-server-0.9.14.tar.gz \
-    && cd guacamole-server-0.9.14 \
-    && autoreconf -fi \
-    && ./configure --with-init-dir=/etc/init.d \
-    && make \
-    && make install \
-    && cd .. \
-    && rm -rf guacamole-server-0.9.14.tar.gz guacamole-server-0.9.14 \
-    && ldconfig \
-    && rm -rf /config/tomcat8/webapps/* \
-    && cp guacamole-0.9.14.war /config/tomcat8/webapps/ROOT.war \
-    && cp guacamole-auth-jumpserver-0.9.14.jar /config/guacamole/extensions/ \
-    && cp root/app/guacamole/guacamole.properties /config/guacamole/ \
-    && rm -rf /opt/docker-guacamole
+ENV GUAC_VER=0.9.14
 
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \
@@ -69,19 +17,32 @@ RUN set -ex \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && pip install -r /opt/coco/requirements/requirements.txt \
-    && rm -rf /opt/luna.tar.gz \
+    && cd /config \
+    && git clone https://github.com/jumpserver/docker-guacamole.git \
+    && cd docker-guacamole \
+    && tar xf guacamole-server-${GUAC_VER}.tar.gz \
+    && cd guacamole-server-${GUAC_VER} \
+    && autoreconf -fi \
+    && ./configure --with-init-dir=/etc/init.d \
+    && make \
+    && make install \
+    && cd .. \
+    && cp guacamole-${GUAC_VER}.war /config/tomcat8/webapps/ROOT.war \
+    && cp guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions \
+    && cp root/app/guacamole/guacamole.properties /config/guacamole \
+    && ldconfig \
+    && cd /config \
+    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
+    && tar xf linux-amd64.tar.gz -C /bin/ \
+    && chmod +x /bin/ssh-forward \
+    && mkdir -p /opt/coco/keys /opt/coco/logs \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
+    && rm -rf /opt/luna.tar.gz \
+    && rm -rf /var/cache/yum/* \
     && rm -rf ~/.cache/pip \
-    && mkdir -p /opt/coco/keys \
-    && mkdir -p /opt/coco/logs
-
-COPY mysql_init.sh mysql_init.sh
-
-RUN set -ex \
-    && mysql_install_db --user=mysql --datadir=/var/lib/mysql \
-    && sh /opt/mysql_init.sh \
-    && rm -rf /opt/mysql_init.sh
+    && rm -rf /config/linux-amd64.tar.gz \
+    && rm -rf /config/docker-guacamole
 
 COPY config.py jumpserver/config.py
 COPY conf.py coco/conf.py
