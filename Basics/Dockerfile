@@ -25,6 +25,7 @@ RUN set -ex \
     && tar xf apache-tomcat-8.5.35.tar.gz -C /config \
     && rm -rf apache-tomcat-8.5.35.tar.gz \
     && mv /config/apache-tomcat-8.5.35 /config/tomcat8 \
+    && rm -rf /config/tomcat8/webapps/* \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml` \
     && sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties` \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat8/conf/logging.properties \
