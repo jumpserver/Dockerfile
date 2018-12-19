@@ -40,6 +40,6 @@ esac
 cd /opt/jumpserver && ./jms start all -d
 /usr/sbin/nginx &
 /etc/init.d/guacd start
-cd /config/tomcat8/bin && ./startup.sh
+sh /config/tomcat8/bin/startup.sh
 cd /opt/coco && ./cocod start -d
 tail -f /opt/readme.txt

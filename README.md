@@ -32,6 +32,8 @@ docker run --name jms_server -dp 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:l
 
 **设置环境变量：**
 
+- BOOTSTRAP_TOKEN = nwv4RdXpM82LtSvmV
+
 - DB_ENGINE = mysql
 - DB_HOST = mysql_host
 - DB_PORT = 3306
@@ -61,6 +63,7 @@ docker run --name jms_server -d \
   -v /opt/mysql:/var/lib/mysql
   -p 80:80 \
   -p 2222:2222 \
+  -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV \
   -e DB_ENGINE=mysql \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
