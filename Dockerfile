@@ -2,12 +2,14 @@ FROM wojiushixiaobai/basics:latest
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
-ENV GUAC_VER=0.9.14
+ENV GUAC_VER=0.9.14 \
+    LUNA_VER=1.4.6
 
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \
     && git clone https://github.com/jumpserver/coco.git \
-    && wget https://github.com/jumpserver/luna/releases/download/1.4.6/luna.tar.gz \
+    && git clone https://github.com/jumpserver/docker-guacamole.git \
+    && wget https://github.com/jumpserver/luna/releases/download/${LUNA_VER}/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
@@ -17,8 +19,6 @@ RUN set -ex \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && pip install -r /opt/coco/requirements/requirements.txt \
-    && cd /config \
-    && git clone https://github.com/jumpserver/docker-guacamole.git \
     && cd docker-guacamole \
     && tar xf guacamole-server-${GUAC_VER}.tar.gz \
     && cd guacamole-server-${GUAC_VER} \
@@ -27,11 +27,12 @@ RUN set -ex \
     && make \
     && make install \
     && cd .. \
-    && cp guacamole-${GUAC_VER}.war /config/tomcat8/webapps/ROOT.war \
-    && cp guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions \
-    && cp root/app/guacamole/guacamole.properties /config/guacamole \
+    && ln -sf /opt/docker-guacamole/guacamole-${GUAC_VER}.war /config/tomcat8/webapps/ROOT.war \
+    && ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
+    && ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
+    && rm -rf guacamole-server-${GUAC_VER} \
     && ldconfig \
-    && cd /config \
+    && cd /opt \
     && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
@@ -41,8 +42,7 @@ RUN set -ex \
     && rm -rf /opt/luna.tar.gz \
     && rm -rf /var/cache/yum/* \
     && rm -rf ~/.cache/pip \
-    && rm -rf /config/linux-amd64.tar.gz \
-    && rm -rf /config/docker-guacamole
+    && rm -rf /opt/linux-amd64.tar.gz
 
 COPY config.py jumpserver/config.py
 COPY conf.py coco/conf.py
