@@ -24,7 +24,7 @@ The main reasons are:
 
 
 ```bash
-docker run --name jms_server -dp 80:80 -p 2222:2222 wojiushixiaobai/jumpserver:latest
+docker run --name jms_server -dp 80:80 -p 2222:2222 jumpserver/jms_all:latest
 
 ```
 
