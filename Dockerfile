@@ -3,7 +3,7 @@ LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 ENV GUAC_VER=0.9.14 \
-    LUNA_VER=1.4.6
+    LUNA_VER=1.4.7
 
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \

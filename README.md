@@ -50,20 +50,16 @@ docker run --name jms_server -dp 80:80 -p 2222:2222 jumpserver/jms_all:latest
 - JUMPSERVER_SERVER=http://127.0.0.1:8080
 
 - VOLUME /opt/jumpserver/data
-- VOLUME /opt/coco/keys
-- VOLUME /config/guacamole/keys
 - VOLUME /var/lib/mysql
 
 
 ```bash
 docker run --name jms_server -d \
   -v /opt/jumpserver:/opt/jumpserver/data
-  -v /opt/coco:/opt/coco/keys
-  -v /opt/guacamole:/config/guacamole/keys
   -v /opt/mysql:/var/lib/mysql
   -p 80:80 \
   -p 2222:2222 \
-  -e BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV \
+  -e BOOTSTRAP_TOKEN=xxxxxx \
   -e DB_ENGINE=mysql \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
