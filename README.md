@@ -69,6 +69,6 @@ docker run --name jms_server -d \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=password \
-  wojiushixiaobai/jumpserver:latest
+  jumpserver/jms:latest
 
 ```
