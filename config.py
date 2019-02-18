@@ -25,14 +25,14 @@ class Config:
     """
     # SECURITY WARNING: keep the secret key used in production secret!
     # 加密秘钥 生产环境中请修改为随机字符串，请勿外泄
-    SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW'
 
     # Django security setting, if your disable debug model, you should setting that
     ALLOWED_HOSTS = ['*']
 
     # SECURITY WARNING: keep the bootstrap token used in production secret!
     # 预共享Token coco和guacamole用来注册服务账号，不在使用原来的注册接受机制
-    BOOTSTRAP_TOKEN = os.environ.get("BOOTSTRAP_TOKEN") or 'nwv4RdXpM82LtSvmV'
+    BOOTSTRAP_TOKEN = os.environ.get("BOOTSTRAP_TOKEN") or 'KXOeyNgDeTdpeu9q'
 
     # Development env open this, when error occur display the full process track, Production disable it
     # DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
@@ -77,7 +77,7 @@ class Config:
     REDIS_HOST = os.environ.get("REDIS_HOST") or '127.0.0.1'
     REDIS_PORT = os.environ.get("REDIS_PORT") or 6379
     REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD") or ''
-    REDIS_DB_CELERY_BROKER = os.environ.get('REDIS_DB') or 3
+    REDIS_DB_CELERY = os.environ.get('REDIS_DB') or 3
     REDIS_DB_CACHE = os.environ.get('REDIS_DB') or 4
 
     # Use OpenID authorization

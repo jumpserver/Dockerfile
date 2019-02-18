@@ -52,11 +52,10 @@ COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
 
 VOLUME /opt/jumpserver/data
-VOLUME /opt/coco/keys
-VOLUME /config/guacamole/keys
 VOLUME /var/lib/mysql
 
-ENV BOOTSTRAP_TOKEN=nwv4RdXpM82LtSvmV
+ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
+    BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q
 
 ENV DB_ENGINE=mysql \
     DB_HOST=127.0.0.1 \
