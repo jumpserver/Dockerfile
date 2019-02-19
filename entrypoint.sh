@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 
+localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8
 export LANG=zh_CN.UTF-8
 
 if [ $DB_HOST == 127.0.0.1 ]; then
