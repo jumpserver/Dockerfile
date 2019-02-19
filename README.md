@@ -24,15 +24,21 @@ The main reasons are:
 
 
 ```bash
-docker run --name jms_server -dp 80:80 -p 2222:2222 jumpserver/jms_all:latest
+SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`  # 生成加密秘钥, 勿外泄
+BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`  # 生成组件注册所需Token, 勿外泄
+
+docker run --name jms_server -dp 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_all:latest
 
 ```
+
+环境迁移和更新升级请手动指定SECRET_KEY和BOOTSTRAP_TOKEN, 需要保持一致
 
 使用外置mysql数据库和redis:
 
 **设置环境变量：**
 
-- BOOTSTRAP_TOKEN = nwv4RdXpM82LtSvmV
+- SECRET_KEY = xxxxx
+- BOOTSTRAP_TOKEN = xxxxx
 
 - DB_ENGINE = mysql
 - DB_HOST = mysql_host
@@ -59,6 +65,7 @@ docker run --name jms_server -d \
   -v /opt/mysql:/var/lib/mysql
   -p 80:80 \
   -p 2222:2222 \
+  -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
   -e DB_ENGINE=mysql \
   -e DB_HOST=192.168.x.x \

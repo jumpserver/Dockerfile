@@ -2,6 +2,8 @@ FROM centos:latest
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
+ENV TOMCAT_VER=8.5.38
+
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && yum -y install kde-l10n-Chinese \
@@ -21,10 +23,10 @@ RUN set -ex \
     && yum install -y ffmpeg-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel ghostscript \
     && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions \
-    && wget https://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.35/bin/apache-tomcat-8.5.35.tar.gz \
-    && tar xf apache-tomcat-8.5.35.tar.gz -C /config \
-    && rm -rf apache-tomcat-8.5.35.tar.gz \
-    && mv /config/apache-tomcat-8.5.35 /config/tomcat8 \
+    && wget https://www-us.apache.org/dist/tomcat/tomcat-8/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
+    && tar xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
+    && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
+    && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat8 \
     && rm -rf /config/tomcat8/webapps/* \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' `grep 'Connector port="8080"' -rl /config/tomcat8/conf/server.xml` \
     && sed -i 's/FINE/WARNING/g' `grep 'FINE' -rl /config/tomcat8/conf/logging.properties` \
