@@ -82,5 +82,11 @@ class Config:
     # 语言 = en
     LANGUAGE_CODE = 'zh'
 
+    # SFTP的根目录, 可选 /tmp, Home其他自定义目录
+    # SFTP_ROOT = '/tmp'
+
+    # SFTP是否显示隐藏文件
+    # SFTP_SHOW_HIDDEN_FILE = false
+
 
 config = Config()
