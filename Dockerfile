@@ -3,7 +3,7 @@ LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 ENV GUAC_VER=0.9.14 \
-    LUNA_VER=1.4.7
+    LUNA_VER=1.4.8
 
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \
@@ -44,14 +44,12 @@ RUN set -ex \
     && rm -rf ~/.cache/pip \
     && rm -rf /opt/linux-amd64.tar.gz
 
-COPY config.py jumpserver/config.py
-COPY conf.py coco/conf.py
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY readme.txt readme.txt
 COPY entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh
 
-VOLUME /opt/jumpserver/data
+VOLUME /opt/jumpserver/data/media
 VOLUME /var/lib/mysql
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
@@ -73,5 +71,5 @@ ENV JUMPSERVER_KEY_DIR=/config/guacamole/keys \
     JUMPSERVER_ENABLE_DRIVE=true \
     JUMPSERVER_SERVER=http://127.0.0.1:8080
 
-EXPOSE 2222 80
+EXPOSE 80 2222
 ENTRYPOINT ["entrypoint.sh"]

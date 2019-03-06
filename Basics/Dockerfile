@@ -33,10 +33,3 @@ RUN set -ex \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat8/conf/logging.properties \
     && yum clean all \
     && rm -rf /var/cache/yum/*
-
-COPY mysql_init.sh mysql_init.sh
-
-RUN set -ex \
-    && mysql_install_db --user=mysql --datadir=/var/lib/mysql \
-    && sh /opt/mysql_init.sh \
-    && rm -rf /opt/mysql_init.sh

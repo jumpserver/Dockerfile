@@ -27,7 +27,7 @@ The main reasons are:
 SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`  # 生成加密秘钥, 勿外泄
 BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`  # 生成组件注册所需Token, 勿外泄
 
-docker run --name jms_server -dp 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_all:latest
+docker run --name jms_all -dp 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_all:latest
 
 ```
 
@@ -55,13 +55,13 @@ docker run --name jms_server -dp 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e
 - GUACAMOLE_HOME=/config/guacamole \
 - JUMPSERVER_SERVER=http://127.0.0.1:8080
 
-- VOLUME /opt/jumpserver/data
+- VOLUME /opt/jumpserver/data/media
 - VOLUME /var/lib/mysql
 
 
 ```bash
-docker run --name jms_server -d \
-  -v /opt/jumpserver:/opt/jumpserver/data
+docker run --name jms_all -d \
+  -v /opt/jumpserver:/opt/jumpserver/data/media
   -v /opt/mysql:/var/lib/mysql
   -p 80:80 \
   -p 2222:2222 \
