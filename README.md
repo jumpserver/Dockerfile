@@ -29,9 +29,13 @@ BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`  # 生成组�
 
 docker run --name jms_all -dp 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN jumpserver/jms_all:latest
 
+# macOS 生成随机 key 可以用下面的命令
+SECRET_KEY=`LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | head -c 50`  # 生成加密秘钥, 勿外泄
+BOOTSTRAP_TOKEN=`LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | head -c 16`  # 生成组件注册所需Token, 勿外泄
+
 ```
 
-环境迁移和更新升级请手动指定SECRET_KEY和BOOTSTRAP_TOKEN, 需要保持一致
+环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密
 
 使用外置mysql数据库和redis:
 
@@ -67,7 +71,6 @@ docker run --name jms_all -d \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
-  -e DB_ENGINE=mysql \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
   -e DB_USER=root \
@@ -76,6 +79,6 @@ docker run --name jms_all -d \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=password \
-  jumpserver/jms:latest
+  jumpserver/jms_all:latest
 
 ```
