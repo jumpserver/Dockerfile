@@ -2,7 +2,7 @@ FROM centos:latest
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
-ENV TOMCAT_VER=8.5.38
+ENV TOMCAT_VER=8.5.39
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \

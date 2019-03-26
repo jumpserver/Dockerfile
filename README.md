@@ -44,7 +44,6 @@ The main reasons are:
     - SECRET_KEY = xxxxx
     - BOOTSTRAP_TOKEN = xxxxx
 
-    - DB_ENGINE = mysql
     - DB_HOST = mysql_host
     - DB_PORT = 3306
     - DB_USER = xxx
@@ -65,8 +64,8 @@ The main reasons are:
 
 ```bash
 docker run --name jms_all -d \
-  -v /opt/jumpserver:/opt/jumpserver/data/media
-  -v /opt/mysql:/var/lib/mysql
+  -v /opt/jumpserver/media:/opt/jumpserver/data/media \
+  -v /opt/jumpserver/mysql:/var/lib/mysql \
   -p 80:80 \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
