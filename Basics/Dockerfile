@@ -2,11 +2,11 @@ FROM centos:latest
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
-ENV TOMCAT_VER=8.5.38
+ENV TOMCAT_VER=8.5.39
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && yum -y install kde-l10n-Chinese glibc-common \
+    && yum -y install kde-l10n-Chinese \
     && yum -y reinstall glibc-common \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && export LC_ALL=zh_CN.UTF-8 \
