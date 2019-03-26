@@ -51,7 +51,6 @@ RUN chmod +x /bin/entrypoint.sh
 
 VOLUME /opt/jumpserver/data/media
 VOLUME /var/lib/mysql
-VOLUME /opt/jumpserver/config.yml
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q
