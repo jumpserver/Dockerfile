@@ -58,14 +58,16 @@ The main reasons are:
     - GUACAMOLE_HOME=/config/guacamole \
     - JUMPSERVER_SERVER=http://127.0.0.1:8080
 
+    - VOLUME /opt/jumpserver/config.yml
     - VOLUME /opt/jumpserver/data/media
     - VOLUME /var/lib/mysql
 
 
 ```bash
 docker run --name jms_all -d \
-  -v /opt/jumpserver:/opt/jumpserver/data/media
-  -v /opt/mysql:/var/lib/mysql
+  -v /opt/jumpserver/config.yml:/opt/jumpserver/config.yml
+  -v /opt/jumpserver/media:/opt/jumpserver/data/media
+  -v /opt/jumpserver/mysql:/var/lib/mysql
   -p 80:80 \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \

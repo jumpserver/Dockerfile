@@ -3,13 +3,13 @@ LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 ENV GUAC_VER=0.9.14 \
-    LUNA_VER=1.4.8
+    LUNA_VER=1.4.9
 
 RUN set -ex \
     && git clone https://github.com/jumpserver/jumpserver.git \
     && git clone https://github.com/jumpserver/coco.git \
     && git clone https://github.com/jumpserver/docker-guacamole.git \
-    && wget https://github.com/jumpserver/luna/releases/download/${LUNA_VER}/luna.tar.gz \
+    && wget https://demo.jumpserver.org/download/luna/${LUNA_VER}/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
@@ -33,7 +33,7 @@ RUN set -ex \
     && rm -rf guacamole-server-${GUAC_VER} \
     && ldconfig \
     && cd /opt \
-    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
+    && wget https://demo.jumpserver.org/download/ssh-forward/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
     && mkdir -p /opt/coco/keys /opt/coco/logs \
@@ -51,6 +51,7 @@ RUN chmod +x /bin/entrypoint.sh
 
 VOLUME /opt/jumpserver/data/media
 VOLUME /var/lib/mysql
+VOLUME /opt/jumpserver/config.yml
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q

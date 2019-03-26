@@ -6,7 +6,7 @@ ENV TOMCAT_VER=8.5.38
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && yum -y install kde-l10n-Chinese \
+    && yum -y install kde-l10n-Chinese glibc-common \
     && yum -y reinstall glibc-common \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && export LC_ALL=zh_CN.UTF-8 \
