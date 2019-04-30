@@ -39,7 +39,7 @@ RUN set -ex \
     && yum clean all \
     && rm -rf /var/cache/yum/*
 
-ENV LC_ALL zh_CN.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
 
 RUN set -ex \
     && git clone --depth=1 https://github.com/jumpserver/jumpserver.git \
