@@ -44,6 +44,7 @@ The main reasons are:
     - SECRET_KEY = xxxxx
     - BOOTSTRAP_TOKEN = xxxxx
 
+    - DB_ENGINE = mysql
     - DB_HOST = mysql_host
     - DB_PORT = 3306
     - DB_USER = xxx
