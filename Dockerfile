@@ -3,8 +3,8 @@ LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 ENV GUAC_VER=0.9.14 \
-    LUNA_VER=1.4.10 \
-    TOMCAT_VER=8.5.40
+    LUNA_VER=1.5.0 \
+    TOMCAT_VER=8.5.41
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -45,7 +45,7 @@ RUN set -ex \
     && git clone --depth=1 https://github.com/jumpserver/jumpserver.git \
     && git clone --depth=1 https://github.com/jumpserver/coco.git \
     && git clone --depth=1 https://github.com/jumpserver/docker-guacamole.git \
-    && wget https://demo.jumpserver.org/download/luna/${LUNA_VER}/luna.tar.gz \
+    && wget https://github.com/jumpserver/luna/releases/download/${LUNA_VER}/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
