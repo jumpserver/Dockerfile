@@ -39,8 +39,6 @@ RUN set -ex \
     && yum clean all \
     && rm -rf /var/cache/yum/*
 
-ENV LC_ALL=zh_CN.UTF-8
-
 RUN set -ex \
     && git clone --depth=1 https://github.com/jumpserver/jumpserver.git \
     && git clone --depth=1 https://github.com/jumpserver/coco.git \
@@ -69,7 +67,7 @@ RUN set -ex \
     && rm -rf guacamole-server-${GUAC_VER} \
     && ldconfig \
     && cd /opt \
-    && wget https://demo.jumpserver.org/download/ssh-forward/v0.0.5/linux-amd64.tar.gz \
+    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
     && mkdir -p /opt/coco/keys /opt/coco/logs \
