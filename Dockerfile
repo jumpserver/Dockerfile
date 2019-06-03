@@ -71,7 +71,7 @@ RUN set -ex \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
     && mkdir -p /opt/coco/keys /opt/coco/logs \
-    && curl -o /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
+    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
     && rm -rf /opt/luna.tar.gz \
