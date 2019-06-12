@@ -2,7 +2,7 @@ FROM centos:latest
 LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
-ENV GUAC_VER=0.9.14 \
+ENV GUAC_VER=1.0.0 \
     LUNA_VER=1.5.0 \
     TOMCAT_VER=8.5.41
 
