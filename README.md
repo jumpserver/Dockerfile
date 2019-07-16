@@ -66,7 +66,6 @@ The main reasons are:
 ```bash
 docker run --name jms_all -d \
   -v /opt/jumpserver/media:/opt/jumpserver/data/media \
-  -v /opt/jumpserver/mysql:/var/lib/mysql \
   -p 80:80 \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
