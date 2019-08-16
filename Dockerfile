@@ -3,7 +3,7 @@ LABEL maintainer "wojiushixiaobai"
 WORKDIR /opt
 
 ENV GUAC_VER=1.0.0 \
-    LUNA_VER=1.5.1 \
+    LUNA_VER=1.5.2 \
     TOMCAT_VER=9.0.22
 
 RUN set -ex \
@@ -72,6 +72,7 @@ RUN set -ex \
     && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
+    && wget -O /etc/nginx/nginx.conf https://demo.jumpserver.org/download/nginx/nginx.conf \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
