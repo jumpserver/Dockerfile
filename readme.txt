@@ -1,4 +1,4 @@
-Jumpserver ALL 1.5.1
+Jumpserver ALL 1.5.2
 官网 http://www.jumpserver.org
 文档 http://docs.jumpserver.org
 有问题请参考 http://docs.jumpserver.org/zh/docs/faq.html

@@ -40,7 +40,10 @@ fi
 if [ ! -f "/opt/coco/config.yml" ]; then
     cp /opt/coco/config_example.yml /opt/coco/config.yml
     sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/coco/config.yml
+    sed -i "s/# BIND_HOST: 0.0.0.0/BIND_HOST: 127.0.0.1/g" /opt/coco/config.yml
+    sed -i "s/# SSHD_PORT: 2222/SSHD_PORT: 2223/g" /opt/coco/config.yml
     sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/coco/config.yml
+    echo "ENABLE_PROXY_PROTOCOL: true" >> /opt/coco/config.yml
 fi
 
 source /opt/py3/bin/activate
