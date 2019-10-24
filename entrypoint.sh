@@ -6,7 +6,7 @@ export LANG=zh_CN.UTF-8
 
 if [ $DB_HOST == 127.0.0.1 ]; then
     if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
-        mysql_install_db --user=mysql --datadir=/var/lib/mysql
+        mysql_install_db --user=mysql --datadir=/var/lib/mysql --force
         mysqld_safe &
         sleep 5s
         mysql -uroot -e "create database jumpserver default charset 'utf8'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
