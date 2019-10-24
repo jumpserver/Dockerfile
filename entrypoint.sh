@@ -47,7 +47,7 @@ fi
 
 source /opt/py3/bin/activate
 cd /opt/jumpserver && ./jms start -d
-cd /opt/koko && ./koko start -d
+cd /opt/koko && ./koko -d
 /etc/init.d/guacd start
 sh /config/tomcat9/bin/startup.sh
 /usr/sbin/nginx &
