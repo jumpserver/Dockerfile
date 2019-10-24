@@ -37,18 +37,17 @@ if [ ! -f "/opt/jumpserver/config.yml" ]; then
     sed -i "s/# REDIS_PASSWORD: /REDIS_PASSWORD: $REDIS_PASSWORD/g" /opt/jumpserver/config.yml
 fi
 
-if [ ! -f "/opt/coco/config.yml" ]; then
-    cp /opt/coco/config_example.yml /opt/coco/config.yml
-    sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/coco/config.yml
-    sed -i "s/# BIND_HOST: 0.0.0.0/BIND_HOST: 127.0.0.1/g" /opt/coco/config.yml
-    sed -i "s/# SSHD_PORT: 2222/SSHD_PORT: 2223/g" /opt/coco/config.yml
-    sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/coco/config.yml
-    echo "ENABLE_PROXY_PROTOCOL: true" >> /opt/coco/config.yml
+if [ ! -f "/opt/koko/config.yml" ]; then
+    cp /opt/koko/config_example.yml /opt/koko/config.yml
+    sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/koko/config.yml
+    sed -i "s/# BIND_HOST: 0.0.0.0/BIND_HOST: 127.0.0.1/g" /opt/koko/config.yml
+    sed -i "s/# SSHD_PORT: 2222/SSHD_PORT: 2223/g" /opt/koko/config.yml
+    sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/koko/config.yml
 fi
 
 source /opt/py3/bin/activate
 cd /opt/jumpserver && ./jms start -d
-cd /opt/coco && ./cocod start -d
+cd /opt/koko && ./koko start -d
 /etc/init.d/guacd start
 sh /config/tomcat9/bin/startup.sh
 /usr/sbin/nginx &
