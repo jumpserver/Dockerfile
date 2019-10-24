@@ -7,8 +7,7 @@ ENV VERSION=1.5.4 \
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && yum -y install kde-l10n-Chinese \
-    && yum -y reinstall glibc-common \
+    && yum -y install kde-l10n-Chinese glibc-common \
     && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
     && export LC_ALL=zh_CN.UTF-8 \
     && echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf \
@@ -52,6 +51,7 @@ RUN set -ex \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
+    && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && source /opt/py3/bin/activate \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
@@ -76,10 +76,9 @@ RUN set -ex \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
-    && rm -rf /opt/luna.tar.gz \
+    && rm -rf /opt/*.tar.gz \
     && rm -rf /var/cache/yum/* \
-    && rm -rf ~/.cache/pip \
-    && rm -rf /opt/linux-amd64.tar.gz
+    && rm -rf ~/.cache/pip
 
 COPY readme.txt readme.txt
 COPY entrypoint.sh /bin/entrypoint.sh
