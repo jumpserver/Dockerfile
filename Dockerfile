@@ -72,7 +72,6 @@ RUN set -ex \
     && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
-    && wget -O /etc/nginx/nginx.conf https://demo.jumpserver.org/download/nginx/nginx.conf \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
