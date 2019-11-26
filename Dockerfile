@@ -53,6 +53,7 @@ RUN set -ex \
     && python3.6 -m venv /opt/py3 \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && source /opt/py3/bin/activate \
+    && pip install wheel \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd docker-guacamole \
