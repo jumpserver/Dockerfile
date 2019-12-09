@@ -1,9 +1,9 @@
 FROM centos:7
 WORKDIR /opt
 
-ENV VERSION=1.5.4 \
+ENV VERSION=1.5.5 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.27
+    TOMCAT_VER=9.0.29
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -53,6 +53,7 @@ RUN set -ex \
     && python3.6 -m venv /opt/py3 \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && source /opt/py3/bin/activate \
+    && pip install wheel \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd docker-guacamole \
@@ -102,6 +103,8 @@ ENV REDIS_HOST=127.0.0.1 \
 
 ENV JUMPSERVER_KEY_DIR=/config/guacamole/keys \
     GUACAMOLE_HOME=/config/guacamole \
+    GUACAMOLE_LOG_LEVEL=ERROR \
+    JUMPSERVER_CLEAR_DRIVE_SESSION=true \
     JUMPSERVER_ENABLE_DRIVE=true \
     JUMPSERVER_SERVER=http://127.0.0.1:8080
 
