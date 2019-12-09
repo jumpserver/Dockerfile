@@ -41,6 +41,7 @@ if [ ! -f "/opt/koko/config.yml" ]; then
     cp /opt/koko/config_example.yml /opt/koko/config.yml
     sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/koko/config.yml
     sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/koko/config.yml
+    sed -i "s@# SFTP_ROOT: /tmp@SFTP_ROOT: /@g" /opt/koko/config.yml
 fi
 
 source /opt/py3/bin/activate
