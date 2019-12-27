@@ -3,7 +3,7 @@ WORKDIR /opt
 
 ENV VERSION=1.5.5 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.29
+    TOMCAT_VER=9.0.30
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
