@@ -3,7 +3,7 @@ WORKDIR /opt
 
 ENV VERSION=1.5.5 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.29
+    TOMCAT_VER=9.0.30
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -14,8 +14,6 @@ RUN set -ex \
     && yum -y install wget gcc epel-release git yum-utils \
     && yum -y install python36 python36-devel \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
-    && rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro \
-    && rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm \
     && yum install -y java-1.8.0-openjdk libtool \
     && mkdir /usr/local/lib/freerdp/ \
     && ln -s /usr/local/lib/freerdp /usr/lib64/freerdp \
