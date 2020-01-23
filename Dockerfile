@@ -86,20 +86,17 @@ VOLUME /opt/jumpserver/data/media
 VOLUME /var/lib/mysql
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
-    BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q
-
-ENV DB_ENGINE=mysql \
+    BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q \
+    DB_ENGINE=mysql \
     DB_HOST=127.0.0.1 \
     DB_PORT=3306 \
     DB_USER=jumpserver \
     DB_PASSWORD=weakPassword \
-    DB_NAME=jumpserver
-
-ENV REDIS_HOST=127.0.0.1 \
+    DB_NAME=jumpserver \
+    REDIS_HOST=127.0.0.1 \
     REDIS_PORT=6379 \
-    REDIS_PASSWORD=
-
-ENV JUMPSERVER_KEY_DIR=/config/guacamole/keys \
+    REDIS_PASSWORD= \
+    JUMPSERVER_KEY_DIR=/config/guacamole/keys \
     GUACAMOLE_HOME=/config/guacamole \
     GUACAMOLE_LOG_LEVEL=ERROR \
     JUMPSERVER_CLEAR_DRIVE_SESSION=true \
