@@ -3,14 +3,10 @@ WORKDIR /opt
 
 ENV VERSION=1.5.6 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.30
+    TOMCAT_VER=9.0.31
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && yum -y install kde-l10n-Chinese glibc-common \
-    && localedef -c -f UTF-8 -i zh_CN zh_CN.UTF-8 \
-    && export LC_ALL=zh_CN.UTF-8 \
-    && echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf \
     && yum -y install wget gcc epel-release git yum-utils \
     && yum -y install python36 python36-devel \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
@@ -23,7 +19,8 @@ RUN set -ex \
     && rpm --import https://nginx.org/keys/nginx_signing.key \
     && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
     && rm -rf /etc/nginx/conf.d/default.conf \
-    && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions \
+    && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions /config/guacamole/record /config/guacamole/drive \
+    && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
     && tar xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
     && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
