@@ -62,7 +62,7 @@ RUN set -ex \
     && ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
     && ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
     && rm -rf guacamole-server-${GUAC_VER} \
-    && tar xf linux-amd64.tar.gz -C /bin/ \
+    && tar xf ssh-forward.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
     && ldconfig \
     && cd /opt \
