@@ -49,7 +49,6 @@ RUN set -ex \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && source /opt/py3/bin/activate \
     && pip install wheel \
-    && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd docker-guacamole \
     && tar xf guacamole-server-${GUAC_VER}.tar.gz \
@@ -63,11 +62,10 @@ RUN set -ex \
     && ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
     && ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
     && rm -rf guacamole-server-${GUAC_VER} \
-    && ldconfig \
-    && cd /opt \
-    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
+    && ldconfig \
+    && cd /opt \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
