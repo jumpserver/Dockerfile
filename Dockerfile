@@ -1,9 +1,9 @@
 FROM centos:7
 WORKDIR /opt
 
-ENV VERSION=1.5.6 \
+ENV VERSION=1.5.7 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.31
+    TOMCAT_VER=9.0.33
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -63,11 +63,10 @@ RUN set -ex \
     && ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
     && ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
     && rm -rf guacamole-server-${GUAC_VER} \
+    && tar xf ssh-forward.tar.gz -C /bin/ \
+    && chmod +x /bin/ssh-forward \
     && ldconfig \
     && cd /opt \
-    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
-    && tar xf linux-amd64.tar.gz -C /bin/ \
-    && chmod +x /bin/ssh-forward \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
