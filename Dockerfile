@@ -1,9 +1,9 @@
 FROM centos:7
 WORKDIR /opt
 
-ENV VERSION=1.5.6 \
+ENV VERSION=1.5.7 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.31
+    TOMCAT_VER=9.0.33
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -49,6 +49,7 @@ RUN set -ex \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && source /opt/py3/bin/activate \
     && pip install wheel \
+    && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd docker-guacamole \
     && tar xf guacamole-server-${GUAC_VER}.tar.gz \
