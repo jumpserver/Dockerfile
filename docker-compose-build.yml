@@ -1,0 +1,153 @@
+version: '3'
+services:
+  mysql:
+    build:
+      context: .
+      dockerfile: mysql/Dockerfile
+      args:
+        Version: ${Version}
+    image: jms_mysql:${Version}
+    container_name: jms_mysql
+    restart: always
+    tty: true
+    environment:
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - jumpserver
+
+  redis:
+    build:
+      context: .
+      dockerfile: redis/Dockerfile
+      args:
+        Version: ${Version}
+    image: jms_redis:${Version}
+    container_name: jms_redis
+    restart: always
+    tty: true
+    environment:
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    volumes:
+      - redis-data:/var/lib/redis/
+    networks:
+      - jumpserver
+
+  core:
+    build:
+      context: .
+      dockerfile: core/Dockerfile
+      args:
+        Version: ${Version}
+    image: jms_core:${Version}
+    container_name: jms_core
+    restart: always
+    tty: true
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    depends_on:
+      - mysql
+      - redis
+    volumes:
+      - static:/opt/jumpserver/data/static
+      - media:/opt/jumpserver/data/media
+    networks:
+      - jumpserver
+
+  koko:
+    build:
+      context: .
+      dockerfile: koko/Dockerfile
+      args:
+        Version: ${Version}
+    image: jms_koko:${Version}
+    container_name: jms_koko
+    restart: always
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+    depends_on:
+      - core
+      - mysql
+      - redis
+    volumes:
+      - koko-keys:/opt/koko/data/keys
+    ports:
+      - 2222:2222
+    networks:
+      - jumpserver
+
+  guacamole:
+    build:
+      context: .
+      dockerfile: guacamole/Dockerfile
+      args:
+        Version: ${Version}
+    image: jms_guacamole:${Version}
+    container_name: jms_guacamole
+    restart: always
+    tty: true
+    environment:
+      JUMPSERVER_SERVER: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      JUMPSERVER_KEY_DIR: /config/guacamole/keys
+      GUACAMOLE_HOME: /config/guacamole
+      GUACAMOLE_LOG_LEVEL: ERROR
+      JUMPSERVER_ENABLE_DRIVE: 'true'
+    depends_on:
+      - core
+      - mysql
+      - redis
+    volumes:
+      - guacamole-keys:/config/guacamole/keys
+    networks:
+      - jumpserver
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+      args:
+        Version: ${Version}
+    image: jms_nginx:${Version}
+    container_name: jms_nginx
+    restart: always
+    tty: true
+    depends_on:
+      - core
+      - koko
+      - mysql
+      - redis
+    volumes:
+      - static:/opt/jumpserver/data/static
+      - media:/opt/jumpserver/data/media
+    ports:
+      - 80:80
+    networks:
+      - jumpserver
+
+volumes:
+  static:
+  media:
+  mysql-data:
+  redis-data:
+  koko-keys:
+  guacamole-keys:
+
+networks:
+  jumpserver:
