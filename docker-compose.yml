@@ -1,7 +1,7 @@
 version: '3'
 services:
   mysql:
-    image: wojiushixiaobai/jms_mysql:${Version}
+    image: jumpserver/jms_mysql:${Version}
     container_name: jms_mysql
     restart: always
     tty: true
@@ -16,7 +16,7 @@ services:
       - jumpserver
 
   redis:
-    image: wojiushixiaobai/jms_redis:${Version}
+    image: jumpserver/jms_redis:${Version}
     container_name: jms_redis
     restart: always
     tty: true
@@ -29,7 +29,7 @@ services:
       - jumpserver
 
   core:
-    image: wojiushixiaobai/jms_core:${Version}
+    image: jumpserver/jms_core:${Version}
     container_name: jms_core
     restart: always
     tty: true
@@ -54,7 +54,7 @@ services:
       - jumpserver
 
   koko:
-    image: wojiushixiaobai/jms_koko:${Version}
+    image: jumpserver/jms_koko:${Version}
     container_name: jms_koko
     restart: always
     tty: true
@@ -73,7 +73,7 @@ services:
       - jumpserver
 
   guacamole:
-    image: wojiushixiaobai/jms_guacamole:${Version}
+    image: jumpserver/jms_guacamole:${Version}
     container_name: jms_guacamole
     restart: always
     tty: true
@@ -94,7 +94,7 @@ services:
       - jumpserver
 
   nginx:
-    image: wojiushixiaobai/jms_nginx:${Version}
+    image: jumpserver/jms_nginx:${Version}
     container_name: jms_nginx
     restart: always
     tty: true
