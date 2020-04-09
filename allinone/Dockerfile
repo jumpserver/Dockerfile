@@ -74,9 +74,9 @@ RUN set -ex \
     && rm -rf /var/cache/yum/* \
     && rm -rf ~/.cache/pip
 
-COPY readme.txt readme.txt
-COPY entrypoint.sh /bin/entrypoint.sh
-RUN chmod +x /bin/entrypoint.sh
+COPY allinone/readme.txt readme.txt
+COPY allinone/entrypoint.sh .
+RUN chmod +x ./entrypoint.sh
 
 VOLUME /opt/jumpserver/data/media
 VOLUME /var/lib/mysql
@@ -99,4 +99,4 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     JUMPSERVER_SERVER=http://127.0.0.1:8080
 
 EXPOSE 80 2222
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
