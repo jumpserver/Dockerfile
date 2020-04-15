@@ -4,7 +4,7 @@ ARG Version=1.5.7
 ENV Version=${Version} \
     LC_ALL=en_US.UTF-8 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.33
+    TOMCAT_VER=9.0.34
 
 RUN set -ex \
     && yum install -y epel-release wget \
