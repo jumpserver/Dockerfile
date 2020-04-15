@@ -16,7 +16,7 @@ if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
     mysql_install_db --user=mysql --datadir=/var/lib/mysql --force
     mysqld_safe &
     sleep 5s
-    mysql -uroot -e "create database $DB_NAME default charset 'utf8';grant all on $DB_NAME.* to '$DB_USER'@'%' identified by '$DB_PASSWORD';flush privileges;";
+    mysql -uroot -e "create database $DB_NAME default charset 'utf8' collate 'utf8_bin';grant all on $DB_NAME.* to '$DB_USER'@'%' identified by '$DB_PASSWORD';flush privileges;";
     mysql --version
     tail -f /var/log/mariadb/mariadb.log
 else
