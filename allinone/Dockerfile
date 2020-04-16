@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=1.5.7
+ARG Version=1.5.8
 ENV VERSION=${Version} \
     GUAC_VER=1.0.0 \
     TOMCAT_VER=9.0.34
