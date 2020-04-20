@@ -43,6 +43,11 @@ if [ ! -f "/opt/koko/config.yml" ]; then
     sed -i "s/BOOTSTRAP_TOKEN: <PleasgeChangeSameWithJumpserver>/BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN/g" /opt/koko/config.yml
     sed -i "s/# LOG_LEVEL: INFO/LOG_LEVEL: ERROR/g" /opt/koko/config.yml
     sed -i "s@# SFTP_ROOT: /tmp@SFTP_ROOT: /@g" /opt/koko/config.yml
+    sed -i "s/# SHARE_ROOM_TYPE: local/SHARE_ROOM_TYPE: redis/g" /opt/koko/config.yml
+    sed -i "s/# REDIS_HOST: 127.0.0.1/REDIS_HOST: $REDIS_HOST/g" /opt/koko/config.yml
+    sed -i "s/# REDIS_PORT: 6379/REDIS_PORT: $REDIS_PORT/g" /opt/koko/config.yml
+    sed -i "s/# REDIS_PASSWORD:/REDIS_PASSWORD: $REDIS_PASSWORD/g" /opt/koko/config.yml
+    sed -i "s/# REDIS_DB_ROOM:/REDIS_DB_ROOM: 6/g" /opt/koko/config.yml
 fi
 
 source /opt/py3/bin/activate

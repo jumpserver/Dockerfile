@@ -1,7 +1,7 @@
 FROM centos:7
 WORKDIR /opt
 ARG Version=1.5.8
-ENV VERSION=${Version} \
+ENV Version=${Version} \
     GUAC_VER=1.0.0 \
     TOMCAT_VER=9.0.34
 
@@ -37,11 +37,11 @@ RUN set -ex \
 RUN set -ex \
     && git clone --depth=1 https://github.com/jumpserver/jumpserver.git \
     && git clone --depth=1 https://github.com/jumpserver/docker-guacamole.git \
-    && wget https://github.com/jumpserver/koko/releases/download/${VERSION}/koko-master-linux-amd64.tar.gz \
+    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-master-linux-amd64.tar.gz \
     && tar xf koko-master-linux-amd64.tar.gz \
     && mv kokodir koko \
     && chown -R root:root koko \
-    && wget https://github.com/jumpserver/luna/releases/download/${VERSION}/luna.tar.gz \
+    && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna.tar.gz \
     && tar xf luna.tar.gz \
     && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
