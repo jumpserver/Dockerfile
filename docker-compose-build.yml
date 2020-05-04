@@ -63,8 +63,7 @@ services:
       - mysql
       - redis
     volumes:
-      - static:/opt/jumpserver/data/static
-      - media:/opt/jumpserver/data/media
+      - core-data:/opt/jumpserver/data
     networks:
       - jumpserver
 
@@ -134,18 +133,16 @@ services:
       - mysql
       - redis
     volumes:
-      - static:/opt/jumpserver/data/static
-      - media:/opt/jumpserver/data/media
+      - core-data:/opt/jumpserver/data
     ports:
       - 80:80
     networks:
       - jumpserver
 
 volumes:
-  static:
-  media:
   mysql-data:
   redis-data:
+  core-data:
   koko-keys:
   guacamole-keys:
 
