@@ -21,7 +21,7 @@ rm -rf /config/guacamole/data/log/*
 rm -rf /config/tomcat9/logs/*
 
 sleep 5s
-while [ "$(curl -I -m 10 -o /dev/null -s -w %{http_code} $JUMPSERVER_SERVER)" != "302" ]
+while [ "$(curl -I -m 10 -L -k -o /dev/null -s -w %{http_code} ${JUMPSERVER_SERVER}/api/health/)" != "200" ]
 do
     echo "wait for jms_core ready"
     sleep 2

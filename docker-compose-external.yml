@@ -1,0 +1,83 @@
+version: '3'
+services:
+  core:
+    image: jumpserver/jms_core:${Version}
+    container_name: jms_core
+    restart: always
+    tty: true
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    volumes:
+      - core-data:/opt/jumpserver/data
+    networks:
+      - jumpserver
+
+  koko:
+    image: jumpserver/jms_koko:${Version}
+    container_name: jms_koko
+    restart: always
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+    depends_on:
+      - core
+    volumes:
+      - koko-keys:/opt/koko/data/keys
+    ports:
+      - 2222:2222
+    networks:
+      - jumpserver
+
+  guacamole:
+    image: jumpserver/jms_guacamole:${Version}
+    container_name: jms_guacamole
+    restart: always
+    tty: true
+    environment:
+      JUMPSERVER_SERVER: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      JUMPSERVER_KEY_DIR: /config/guacamole/keys
+      GUACAMOLE_HOME: /config/guacamole
+      GUACAMOLE_LOG_LEVEL: ERROR
+      JUMPSERVER_ENABLE_DRIVE: 'true'
+    depends_on:
+      - core
+    volumes:
+      - guacamole-keys:/config/guacamole/keys
+    networks:
+      - jumpserver
+
+  nginx:
+    image: jumpserver/jms_nginx:${Version}
+    container_name: jms_nginx
+    restart: always
+    tty: true
+    depends_on:
+      - core
+      - koko
+      - guacamole
+
+    volumes:
+      - core-data:/opt/jumpserver/data
+    ports:
+      - 80:80
+    networks:
+      - jumpserver
+
+volumes:
+  core-data:
+  koko-keys:
+  guacamole-keys:
+
+networks:
+  jumpserver:
