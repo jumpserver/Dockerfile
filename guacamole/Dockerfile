@@ -1,10 +1,10 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=1.5.8
+ARG Version=1.5.9
 ENV Version=${Version} \
     LC_ALL=en_US.UTF-8 \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.34
+    TOMCAT_VER=9.0.35
 
 RUN set -ex \
     && yum install -y epel-release wget \
