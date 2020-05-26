@@ -2,12 +2,12 @@ FROM centos:7
 WORKDIR /opt
 ARG Version=1.5.9
 ENV Version=${Version} \
-    LC_ALL=en_US.UTF-8
-
+    LC_ALL=zh_CN.utf8
 
 RUN set -ex \
     && yum install -y epel-release wget \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "LC_ALL=zh_CN.utf8" > /etc/locale.conf \
     && yum -y install gcc nc \
     && yum -y install python36 python36-devel unzip \
     && wget https://github.com/jumpserver/jumpserver/archive/${Version}.zip \

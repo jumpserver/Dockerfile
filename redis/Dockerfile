@@ -2,11 +2,12 @@ FROM centos:7
 WORKDIR /opt
 ARG Version=1.5.9
 ENV Version=${Version} \
-    LC_ALL=en_US.UTF-8
+    LC_ALL=zh_CN.utf8
 
 RUN set -ex \
     && yum install -y epel-release wget \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "LC_ALL=zh_CN.utf8" > /etc/locale.conf \
     && yum -y install redis \
     && yum remove -y wget \
     && sed -i "s/protected-mode yes/protected-mode no/g" /etc/redis.conf \
