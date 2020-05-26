@@ -4,11 +4,11 @@ ARG Version=1.5.9
 ENV Version=${Version} \
     GUAC_VER=1.0.0 \
     TOMCAT_VER=9.0.34 \
-    LC_ALL=zh_CN.utf8
+    LANG=en_US.utf8
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LC_ALL=zh_CN.utf8" > /etc/locale.conf \
+    && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && yum -y install wget gcc epel-release git yum-utils \
     && yum -y install python36 python36-devel \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \

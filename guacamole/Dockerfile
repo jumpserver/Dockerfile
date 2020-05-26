@@ -4,12 +4,12 @@ ARG Version=1.5.9
 ENV Version=${Version} \
     GUAC_VER=1.0.0 \
     TOMCAT_VER=9.0.35 \
-    LC_ALL=zh_CN.utf8
+    LANG=en_US.utf8
 
 RUN set -ex \
     && yum install -y epel-release wget \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LC_ALL=zh_CN.utf8" > /etc/locale.conf \
+    && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && mkdir /usr/local/lib/freerdp/ \
     && ln -s /usr/local/lib/freerdp /usr/lib64/freerdp \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
