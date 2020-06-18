@@ -43,9 +43,9 @@ RUN set -ex \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-master-linux-amd64.tar.gz \
     && tar -xf koko-master-linux-amd64.tar.gz \
     && mv kokodir koko \
-    && wget -O guacamole.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && wget -O guacamole.tar.gz https://github.com/jumpserver/guacamole/archive/${Version}.tar.gz \
     && tar -xf guacamole.tar.gz \
-    && mv docker-guacamole-${Version} guacamole \
+    && mv guacamole-${Version} guacamole \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina.tar.gz \
     && tar -xf lina.tar.gz \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna.tar.gz \
@@ -57,7 +57,7 @@ RUN set -ex \
     && pip install wheel \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
-    && cd docker-guacamole \
+    && cd guacamole \
     && tar xf guacamole-server-${GUAC_VER}.tar.gz \
     && cd guacamole-server-${GUAC_VER} \
     && autoreconf -fi \
@@ -65,9 +65,9 @@ RUN set -ex \
     && make \
     && make install \
     && cd .. \
-    && ln -sf /opt/docker-guacamole/guacamole-${GUAC_VER}.war /config/tomcat9/webapps/ROOT.war \
-    && ln -sf /opt/docker-guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
-    && ln -sf /opt/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
+    && ln -sf /opt/guacamole/guacamole-${GUAC_VER}.war /config/tomcat9/webapps/ROOT.war \
+    && ln -sf /opt/guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
+    && ln -sf /opt/guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
     && rm -rf guacamole-server-${GUAC_VER} \
     && tar xf ssh-forward.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
