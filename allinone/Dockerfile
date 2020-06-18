@@ -38,7 +38,7 @@ RUN set -ex \
 
 RUN set -ex \
     && wget -O jumpserver.tar.gz https://github.com/jumpserver/jumpserver/archive/${Version}.tar.gz \
-    && tar -xf ${Version}.tar.gz \
+    && tar -xf jumpserver.tar.gz \
     && mv jumpserver-${Version} jumpserver \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-master-linux-amd64.tar.gz \
     && tar -xf koko-master-linux-amd64.tar.gz \
