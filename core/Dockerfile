@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=1.5.9
+ARG Version=2.0.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -9,9 +9,9 @@ RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && yum -y install gcc nc \
-    && yum -y install python36 python36-devel unzip \
-    && wget https://github.com/jumpserver/jumpserver/archive/${Version}.zip \
-    && unzip ${Version}.zip \
+    && yum -y install python36 python36-devel \
+    && wget https://github.com/jumpserver/jumpserver/archive/${Version}.tar.gz \
+    && tar -xf ${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
     && chown -R root:root jumpserver \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
@@ -23,7 +23,7 @@ RUN set -ex \
     && yum remove -y wget gcc unzip \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
-    && rm -rf /opt/${Version}.zip \
+    && rm -rf /opt/*.tar.gz \
     && rm -rf /var/cache/yum* \
     && rm -rf ~/.cache/pip
 

@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=1.5.9
+ARG Version=2.0.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -13,8 +13,9 @@ RUN set -ex \
     && echo > /etc/nginx/conf.d/default.conf \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna.tar.gz \
     && tar -xf luna.tar.gz \
-    && chown -R root:root luna \
-    && rm -rf luna.tar.gz \
+    && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina.tar.gz \
+    && tar -xf lina.tar.gz \
+    && rm -rf /opt/*.tar.gz \
     && yum remove -y wget \
     && yum clean all \
     && rm -rf /var/tmp/yum*

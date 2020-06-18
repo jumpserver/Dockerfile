@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=1.5.9
+ARG Version=2.0.0
 ENV Version=${Version} \
     GUAC_VER=1.0.0 \
     TOMCAT_VER=9.0.34 \
@@ -37,15 +37,19 @@ RUN set -ex \
     && rm -rf /var/cache/yum/*
 
 RUN set -ex \
-    && git clone --depth=1 https://github.com/jumpserver/jumpserver.git \
-    && git clone --depth=1 https://github.com/jumpserver/docker-guacamole.git \
+    && wget -O jumpserver.tar.gz https://github.com/jumpserver/jumpserver/archive/${Version}.tar.gz \
+    && tar -xf ${Version}.tar.gz \
+    && mv jumpserver-${Version} jumpserver \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-master-linux-amd64.tar.gz \
-    && tar xf koko-master-linux-amd64.tar.gz \
+    && tar -xf koko-master-linux-amd64.tar.gz \
     && mv kokodir koko \
-    && chown -R root:root koko \
+    && wget -O guacamole.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && tar -xf guacamole.tar.gz \
+    && mv docker-guacamole-${Version} guacamole \
+    && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina.tar.gz \
+    && tar -xf lina.tar.gz \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna.tar.gz \
     && tar xf luna.tar.gz \
-    && chown -R root:root luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
@@ -69,7 +73,7 @@ RUN set -ex \
     && chmod +x /bin/ssh-forward \
     && ldconfig \
     && cd /opt \
-    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/jumpserver.conf \
+    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/${Version}/jumpserver.conf \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
     && rm -rf /opt/*.tar.gz \
