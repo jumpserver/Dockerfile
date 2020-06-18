@@ -3,7 +3,7 @@ WORKDIR /opt
 ARG Version=2.0.0
 ENV Version=${Version} \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.34 \
+    TOMCAT_VER=9.0.36 \
     LANG=en_US.utf8
 
 RUN set -ex \
