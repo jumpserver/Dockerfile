@@ -45,7 +45,7 @@ RUN set -ex \
     && mv kokodir koko \
     && wget -O guacamole.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
     && tar -xf guacamole.tar.gz \
-    && mv docker-guacamole-${Version} docker-guacamole \
+    && mv docker-guacamole-${Version} guacamole \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina.tar.gz \
     && tar -xf lina.tar.gz \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna.tar.gz \
