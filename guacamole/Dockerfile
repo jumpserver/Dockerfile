@@ -3,7 +3,6 @@ WORKDIR /opt
 ARG Version=2.0.0
 ENV Version=${Version} \
     GUAC_VER=1.0.0 \
-    TOMCAT_VER=9.0.36 \
     LANG=en_US.utf8
 
 RUN set -ex \
@@ -19,6 +18,7 @@ RUN set -ex \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/record /config/guacamole/drive \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && cd /config \
+    && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
     && tar xf apache-tomcat-${TOMCAT_VER}.tar.gz \
     && mv apache-tomcat-${TOMCAT_VER} tomcat9 \
