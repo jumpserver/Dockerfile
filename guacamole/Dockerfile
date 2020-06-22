@@ -12,7 +12,7 @@ RUN set -ex \
     && mkdir /usr/local/lib/freerdp/ \
     && ln -s /usr/local/lib/freerdp /usr/lib64/freerdp \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
-    && yum install -y make gcc libtool java-1.8.0-openjdk wget unzip \
+    && yum install -y make gcc libtool java-1.8.0-openjdk wget \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel \
     && yum install -y ffmpeg-devel freerdp1.2-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/record /config/guacamole/drive \
@@ -52,7 +52,7 @@ RUN set -ex \
     && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
-    && yum remove -y wget gcc make unzip \
+    && yum remove -y wget gcc make \
     && rm -rf /config/linux-amd64.tar.gz \
     && rm -rf /config/docker-guacamole \
     && yum clean all \
