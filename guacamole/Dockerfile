@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=2.0.0
+ARG Version=2.0.1
 ENV Version=${Version} \
     GUAC_VER=1.0.0 \
     LANG=en_US.utf8
