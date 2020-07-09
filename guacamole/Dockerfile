@@ -22,7 +22,7 @@ RUN set -ex \
     && cd /config \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && tar xf apache-tomcat-${TOMCAT_VER}.tar.gz \
+    && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz \
     && mv apache-tomcat-${TOMCAT_VER} tomcat9 \
     && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
     && rm -rf tomcat9/webapps/* \
@@ -38,14 +38,14 @@ RUN set -ex \
     && mv docker-guacamole-${Version} docker-guacamole \
     && chown -R root:root docker-guacamole \
     && cd /config/docker-guacamole \
-    && tar xf guacamole-server-1.2.0.tar.gz \
+    && tar -xf guacamole-server-1.2.0.tar.gz \
     && cd guacamole-server-1.2.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
     && make install \
     && ldconfig \
     && cd .. \
-    && tar xf linux-amd64.tar.gz -C /bin/ \
+    && tar -xf ssh-forward.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
     && rm -rf guacamole-server-1.2.0 \
     && cd /config \

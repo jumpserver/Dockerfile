@@ -21,7 +21,7 @@ RUN set -ex \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && tar xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
+    && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
     && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
     && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
     && rm -rf /config/tomcat9/webapps/* \
@@ -47,7 +47,7 @@ RUN set -ex \
     && tar -xf lina-v${Version}.tar.gz \
     && mv lina-v${Version} lina \
     && wget https://github.com/jumpserver/luna/releases/download/v${Version}/luna-v${Version}.tar.gz \
-    && tar xf luna-v${Version}.tar.gz \
+    && tar -xf luna-v${Version}.tar.gz \
     && mv luna-v${Version} luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
@@ -57,7 +57,7 @@ RUN set -ex \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd guacamole \
-    && tar xf guacamole-server-1.2.0.tar.gz \
+    && tar -xf guacamole-server-1.2.0.tar.gz \
     && cd guacamole-server-1.2.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
@@ -67,7 +67,7 @@ RUN set -ex \
     && ln -sf /opt/guacamole/guacamole-auth-jumpserver-1.0.0.jar /config/guacamole/extensions/guacamole-auth-jumpserver-1.0.0.jar \
     && ln -sf /opt/guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
     && rm -rf guacamole-server-1.2.0 \
-    && tar xf ssh-forward.tar.gz -C /bin/ \
+    && tar -xf ssh-forward.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
     && ldconfig \
     && cd /opt \
