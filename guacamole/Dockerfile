@@ -1,20 +1,22 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=2.0.1
+ARG Version=2.0.2
 ENV Version=${Version} \
-    GUAC_VER=1.0.0 \
     LANG=en_US.utf8
 
 RUN set -ex \
     && yum install -y epel-release wget \
+    && wget -qO /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
+    && wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo \
+    && sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo \
+    && sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/epel.repo \
+    && yum clean all \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
-    && mkdir /usr/local/lib/freerdp/ \
-    && ln -s /usr/local/lib/freerdp /usr/lib64/freerdp \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
-    && yum install -y make gcc libtool java-1.8.0-openjdk wget \
-    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel \
-    && yum install -y ffmpeg-devel freerdp1.2-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
+    && yum install -y make gcc java-1.8.0-openjdk \
+    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
+    && yum install -y ffmpeg-devel freerdp-devel libssh2-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/record /config/guacamole/drive \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && cd /config \
@@ -36,22 +38,20 @@ RUN set -ex \
     && mv docker-guacamole-${Version} docker-guacamole \
     && chown -R root:root docker-guacamole \
     && cd /config/docker-guacamole \
-    && tar xf guacamole-server-${GUAC_VER}.tar.gz \
-    && cd guacamole-server-${GUAC_VER} \
-    && autoreconf -fi \
+    && tar xf guacamole-server-1.2.0.tar.gz \
+    && cd guacamole-server-1.2.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
     && make install \
     && ldconfig \
     && cd .. \
-    && rm -rf guacamole-server-${GUAC_VER} \
-    && cd /config \
-    && mv /config/docker-guacamole/guacamole-${GUAC_VER}.war /config/tomcat9/webapps/ROOT.war \
-    && mv /config/docker-guacamole/guacamole-auth-jumpserver-${GUAC_VER}.jar /config/guacamole/extensions/guacamole-auth-jumpserver-${GUAC_VER}.jar \
-    && mv /config/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
-    && wget https://github.com/ibuler/ssh-forward/releases/download/v0.0.5/linux-amd64.tar.gz \
     && tar xf linux-amd64.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
+    && rm -rf guacamole-server-1.2.0 \
+    && cd /config \
+    && mv /config/docker-guacamole/guacamole-1.0.0.war /config/tomcat9/webapps/ROOT.war \
+    && mv /config/docker-guacamole/guacamole-auth-jumpserver-1.0.0.jar /config/guacamole/extensions/guacamole-auth-jumpserver-1.0.0.jar \
+    && mv /config/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
     && yum remove -y wget gcc make \
     && rm -rf /config/linux-amd64.tar.gz \
     && rm -rf /config/docker-guacamole \
