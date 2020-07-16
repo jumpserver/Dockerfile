@@ -40,9 +40,9 @@ RUN set -ex \
     && wget https://github.com/jumpserver/koko/releases/download/v${Version}/koko-v${Version}-linux-amd64.tar.gz \
     && tar -xf koko-v${Version}-linux-amd64.tar.gz \
     && mv koko-v${Version}-linux-amd64 koko \
-    && wget -O guacamole-v${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && wget -O guacamole-v${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/v${Version}.tar.gz \
     && tar -xf guacamole-v${Version}.tar.gz \
-    && mv docker-guacamole-${Version} guacamole \
+    && mv docker-guacamole-v${Version} guacamole \
     && wget https://github.com/jumpserver/lina/releases/download/v${Version}/lina-v${Version}.tar.gz \
     && tar -xf lina-v${Version}.tar.gz \
     && mv lina-v${Version} lina \
