@@ -35,7 +35,7 @@ RUN set -ex \
     && wget https://github.com/jumpserver/docker-guacamole/archive/v${Version}.tar.gz \
     && tar -xf v${Version}.tar.gz \
     && rm -rf v${Version}.tar.gz \
-    && mv docker-guacamole-v${Version} docker-guacamole \
+    && mv docker-guacamole-${Version} docker-guacamole \
     && chown -R root:root docker-guacamole \
     && cd /config/docker-guacamole \
     && tar -xf guacamole-server-1.2.0.tar.gz \
