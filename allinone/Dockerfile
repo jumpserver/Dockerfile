@@ -83,7 +83,7 @@ COPY allinone/readme.txt readme.txt
 COPY allinone/entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
 
-VOLUME /opt/jumpserver/data/media
+VOLUME /opt/jumpserver/data
 VOLUME /var/lib/mysql
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
