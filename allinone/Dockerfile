@@ -71,7 +71,7 @@ RUN set -ex \
     && chmod +x /bin/ssh-forward \
     && ldconfig \
     && cd /opt \
-    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/${Version}/jumpserver.conf \
+    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && chown -R root:root /opt/* \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
