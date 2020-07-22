@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=2.1.0
+ARG Version=v2.1.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -32,10 +32,10 @@ RUN set -ex \
     && sed -i 's/# export/export/g' /root/.bashrc \
     && sed -i 's/# alias l/alias l/g' /root/.bashrc \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
-    && wget https://github.com/jumpserver/docker-guacamole/archive/v${Version}.tar.gz \
-    && tar -xf v${Version}.tar.gz \
-    && rm -rf v${Version}.tar.gz \
-    && mv docker-guacamole-${Version} docker-guacamole \
+    && wget https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && mkdir /opt/docker-guacamole \
+    && tar -xf ${Version}.tar.gz -C /opt/docker-guacamole --strip-components 1 \
+    && rm -rf ${Version}.tar.gz \
     && chown -R root:root docker-guacamole \
     && cd /config/docker-guacamole \
     && tar -xf guacamole-server-1.2.0.tar.gz \

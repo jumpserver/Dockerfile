@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=2.1.0
+ARG Version=v2.1.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -34,21 +34,22 @@ RUN set -ex \
     && rm -rf /var/cache/yum/*
 
 RUN set -ex \
-    && wget https://github.com/jumpserver/jumpserver/releases/download/v${Version}/jumpserver-v${Version}.tar.gz \
-    && tar -xf jumpserver-v${Version}.tar.gz \
-    && mv jumpserver-v${Version} jumpserver \
-    && wget https://github.com/jumpserver/koko/releases/download/v${Version}/koko-v${Version}-linux-amd64.tar.gz \
-    && tar -xf koko-v${Version}-linux-amd64.tar.gz \
-    && mv koko-v${Version}-linux-amd64 koko \
-    && wget -O guacamole-v${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/v${Version}.tar.gz \
-    && tar -xf guacamole-v${Version}.tar.gz \
+    && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
+    && tar -xf jumpserver-${Version}.tar.gz \
+    && mv jumpserver-${Version} jumpserver \
+    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
+    && tar -xf koko-${Version}-linux-amd64.tar.gz \
+    && mv koko-${Version}-linux-amd64 koko \
+    && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && mkdir /opt/docker-guacamole \
+    && tar -xf guacamole-${Version}.tar.gz -C /opt/docker-guacamole --strip-components 1 \
     && mv docker-guacamole-${Version} guacamole \
-    && wget https://github.com/jumpserver/lina/releases/download/v${Version}/lina-v${Version}.tar.gz \
-    && tar -xf lina-v${Version}.tar.gz \
-    && mv lina-v${Version} lina \
-    && wget https://github.com/jumpserver/luna/releases/download/v${Version}/luna-v${Version}.tar.gz \
-    && tar -xf luna-v${Version}.tar.gz \
-    && mv luna-v${Version} luna \
+    && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
+    && tar -xf lina-${Version}.tar.gz \
+    && mv lina-${Version} lina \
+    && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna-${Version}.tar.gz \
+    && tar -xf luna-${Version}.tar.gz \
+    && mv luna-${Version} luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \

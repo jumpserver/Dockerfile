@@ -16,5 +16,7 @@ jobs:
       run: |
         TAG=$(basename ${GITHUB_REF})
         echo "::set-output name=TAG::$TAG"
-    - name: Build the Docker image
-      run: docker build --build-arg Version=${{ steps.get_tag.outputs.TAG }} . --file ./allinone/Dockerfile --tag jumpserver:latest 
+    - name: Build Docker Image
+      run: docker build --build-arg Version=${{ steps.get_tag.outputs.TAG }} . --file ./allinone/Dockerfile --tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
+    - name: Docker Tag Rename
+      run: docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_all:latest

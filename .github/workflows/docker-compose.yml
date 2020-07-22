@@ -2,24 +2,19 @@ name: Docker Compose Image CI
 
 on:
   push:
-    # Publish `master` as Docker `latest` image.
-    branches:
-      - master
-
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
 
-  # Run tests for any PRs.
-  pull_request:
-
 jobs:
-  # Run tests.
-  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      - name: Build image
-        run: docker-compose --file docker-compose-build.yml build
+    - uses: actions/checkout@v2
+    - name: Get tag
+      id: get_tag
+      run: |
+        TAG=$(basename ${GITHUB_REF})
+        echo "::set-output name=TAG::$TAG"
+    - name: Build Docker-Compose image
+      run: docker-compose --file docker-compose-build.yml build --build-arg Version=${{ steps.get_tag.outputs.TAG }}

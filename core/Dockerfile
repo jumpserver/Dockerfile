@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=2.1.0
+ARG Version=v2.1.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -10,9 +10,9 @@ RUN set -ex \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && yum -y install gcc nc \
     && yum -y install python36 python36-devel \
-    && wget https://github.com/jumpserver/jumpserver/releases/download/v${Version}/jumpserver-v${Version}.tar.gz \
-    && tar -xf jumpserver-v${Version}.tar.gz \
-    && mv jumpserver-v${Version} jumpserver \
+    && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
+    && tar -xf jumpserver-${Version}.tar.gz \
+    && mv jumpserver-${Version} jumpserver \
     && chown -R root:root jumpserver \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && python3.6 -m venv /opt/py3 \

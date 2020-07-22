@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=2.1.0
+ARG Version=v2.1.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -9,9 +9,9 @@ RUN set -ex \
    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
    && echo "LANG=en_US.utf8" > /etc/locale.conf \
    && yum -y install mariadb \
-   && wget https://github.com/jumpserver/koko/releases/download/v${Version}/koko-v${Version}-linux-amd64.tar.gz \
-   && tar -xf koko-v${Version}-linux-amd64.tar.gz \
-   && mv koko-v${Version}-linux-amd64 koko \
+   && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
+   && tar -xf koko-${Version}-linux-amd64.tar.gz \
+   && mv koko-${Version}-linux-amd64 koko \
    && chown -R root:root koko \
    && rm -rf /opt/*.tar.gz \
    && yum remove -y wget \
