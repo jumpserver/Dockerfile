@@ -2,8 +2,8 @@ name: Docker Compose Image CI
 
 on:
   push:
-    branches:
-      - master
+    # branches:
+      # - master
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
