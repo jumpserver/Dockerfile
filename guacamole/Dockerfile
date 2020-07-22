@@ -33,10 +33,10 @@ RUN set -ex \
     && sed -i 's/# alias l/alias l/g' /root/.bashrc \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
-    && mkdir /opt/docker-guacamole \
-    && tar -xf ${Version}.tar.gz -C /opt/docker-guacamole --strip-components 1 \
+    && mkdir /config/docker-guacamole \
+    && tar -xf ${Version}.tar.gz -C /config/docker-guacamole --strip-components 1 \
     && rm -rf ${Version}.tar.gz \
-    && chown -R root:root docker-guacamole \
+    && chown -R root:root /config/docker-guacamole \
     && cd /config/docker-guacamole \
     && tar -xf guacamole-server-1.2.0.tar.gz \
     && cd guacamole-server-1.2.0 \
