@@ -2,24 +2,19 @@ name: Docker Image CI
 
 on:
   push:
-    # Publish `master` as Docker `latest` image.
-    branches:
-      - master
-
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
 
-  # Run tests for any PRs.
-  pull_request:
-
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
+    - name: Get tag
+      id: get_tag
+      run: |
+        TAG=$(basename ${GITHUB_REF})
+        echo "::set-output name=TAG::$TAG"
     - name: Build the Docker image
-      run: docker build . --file ./allinone/Dockerfile --tag jumpserver:latest
+      run: docker build --build-arg Version=${{ steps.get_tag.outputs.TAG }} . --file ./allinone/Dockerfile --tag jumpserver:latest 
