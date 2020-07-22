@@ -6,7 +6,7 @@ services:
       dockerfile: mysql/Dockerfile
       args:
         Version: ${Version}
-    image: jms_mysql:${Version}
+    image: jumpserver/jms_mysql:${Version}
     container_name: jms_mysql
     restart: always
     tty: true
@@ -26,7 +26,7 @@ services:
       dockerfile: redis/Dockerfile
       args:
         Version: ${Version}
-    image: jms_redis:${Version}
+    image: jumpserver/jms_redis:${Version}
     container_name: jms_redis
     restart: always
     tty: true
@@ -44,7 +44,7 @@ services:
       dockerfile: core/Dockerfile
       args:
         Version: ${Version}
-    image: jms_core:${Version}
+    image: jumpserver/jms_core:${Version}
     container_name: jms_core
     restart: always
     tty: true
@@ -73,7 +73,7 @@ services:
       dockerfile: koko/Dockerfile
       args:
         Version: ${Version}
-    image: jms_koko:${Version}
+    image: jumpserver/jms_koko:${Version}
     container_name: jms_koko
     restart: always
     tty: true
@@ -97,7 +97,7 @@ services:
       dockerfile: guacamole/Dockerfile
       args:
         Version: ${Version}
-    image: jms_guacamole:${Version}
+    image: jumpserver/jms_guacamole:${Version}
     container_name: jms_guacamole
     restart: always
     tty: true
@@ -123,7 +123,7 @@ services:
       dockerfile: nginx/Dockerfile
       args:
         Version: ${Version}
-    image: jms_nginx:${Version}
+    image: jumpserver/jms_nginx:${Version}
     container_name: jms_nginx
     restart: always
     tty: true
