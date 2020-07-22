@@ -43,7 +43,6 @@ RUN set -ex \
     && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
     && mkdir /opt/docker-guacamole \
     && tar -xf guacamole-${Version}.tar.gz -C /opt/docker-guacamole --strip-components 1 \
-    && mv docker-guacamole-${Version} guacamole \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
