@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.1.0
+ARG Version=v2.1.1
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -16,7 +16,10 @@ RUN set -ex \
     && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
     && rpm --import https://nginx.org/keys/nginx_signing.key \
     && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
+    && python3.6 -m venv /opt/py3 \
+    && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && rm -rf /etc/nginx/conf.d/default.conf \
+    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions /config/guacamole/record /config/guacamole/drive \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
@@ -30,7 +33,20 @@ RUN set -ex \
     && sed -i 's/level = INFO/level = OFF/g' /config/tomcat9/conf/logging.properties \
     && sed -i 's@CATALINA_OUT="$CATALINA_BASE"/logs/catalina.out@CATALINA_OUT=/dev/null@g' /config/tomcat9/bin/catalina.sh \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
+    && tar -xf guacamole-server-1.2.0.tar.gz \
+    && cd guacamole-server-1.2.0 \
+    && ./configure --with-init-dir=/etc/init.d \
+    && make \
+    && make install \
+    && ldconfig \
+    && cd .. \
+    && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
+    && tar -xf guacamole-client-${Version}.tar.gz \
+    && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
+    && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && yum clean all \
+    && rm -rf guacamole-server-1.2.0 guacamole-server-1.2.0.tar.gz guacamole-client-${Version} guacamole-client-${Version}.tar.gz \
     && rm -rf /var/cache/yum/*
 
 RUN set -ex \
@@ -40,7 +56,7 @@ RUN set -ex \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
     && tar -xf koko-${Version}-linux-amd64.tar.gz \
     && mv koko-${Version}-linux-amd64 koko \
-    && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
     && mkdir /opt/guacamole \
     && tar -xf guacamole-${Version}.tar.gz -C /opt/guacamole --strip-components 1 \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
@@ -50,30 +66,19 @@ RUN set -ex \
     && tar -xf luna-${Version}.tar.gz \
     && mv luna-${Version} luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
-    && python3.6 -m venv /opt/py3 \
-    && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && source /opt/py3/bin/activate \
     && pip install wheel \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd guacamole \
-    && tar -xf guacamole-server-1.2.0.tar.gz \
-    && cd guacamole-server-1.2.0 \
-    && ./configure --with-init-dir=/etc/init.d \
-    && make \
-    && make install \
-    && cd .. \
-    && ln -sf /opt/guacamole/guacamole-1.0.0.war /config/tomcat9/webapps/ROOT.war \
-    && ln -sf /opt/guacamole/guacamole-auth-jumpserver-1.0.0.jar /config/guacamole/extensions/guacamole-auth-jumpserver-1.0.0.jar \
-    && ln -sf /opt/guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
-    && rm -rf guacamole-server-1.2.0 \
+    && mv /opt/guacamole/guacamole.properties /config/guacamole/ \
+    && wget http://download.jumpserver.org/public/ssh-forward.tar.gz \
     && tar -xf ssh-forward.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
-    && ldconfig \
     && cd /opt \
-    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && chown -R root:root /opt/* \
     && yum clean all \
+    && rm -rf /opt/guacamole \
     && rm -rf /var/cache/yum/* \
     && rm -rf /opt/*.tar.gz \
     && rm -rf /var/cache/yum/* \

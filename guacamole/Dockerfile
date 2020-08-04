@@ -1,15 +1,11 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.1.0
+ARG Version=v2.1.1
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && yum install -y epel-release wget \
-    && wget -qO /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
-    && wget -qO /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo \
-    && sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo \
-    && sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/epel.repo \
     && yum clean all \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
@@ -32,12 +28,13 @@ RUN set -ex \
     && sed -i 's/# export/export/g' /root/.bashrc \
     && sed -i 's/# alias l/alias l/g' /root/.bashrc \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
-    && wget https://github.com/jumpserver/docker-guacamole/archive/${Version}.tar.gz \
+    && wget -O docker-guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
     && mkdir /config/docker-guacamole \
-    && tar -xf ${Version}.tar.gz -C /config/docker-guacamole --strip-components 1 \
-    && rm -rf ${Version}.tar.gz \
+    && tar -xf docker-guacamole-${Version}.tar.gz -C /config/docker-guacamole --strip-components 1 \
+    && rm -rf docker-guacamole-${Version}.tar.gz \
     && chown -R root:root /config/docker-guacamole \
     && cd /config/docker-guacamole \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
     && tar -xf guacamole-server-1.2.0.tar.gz \
     && cd guacamole-server-1.2.0 \
     && ./configure --with-init-dir=/etc/init.d \
@@ -45,15 +42,16 @@ RUN set -ex \
     && make install \
     && ldconfig \
     && cd .. \
+    && wget http://download.jumpserver.org/public/ssh-forward.tar.gz \
     && tar -xf ssh-forward.tar.gz -C /bin/ \
     && chmod +x /bin/ssh-forward \
-    && rm -rf guacamole-server-1.2.0 \
+    && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
+    && tar -xf guacamole-client-${Version}.tar.gz \
+    && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
+    && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && cd /config \
-    && mv /config/docker-guacamole/guacamole-1.0.0.war /config/tomcat9/webapps/ROOT.war \
-    && mv /config/docker-guacamole/guacamole-auth-jumpserver-1.0.0.jar /config/guacamole/extensions/guacamole-auth-jumpserver-1.0.0.jar \
-    && mv /config/docker-guacamole/root/app/guacamole/guacamole.properties /config/guacamole/guacamole.properties \
+    && mv /config/docker-guacamole/guacamole.properties /config/guacamole/ \
     && yum remove -y wget gcc make \
-    && rm -rf /config/linux-amd64.tar.gz \
     && rm -rf /config/docker-guacamole \
     && yum clean all \
     && rm -rf /var/tmp/yum*
