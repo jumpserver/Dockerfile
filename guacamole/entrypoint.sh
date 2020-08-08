@@ -13,9 +13,6 @@ fi
 if [ ! $JUMPSERVER_ENABLE_DRIVE ]; then
     export JUMPSERVER_ENABLE_DRIVE=true
 fi
-if [ ! $JUMPSERVER_CLEAR_DRIVE_SESSION ]; then
-    export JUMPSERVER_CLEAR_DRIVE_SESSION=true
-fi
 
 rm -rf /config/guacamole/data/log/*
 rm -rf /config/tomcat9/logs/*
