@@ -18,6 +18,10 @@ if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml
 fi
 
+if [ ! $LOG_LEVEL ]; then
+    export LOG_LEVEL=ERROR
+fi
+
 if [ ! $WINDOWS_SKIP_ALL_MANUAL_PASSWORD ]; then
     export WINDOWS_SKIP_ALL_MANUAL_PASSWORD=True
 fi

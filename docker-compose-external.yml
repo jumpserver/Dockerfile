@@ -8,6 +8,7 @@ services:
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
       DB_USER: $DB_USER
@@ -29,6 +30,7 @@ services:
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
     volumes:
@@ -46,10 +48,7 @@ services:
     environment:
       JUMPSERVER_SERVER: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      JUMPSERVER_KEY_DIR: /config/guacamole/keys
-      GUACAMOLE_HOME: /config/guacamole
-      GUACAMOLE_LOG_LEVEL: ERROR
-      JUMPSERVER_ENABLE_DRIVE: 'true'
+      GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
     volumes:
