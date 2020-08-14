@@ -8,8 +8,8 @@ RUN set -ex \
     && yum install -y epel-release wget \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
-    && echo "net.core.somaxconn = 1024" >> etc/sysctl.conf \
-    && echo "vm.overcommit_memory = 1" >> etc/sysctl.conf \
+    && echo "net.core.somaxconn = 1024" >> /etc/sysctl.conf \
+    && echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf \
     && echo never > /sys/kernel/mm/transparent_hugepage/enabled \
     && sysctl -p \
     && yum -y install redis \
