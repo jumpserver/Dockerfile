@@ -9,8 +9,6 @@ RUN set -ex \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && echo "net.core.somaxconn = 1024" >> /etc/sysctl.conf \
     && echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf \
-    && echo never > /sys/kernel/mm/transparent_hugepage/enabled \
-    && sysctl -p \
     && yum -y install wget gcc epel-release git yum-utils \
     && yum -y install python36 python36-devel \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \

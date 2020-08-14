@@ -10,8 +10,6 @@ RUN set -ex \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && echo "net.core.somaxconn = 1024" >> /etc/sysctl.conf \
     && echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf \
-    && echo never > /sys/kernel/mm/transparent_hugepage/enabled \
-    && sysctl -p \
     && yum -y install redis \
     && yum remove -y wget \
     && sed -i "s/protected-mode yes/protected-mode no/g" /etc/redis.conf \
