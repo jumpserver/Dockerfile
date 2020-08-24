@@ -44,7 +44,7 @@ RUN set -ex \
     && cd .. \
     && wget http://download.jumpserver.org/public/ssh-forward.tar.gz \
     && tar -xf ssh-forward.tar.gz -C /bin/ \
-    && chmod +x /bin/ssh-forward \
+    && chmod 755 /bin/ssh-forward \
     && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
     && tar -xf guacamole-client-${Version}.tar.gz \
     && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \

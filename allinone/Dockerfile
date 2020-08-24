@@ -58,6 +58,11 @@ RUN set -ex \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
     && tar -xf koko-${Version}-linux-amd64.tar.gz \
     && mv koko-${Version}-linux-amd64 koko \
+    && mv /opt/koko/kubectl /usr/local/bin/ \
+    && wget https://download.jumpserver.org/public/kubectl.tar.gz \
+    && tar -xf kubectl.tar.gz \
+    && chmod 755 kubectl \
+    && mv kubectl /usr/local/bin/rawkubectl \
     && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
     && mkdir /opt/guacamole \
     && tar -xf guacamole-${Version}.tar.gz -C /opt/guacamole --strip-components 1 \
@@ -76,7 +81,7 @@ RUN set -ex \
     && mv /opt/guacamole/guacamole.properties /config/guacamole/ \
     && wget http://download.jumpserver.org/public/ssh-forward.tar.gz \
     && tar -xf ssh-forward.tar.gz -C /bin/ \
-    && chmod +x /bin/ssh-forward \
+    && chmod 755 /bin/ssh-forward \
     && cd /opt \
     && chown -R root:root /opt/* \
     && yum clean all \
