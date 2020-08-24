@@ -13,6 +13,11 @@ RUN set -ex \
    && tar -xf koko-${Version}-linux-amd64.tar.gz \
    && mv koko-${Version}-linux-amd64 koko \
    && chown -R root:root koko \
+   && mv /opt/koko/kubectl /usr/local/bin/ \
+   && wget https://download.jumpserver.org/public/kubectl.tar.gz \
+   && tar -xf kubectl.tar.gz \
+   && chmod 755 kubectl \
+   && mv kubectl /usr/local/bin/rawkubectl \
    && rm -rf /opt/*.tar.gz \
    && yum remove -y wget \
    && yum clean all \
