@@ -57,6 +57,7 @@ services:
     image: jumpserver/jms_koko:${Version}
     container_name: jms_koko
     restart: always
+    privileged: true
     tty: true
     environment:
       CORE_HOST: http://core:8080
