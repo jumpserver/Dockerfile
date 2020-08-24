@@ -8,7 +8,7 @@ RUN set -ex \
    && yum install -y wget \
    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
    && echo "LANG=en_US.utf8" > /etc/locale.conf \
-   && yum -y install mariadb \
+   && yum -y install mariadb bash-completion \
    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
    && tar -xf koko-${Version}-linux-amd64.tar.gz \
    && mv koko-${Version}-linux-amd64 koko \
@@ -16,8 +16,14 @@ RUN set -ex \
    && mv /opt/koko/kubectl /usr/local/bin/ \
    && wget https://download.jumpserver.org/public/kubectl.tar.gz \
    && tar -xf kubectl.tar.gz \
-   && chmod 755 kubectl \
+   && chmod 755 ./kubectl \
+   && chown root:root ./kubectl \
    && mv kubectl /usr/local/bin/rawkubectl \
+   && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
+   && mkdir /opt/kubectl-aliases/ \
+   && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
+   && chown -R root:root /opt/kubectl-aliases/ \
+   && chmod 755 /opt/koko/init-kubectl.sh \
    && rm -rf /opt/*.tar.gz \
    && yum remove -y wget \
    && yum clean all \
