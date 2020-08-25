@@ -18,8 +18,10 @@ jobs:
       run: |
         TAG=$(basename ${GITHUB_REF})
         echo "::set-output name=TAG::$TAG"
+    - name: Update Version
+      run: sed -i "s/Version=v2.2.0/Version=${{ steps.get_tag.outputs.TAG }}" .env
     - name: Build Docker-Compose image
-      run: docker-compose --file docker-compose-build.yml build --build-arg Version=${{ steps.get_tag.outputs.TAG }}
+      run: docker-compose --file docker-compose-build.yml build
     - name: Docker Tag Rename
       run: |
         docker tag jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_mysql:latest
