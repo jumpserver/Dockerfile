@@ -64,6 +64,11 @@ RUN set -ex \
     && tar -xf kubectl.tar.gz \
     && chmod 755 kubectl \
     && mv kubectl /usr/local/bin/rawkubectl \
+    && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
+    && mkdir /opt/kubectl-aliases/ \
+    && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
+    && chown -R root:root /opt/kubectl-aliases/ \
+    && chmod 755 /opt/koko/init-kubectl.sh \
     && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
     && mkdir /opt/guacamole \
     && tar -xf guacamole-${Version}.tar.gz -C /opt/guacamole --strip-components 1 \
