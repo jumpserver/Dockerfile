@@ -68,7 +68,7 @@ services:
       - mysql
       - redis
     volumes:
-      - koko-keys:/opt/koko/data/keys
+      - koko-data:/opt/koko/data
     ports:
       - 2222:2222
     networks:
@@ -88,7 +88,7 @@ services:
       - mysql
       - redis
     volumes:
-      - guacamole-keys:/config/guacamole/keys
+      - guacamole-data:/config/guacamole/data
     networks:
       - jumpserver
 
@@ -113,8 +113,8 @@ volumes:
   mysql-data:
   redis-data:
   core-data:
-  koko-keys:
-  guacamole-keys:
+  koko-data:
+  guacamole-data:
 
 networks:
   jumpserver:

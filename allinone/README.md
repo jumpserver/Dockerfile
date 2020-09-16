@@ -55,7 +55,7 @@ The main reasons are:
     - REDIS_PORT = 6379
     - REDIS_PASSWORD = xxxx
 
-    - JUMPSERVER_KEY_DIR=/config/guacamole/keys \
+    - JUMPSERVER_KEY_DIR=/config/guacamole/data/keys \
     - GUACAMOLE_HOME=/config/guacamole \
     - JUMPSERVER_SERVER=http://127.0.0.1:8080
 

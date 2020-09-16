@@ -2,7 +2,7 @@
 #
 
 if [ ! $JUMPSERVER_KEY_DIR ]; then
-    export JUMPSERVER_KEY_DIR=/config/guacamole/keys
+    export JUMPSERVER_KEY_DIR=/config/guacamole/data/keys
 fi
 if [ ! $GUACAMOLE_HOME ]; then
     export GUACAMOLE_HOME=/config/guacamole
@@ -13,9 +13,6 @@ fi
 if [ ! $JUMPSERVER_ENABLE_DRIVE ]; then
     export JUMPSERVER_ENABLE_DRIVE=true
 fi
-
-rm -rf /config/guacamole/data/log/*
-rm -rf /config/tomcat9/logs/*
 
 sleep 5s
 while [ "$(curl -I -m 10 -L -k -o /dev/null -s -w %{http_code} ${JUMPSERVER_SERVER}/api/health/)" != "200" ]
