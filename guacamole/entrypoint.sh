@@ -21,7 +21,7 @@ do
     sleep 2
 done
 
-guacd &
+/etc/init.d/guacd start
 cd /config/tomcat9/bin && ./startup.sh
 
 echo "Guacamole version $Version, more see https://www.jumpserver.org"
