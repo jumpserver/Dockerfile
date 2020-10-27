@@ -3,6 +3,7 @@
 ```sh
 git clone https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile
+cp config_example.conf .env
 cat .env
 docker-compose up
 ```
@@ -10,6 +11,7 @@ docker-compose up
 build
 ```sh
 cd Dockerfile
+cp config_example.conf .env
 cat .env
 docker-compose -f docker-compose-build.yml up
 ```
@@ -33,6 +35,7 @@ grant all on jumpserver.* to 'jumpserver'@'%' identified by 'weakPassword';
 
 ```sh
 cd Dockerfile
+cp config_example.conf .env
 vi .env
 docker-compose -f docker-compose-external.yml up
 ```

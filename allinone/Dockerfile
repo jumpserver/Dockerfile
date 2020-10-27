@@ -23,7 +23,7 @@ RUN set -ex \
     && rm -rf /etc/nginx/conf.d/default.conf \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && yum install -y bash-completion \
-    && mkdir -p /config/guacamole /config/guacamole/lib /config/guacamole/extensions /config/guacamole/record /config/guacamole/drive \
+    && mkdir -p /config/guacamole /config/guacamole/data /config/guacamole/lib /config/guacamole/extensions /config/guacamole/record /config/guacamole/drive \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
@@ -101,8 +101,10 @@ COPY allinone/readme.txt readme.txt
 COPY allinone/entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
 
-VOLUME /opt/jumpserver/data
 VOLUME /var/lib/mysql
+VOLUME /opt/jumpserver/data
+VOLUME /opt/koko/data
+VOLUME /config/guacamole/data
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q \
@@ -117,7 +119,7 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     REDIS_PASSWORD= \
     CORE_HOST=http://127.0.0.1:8080 \
     LOG_LEVEL=ERROR \
-    JUMPSERVER_KEY_DIR=/config/guacamole/keys \
+    JUMPSERVER_KEY_DIR=/config/guacamole/data/keys \
     GUACAMOLE_HOME=/config/guacamole \
     GUACAMOLE_LOG_LEVEL=ERROR \
     JUMPSERVER_ENABLE_DRIVE=true \
