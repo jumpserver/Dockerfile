@@ -25,7 +25,6 @@ RUN set -ex \
    && chown -R root:root /opt/kubectl-aliases/ \
    && chmod 755 /opt/koko/init-kubectl.sh \
    && rm -rf /opt/*.tar.gz \
-   && yum remove -y wget \
    && yum clean all \
    && rm -rf /var/cache/yum*
 

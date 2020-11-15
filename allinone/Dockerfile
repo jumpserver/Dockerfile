@@ -11,10 +11,10 @@ RUN set -ex \
     && echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf \
     && yum -y install wget gcc epel-release git yum-utils \
     && yum -y install python36 python36-devel \
-    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
+    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
     && yum install -y java-1.8.0-openjdk \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
-    && yum install -y ffmpeg-devel freerdp-devel libssh2-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
+    && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
     && rpm --import https://nginx.org/keys/nginx_signing.key \
     && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
@@ -32,9 +32,6 @@ RUN set -ex \
     && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
     && rm -rf /config/tomcat9/webapps/* \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat9/conf/server.xml \
-    && sed -i 's/level = FINE/level = OFF/g' /config/tomcat9/conf/logging.properties \
-    && sed -i 's/level = INFO/level = OFF/g' /config/tomcat9/conf/logging.properties \
-    && sed -i 's@CATALINA_OUT="$CATALINA_BASE"/logs/catalina.out@CATALINA_OUT=/dev/null@g' /config/tomcat9/bin/catalina.sh \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
     && tar -xf guacamole-server-1.2.0.tar.gz \
@@ -90,6 +87,11 @@ RUN set -ex \
     && chmod 755 /bin/ssh-forward \
     && cd /opt \
     && chown -R root:root /opt/* \
+    && yum -y remove libwinpr \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/libwinpr-devel-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/libwinpr-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/freerdp-libs-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/freerdp-devel-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
     && yum clean all \
     && rm -rf /opt/guacamole \
     && rm -rf /var/cache/yum/* \

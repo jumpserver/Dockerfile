@@ -5,11 +5,10 @@ ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && yum install -y epel-release wget \
+    && yum install -y epel-release \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && yum -y install mariadb-server \
-    && yum remove -y wget \
     && yum clean all \
     && rm -rf /var/cache/yum/*
 

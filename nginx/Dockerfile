@@ -18,7 +18,6 @@ RUN set -ex \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
     && rm -rf /opt/*.tar.gz \
-    && yum remove -y wget \
     && yum clean all \
     && rm -rf /var/tmp/yum*
 

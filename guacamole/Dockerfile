@@ -9,7 +9,7 @@ RUN set -ex \
     && yum clean all \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
-    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
+    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
     && yum install -y make gcc java-1.8.0-openjdk \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
@@ -22,9 +22,6 @@ RUN set -ex \
     && mv apache-tomcat-${TOMCAT_VER} tomcat9 \
     && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
     && rm -rf tomcat9/webapps/* \
-    && sed -i 's/level = FINE/level = OFF/g' /config/tomcat9/conf/logging.properties \
-    && sed -i 's/level = INFO/level = OFF/g' /config/tomcat9/conf/logging.properties \
-    && sed -i 's@CATALINA_OUT="$CATALINA_BASE"/logs/catalina.out@CATALINA_OUT=/dev/null@g' /config/tomcat9/bin/catalina.sh \
     && sed -i 's/# export/export/g' /root/.bashrc \
     && sed -i 's/# alias l/alias l/g' /root/.bashrc \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
@@ -51,7 +48,11 @@ RUN set -ex \
     && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && cd /config \
     && mv /config/docker-guacamole/guacamole.properties /config/guacamole/ \
-    && yum remove -y wget gcc make \
+    && yum -y remove libwinpr \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/libwinpr-devel-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/libwinpr-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/freerdp-libs-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
+    && rpm -ivh https://demo.jumpserver.org/download/centos/7/freerdp-devel-2.0.0-4.rc4.el7_8.x86_64.rpm --nodeps \
     && rm -rf /config/docker-guacamole \
     && yum clean all \
     && rm -rf /var/tmp/yum*

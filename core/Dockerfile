@@ -20,7 +20,6 @@ RUN set -ex \
     && pip install wheel \
     && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
-    && yum remove -y wget gcc \
     && yum clean all \
     && rm -rf /var/cache/yum/* \
     && rm -rf /opt/*.tar.gz \
