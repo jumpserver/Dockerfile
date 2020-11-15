@@ -11,7 +11,7 @@ RUN set -ex \
     && echo "LANG=en_US.utf8" > /etc/locale.conf \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm https://mirrors.aliyun.com/rpmfusion/nonfree/el/rpmfusion-nonfree-release-7.noarch.rpm \
     && yum install -y make gcc java-1.8.0-openjdk \
-    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-deve \
+    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && mkdir -p /config/guacamole /config/guacamole/data /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/record /config/guacamole/drive \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
