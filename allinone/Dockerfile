@@ -17,7 +17,10 @@ RUN set -ex \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
     && rpm --import https://nginx.org/keys/nginx_signing.key \
-    && yum -y install mariadb mariadb-devel mariadb-server redis nginx \
+    && echo -e "# MariaDB 10.5 CentOS repository list - created 2020-11-18 06:35 UTC\n# http://downloads.mariadb.org/mariadb/repositories/\n[mariadb]\nname = MariaDB\nbaseurl = http://yum.mariadb.org/10.5/centos7-amd64\ngpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB\ngpgcheck=1" > /etc/yum.repos.d/mariadb.repo \
+    && sed -i 's#yum\.mariadb\.org#mirrors.ustc.edu.cn/mariadb/yum#' /etc/yum.repos.d/mariadb.repo \
+    && sed -i 's#http://mirrors\.ustc\.edu\.cn#https://mirrors.ustc.edu.cn#g' /etc/yum.repos.d/mariadb.repo \
+    && yum -y install MariaDB-server MariaDB-client MariaDB-devel MariaDB-shared redis nginx \
     && python3.6 -m venv /opt/py3 \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && rm -rf /etc/nginx/conf.d/default.conf \
