@@ -13,22 +13,15 @@ function config_mysql {
 
 if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
     config_mysql
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql --force
-    mysqld_safe &
+    mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
+    mysqld --daemonize --user=mysql --defaults-file=/etc/my.cnf
     sleep 5s
-    echo "
-n
-n
-
-
-
-
-" | mysql_secure_installation
     mysql -uroot -e "create database $DB_NAME default charset 'utf8' collate 'utf8_bin';grant all on $DB_NAME.* to '$DB_USER'@'%' identified by '$DB_PASSWORD';flush privileges;";
     mysql --version
-    tail -f /var/log/mariadb/mariadb.log
+    tail -f /var/log/mysqld.log
 else
     config_mysql
+    mysqld --daemonize --user=mysql --defaults-file=/etc/my.cnf
     mysql --version
-    mysqld_safe
+    tail -f /var/log/mysqld.log
 fi

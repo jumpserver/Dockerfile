@@ -3,20 +3,12 @@
 
 if [ $DB_HOST == 127.0.0.1 ]; then
     if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
-        mysql_install_db --user=mysql --datadir=/var/lib/mysql --force
-        mysqld_safe &
+        mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
+        mysqld --daemonize --user=mysql
         sleep 5s
-        echo "
-n
-n
-
-
-
-
-" | mysql_secure_installation
         mysql -uroot -e "create database jumpserver default charset 'utf8' collate 'utf8_bin'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
     else
-        mysqld_safe &
+        mysqld --daemonize --user=mysql --defaults-file=/etc/my.cnf
     fi
 fi
 
