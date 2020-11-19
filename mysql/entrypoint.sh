@@ -14,14 +14,14 @@ function config_mysql {
 if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
     config_mysql
     mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
-    mysqld --daemonize --user=mysql --defaults-file=/etc/my.cnf
+    mysqld --daemonize --user=mysql
     sleep 5s
-    mysql -uroot -e "set global validate_password_policy=LOW; create database $DB_NAME default charset 'utf8' collate 'utf8_bin';grant all on $DB_NAME.* to '$DB_USER'@'%' identified by '$DB_PASSWORD';flush privileges;";
+    mysql -uroot -e "create database $DB_NAME default charset 'utf8' collate 'utf8_bin';grant all on $DB_NAME.* to '$DB_USER'@'%' identified by '$DB_PASSWORD';flush privileges;";
     mysql --version
     tail -f /var/log/mysqld.log
 else
     config_mysql
-    mysqld --daemonize --user=mysql --defaults-file=/etc/my.cnf
+    mysqld --daemonize --user=mysql
     mysql --version
     tail -f /var/log/mysqld.log
 fi

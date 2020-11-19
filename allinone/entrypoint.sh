@@ -6,9 +6,9 @@ if [ $DB_HOST == 127.0.0.1 ]; then
         mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
         mysqld --daemonize --user=mysql
         sleep 5s
-        mysql -uroot -e "set global validate_password_policy=LOW; create database jumpserver default charset 'utf8' collate 'utf8_bin'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
+        mysql -uroot -e "create database jumpserver default charset 'utf8' collate 'utf8_bin'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
     else
-        mysqld --daemonize --user=mysql --defaults-file=/etc/my.cnf
+        mysqld --daemonize --user=mysql
     fi
 fi
 
