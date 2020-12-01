@@ -78,8 +78,6 @@ RUN set -ex \
     && mv luna-${Version} luna \
     && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
     && source /opt/py3/bin/activate \
-    && pip install wheel \
-    && pip install --upgrade pip setuptools \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd guacamole \
     && mv /opt/guacamole/guacamole.properties /config/guacamole/ \
