@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.5.2
+ARG Version=v2.5.3
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -121,6 +121,10 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     GUACAMOLE_HOME=/config/guacamole \
     GUACAMOLE_LOG_LEVEL=ERROR \
     JUMPSERVER_ENABLE_DRIVE=true \
+    JUMPSERVER_RECORD_PATH=/config/guacamole/data/record \
+    JUMPSERVER_DRIVE_PATH=/config/guacamole/data/drive \
+    JUMPSERVER_CLEAR_DRIVE_SESSION=true \
+    JUMPSERVER_CLEAR_DRIVE_SCHEDULE=24 \
     JUMPSERVER_SERVER=http://127.0.0.1:8080
 
 EXPOSE 80 2222

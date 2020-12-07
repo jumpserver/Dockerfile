@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.5.2
+ARG Version=v2.5.3
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -13,7 +13,7 @@ RUN set -ex \
     && yum install -y make gcc java-1.8.0-openjdk \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
-    && mkdir -p /config/guacamole /config/guacamole/data /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/record /config/guacamole/drive \
+    && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && cd /config \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \

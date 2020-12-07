@@ -13,6 +13,18 @@ fi
 if [ ! $JUMPSERVER_ENABLE_DRIVE ]; then
     export JUMPSERVER_ENABLE_DRIVE=true
 fi
+if [ ! $JUMPSERVER_RECORD_PATH ]; then
+    export JUMPSERVER_RECORD_PATH=/config/guacamole/data/record/
+fi
+if [ ! $JUMPSERVER_DRIVE_PATH ]; then
+    export JUMPSERVER_DRIVE_PATH=/config/guacamole/data/drive/
+fi
+if [ ! $JUMPSERVER_CLEAR_DRIVE_SESSION ]; then
+    export JUMPSERVER_CLEAR_DRIVE_SESSION=true
+fi
+if [ ! $JUMPSERVER_CLEAR_DRIVE_SCHEDULE ]; then
+    export JUMPSERVER_CLEAR_DRIVE_SCHEDULE=24
+fi
 
 rm -rf /config/tomcat9/logs/*
 
