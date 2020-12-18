@@ -1,3 +1,6 @@
+# 说明 
+从 v2.6 开始 Dockerfile 不再维护，它的工作由 https://github.com/jumpserver/installer 来完成，installer 统一了社区和企业版的安装，并且可以做到无缝迁移
+
 ## Jumpserver Docker-Compose
 
 ```sh
