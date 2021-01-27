@@ -23,7 +23,7 @@ jobs:
     - name: Docker Tag Rename
       run: docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_all:latest
     - name: Logo into registry
-      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u fit2bot --password-stdin
+      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u wojiushixiaobai --password-stdin
     - name: Push image
       run: |
         docker push jumpserver/jms_all:latest
