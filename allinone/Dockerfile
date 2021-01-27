@@ -6,7 +6,7 @@ ENV Version=${Version} \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends curl wget ca-certificates \
+    && apt-get -y install --no-install-recommends curl wget ca-certificates gnupg2 \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get -y install --no-install-recommends gcc netcat net-tools telnet \
     && apt-get -y install --no-install-recommends python3-venv python3.7-dev \
