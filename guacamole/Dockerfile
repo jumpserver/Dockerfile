@@ -47,8 +47,6 @@ RUN set -ex \
     && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && cd /config \
     && mv /config/docker-guacamole/guacamole.properties /config/guacamole/ \
-    && yum -y remove libwinpr \
-    && yum localinstall -y https://demo.jumpserver.org/download/centos/7/libwinpr-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/libwinpr-devel-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-libs-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-devel-2.0.0-4.rc4.el7_8.x86_64.rpm \
     && rm -rf /config/docker-guacamole \
     && yum clean all \
     && rm -rf /var/tmp/yum*

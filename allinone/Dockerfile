@@ -7,6 +7,7 @@ ENV Version=${Version} \
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/locale.conf \
+    && yum -y install epel-release https://repo.ius.io/ius-release-el7.rpm \
     && yum -y install wget gcc epel-release git yum-utils \
     && yum -y install python36 python36-devel \
     && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
@@ -23,7 +24,6 @@ RUN set -ex \
     && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && yum install -y bash-completion \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
-    && chown daemon:daemon /config/guacamole/record /config/guacamole/drive \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
     && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
@@ -84,8 +84,6 @@ RUN set -ex \
     && chmod 755 /bin/ssh-forward \
     && cd /opt \
     && chown -R root:root /opt/* \
-    && yum -y remove libwinpr \
-    && yum localinstall -y https://demo.jumpserver.org/download/centos/7/libwinpr-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/libwinpr-devel-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-libs-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-devel-2.0.0-4.rc4.el7_8.x86_64.rpm \
     && yum clean all \
     && rm -rf /opt/guacamole \
     && rm -rf /var/cache/yum/* \
