@@ -1,43 +1,5 @@
 version: '3'
 services:
-  mysql:
-    build:
-      context: .
-      dockerfile: mysql/Dockerfile
-      args:
-        Version: ${Version}
-    image: jumpserver/jms_mysql:${Version}
-    container_name: jms_mysql
-    restart: always
-    tty: true
-    environment:
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - jumpserver
-
-  redis:
-    build:
-      context: .
-      dockerfile: redis/Dockerfile
-      args:
-        Version: ${Version}
-    image: jumpserver/jms_redis:${Version}
-    container_name: jms_redis
-    restart: always
-    tty: true
-    environment:
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-    volumes:
-      - redis-data:/var/lib/redis/
-    networks:
-      - jumpserver
-
   core:
     build:
       context: .
@@ -48,6 +10,7 @@ services:
     container_name: jms_core
     restart: always
     tty: true
+    command: start all
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -60,9 +23,11 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
-    depends_on:
-      - mysql
-      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
@@ -85,8 +50,11 @@ services:
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
-      - mysql
-      - redis
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:5000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
       - koko-data:/opt/koko/data
     ports:
@@ -110,8 +78,11 @@ services:
       GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
-      - mysql
-      - redis
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
       - guacamole-data:/config/guacamole/data
     networks:
@@ -130,8 +101,12 @@ services:
     depends_on:
       - core
       - koko
-      - mysql
-      - redis
+      - guacamole
+    healthcheck:
+      test: ["CMD", "test", "-f", "/var/run/nginx.pid"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
     volumes:
       - core-data:/opt/jumpserver/data
     ports:
@@ -140,11 +115,10 @@ services:
       - jumpserver
 
 volumes:
-  mysql-data:
-  redis-data:
-  core-data:
-  koko-data:
-  guacamole-data:
+  core-data: ${VOLUME_DIR}/core/data
+  koko-data: ${VOLUME_DIR}/koko/data
+  guacamole-data: ${VOLUME_DIR}/guacamole/data
 
 networks:
-  jumpserver:
+  net:
+    driver: bridge

@@ -1,4 +1,4 @@
-# 说明 
+# 说明
 从 v2.6 开始 Dockerfile 不再维护，它的工作由 https://github.com/jumpserver/installer 来完成，installer 统一了社区和企业版的安装，并且可以做到无缝迁移
 
 ## Jumpserver Docker-Compose
@@ -7,7 +7,7 @@
 git clone https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
-cat .env
+vi .env
 docker-compose up
 ```
 
@@ -15,7 +15,7 @@ build
 ```sh
 cd Dockerfile
 cp config_example.conf .env
-cat .env
+vi .env  # 修改配置
 docker-compose -f docker-compose-build.yml up
 ```
 ## 说明
@@ -27,7 +27,9 @@ docker-compose -f docker-compose-build.yml up
 
 ## 外置 数据库 和 redis
 
-- mysql server
+- REDIS >= 5.0
+- MySQL >= 5.7
+- MariaDB >= 10.2
 
 ```mysql
 create database jumpserver default charset 'utf8' collate 'utf8_bin';

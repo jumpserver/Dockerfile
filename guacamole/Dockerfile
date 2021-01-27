@@ -1,38 +1,28 @@
-FROM centos:7
+FROM debian:10
 WORKDIR /opt
-ARG Version=v2.5.3
+ARG Version=v2.7.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && yum install -y epel-release wget \
-    && yum clean all \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends curl wget \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=en_US.utf8" > /etc/locale.conf \
-    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
-    && yum install -y make gcc java-1.8.0-openjdk \
-    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
-    && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
+    && apt-get -y install --no-install-recommends netcat net-tools telnet \
+    && apt-get -y install --no-install-recommends tomcat9 \
+    && apt-get -y install --no-install-recommends libcairo2-dev libjpeg62-turbo-dev	libpng12-dev libtool-bin libossp-uuid-dev \
+    && apt-get -y install --no-install-recommends	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && cd /config \
-    && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
-    && wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && mv apache-tomcat-${TOMCAT_VER} tomcat9 \
-    && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && rm -rf tomcat9/webapps/* \
-    && sed -i 's/# export/export/g' /root/.bashrc \
-    && sed -i 's/# alias l/alias l/g' /root/.bashrc \
-    && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget -O docker-guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
     && mkdir /config/docker-guacamole \
     && tar -xf docker-guacamole-${Version}.tar.gz -C /config/docker-guacamole --strip-components 1 \
     && rm -rf docker-guacamole-${Version}.tar.gz \
     && chown -R root:root /config/docker-guacamole \
     && cd /config/docker-guacamole \
-    && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
-    && tar -xf guacamole-server-1.2.0.tar.gz \
-    && cd guacamole-server-1.2.0 \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
+    && tar -xf guacamole-server-1.3.0.tar.gz \
+    && cd guacamole-server-1.3.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
     && make install \
@@ -43,17 +33,22 @@ RUN set -ex \
     && chmod 755 /bin/ssh-forward \
     && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
     && tar -xf guacamole-client-${Version}.tar.gz \
-    && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
+    && rm -rf /var/lib/tomcat9/webapps/* \
+    && cp guacamole-client-${Version}/guacamole-*.war /var/lib/tomcat9/webapps/ROOT.war \
     && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && cd /config \
     && mv /config/docker-guacamole/guacamole.properties /config/guacamole/ \
-    && yum -y remove libwinpr \
-    && yum localinstall -y https://demo.jumpserver.org/download/centos/7/libwinpr-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/libwinpr-devel-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-libs-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-devel-2.0.0-4.rc4.el7_8.x86_64.rpm \
     && rm -rf /config/docker-guacamole \
-    && yum clean all \
-    && rm -rf /var/tmp/yum*
+    && sed -i "s@# export LS_OPTIONS@export LS_OPTIONS@g" ~/.bashrc \
+    && sed -i "s@# alias l@alias l@g" ~/.bashrc \
+    && apt-get -y autoclean \
+    && apt-get -y clean \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY guacamole/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
 CMD ["./entrypoint.sh"]
+/var/lib/tomcat9/webapps/
+/usr/libexec/tomcat9/tomcat-start.sh

@@ -1,35 +1,34 @@
 #!/bin/bash
 #
 
-if [ $DB_HOST == 127.0.0.1 ]; then
-    if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
-        mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
-        mysqld --daemonize --user=mysql
-        sleep 5s
-        mysql -uroot -e "create database jumpserver default charset 'utf8' collate 'utf8_bin'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
-    else
-        mysqld --daemonize --user=mysql
-    fi
-fi
+while [ "$DB_HOST" == "127.0.0.1" ]; do
+    echo -e "Error: DB_HOST cannot be set to 127.0.0.1 "
+    sleep 2s
+done
 
-if [ $REDIS_HOST == 127.0.0.1 ]; then
-    redis-server &
-fi
+while [ "$REDIS_HOST" == "127.0.0.1" ]; do
+    echo -e "Error: REDIS_HOST cannot be set to 127.0.0.1 "
+    sleep 2s
+done
 
 if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml
 fi
 
-if [ ! $WINDOWS_SKIP_ALL_MANUAL_PASSWORD ]; then
-    export WINDOWS_SKIP_ALL_MANUAL_PASSWORD=True
+export CATALINA_HOME=/usr/share/tomcat9
+export CATALINA_BASE=/var/lib/tomcat9
+export CATALINA_TMPDIR=/tmp
+export JAVA_OPTS=-Djava.awt.headless=true
+if grep -q "catalina.sh run " /usr/libexec/tomcat9/tomcat-start.sh; then
+    sed -i "s@catalina.sh run @catalina.sh start @g" /usr/libexec/tomcat9/tomcat-start.sh
 fi
 
 source /opt/py3/bin/activate
-cd /opt/jumpserver && ./jms start -d
+cd /opt/jumpserver && ./jms start all -d
 cd /opt/koko && ./koko -d
 /etc/init.d/guacd start
-sh /config/tomcat9/bin/startup.sh
-/usr/sbin/nginx &
+sh /usr/libexec/tomcat9/tomcat-start.sh
+/usr/sbin/nginx
 
 echo "Jumpserver ALL $Version"
 tail -f /opt/readme.txt
