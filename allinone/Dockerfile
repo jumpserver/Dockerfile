@@ -31,9 +31,6 @@ RUN set -ex \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends curl wget \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apt-get -y install --no-install-recommends netcat net-tools telnet \
     && apt-get -y install --no-install-recommends bash-completion mariadb-client \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
     && tar -xf koko-${Version}-linux-amd64.tar.gz \
@@ -58,11 +55,8 @@ RUN set -ex \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends curl wget \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apt-get -y install --no-install-recommends netcat net-tools telnet \
-    && apt-get -y install --no-install-recommends tomcat9 \
-    && apt-get -y install --no-install-recommends libcairo2-dev libjpeg62-turbo-dev	libpng-dev libtool-bin libossp-uuid-dev \
+    && apt-get -y install --no-install-recommends tomcat9 make \
+    && apt-get -y install --no-install-recommends libcairo2-dev libjpeg62-turbo-dev libpng-dev libtool-bin libossp-uuid-dev \
     && apt-get -y install --no-install-recommends	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && cd /config \
@@ -72,9 +66,9 @@ RUN set -ex \
     && rm -rf docker-guacamole-${Version}.tar.gz \
     && chown -R root:root /config/docker-guacamole \
     && cd /config/docker-guacamole \
-    && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
-    && tar -xf guacamole-server-1.3.0.tar.gz \
-    && cd guacamole-server-1.3.0 \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
+    && tar -xf guacamole-server-1.2.0.tar.gz \
+    && cd guacamole-server-1.2.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
     && make install \
@@ -97,10 +91,6 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get -y install --no-install-recommends curl wget \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apt-get -y install --no-install-recommends netcat net-tools telnet \
     && echo "deb http://nginx.org/packages/debian buster nginx" >> /etc/apt/sources.list.d/nginx.list \
     && curl -fsSL https://nginx.org/keys/nginx_signing.key | apt-key add - \
     && apt-get update \
