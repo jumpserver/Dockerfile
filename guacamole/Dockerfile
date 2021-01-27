@@ -11,6 +11,7 @@ RUN set -ex \
     && apt-get -y install --no-install-recommends netcat net-tools telnet \
     && apt-get -y install --no-install-recommends tomcat9 make gcc autoconf make automake \
     && apt-get -y install --no-install-recommends freerdp2-dev libcairo2-dev libjpeg62-turbo-dev libossp-uuid-dev libpango1.0-dev libpulse-dev libssh2-1-dev libssl-dev libtelnet-dev libtool libvncserver-dev libwebsockets-dev libwebp-dev \
+    && apt-get -y install --no-install-recommends	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && cd /config \
     && wget -O docker-guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
