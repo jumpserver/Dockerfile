@@ -1,19 +1,29 @@
-FROM debian:10
+FROM centos:7
 WORKDIR /opt
 ARG Version=v2.6.2
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get -y install --no-install-recommends curl wget ca-certificates \
+    && yum install -y epel-release wget \
+    && yum clean all \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apt-get -y install --no-install-recommends netcat net-tools telnet \
-    && apt-get -y install --no-install-recommends tomcat9 make gcc autoconf make automake \
-    && apt-get -y install --no-install-recommends freerdp2-dev libcairo2-dev libjpeg62-turbo-dev libossp-uuid-dev libpango1.0-dev libpulse-dev libssh2-1-dev libssl-dev libtelnet-dev libtool libvncserver-dev libwebsockets-dev libwebp-dev \
-    && apt-get -y install --no-install-recommends	libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libvncserver-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
+    && echo "LANG=$LANG" > /etc/locale.conf \
+    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
+    && yum install -y make gcc java-1.8.0-openjdk \
+    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
+    && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && cd /config \
+    && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
+    && wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
+    && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz \
+    && mv apache-tomcat-${TOMCAT_VER} tomcat9 \
+    && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
+    && rm -rf tomcat9/webapps/* \
+    && sed -i 's/# export/export/g' /root/.bashrc \
+    && sed -i 's/# alias l/alias l/g' /root/.bashrc \
+    && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget -O docker-guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
     && mkdir /config/docker-guacamole \
     && tar -xf docker-guacamole-${Version}.tar.gz -C /config/docker-guacamole --strip-components 1 \
@@ -23,37 +33,25 @@ RUN set -ex \
     && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
     && tar -xf guacamole-server-1.2.0.tar.gz \
     && cd guacamole-server-1.2.0 \
-    && mkdir -p /usr/local/guacamole /tmp/guacd-docker-BUILD \
-    && export PREFIX_DIR=/usr/local/guacamole \
-    && export BUILD_DIR=/tmp/guacd-docker-BUILD \
-    && export LD_LIBRARY_PATH=${PREFIX_DIR}/lib \
-    && cp -r src/guacd-docker/bin "${PREFIX_DIR}/bin/" \
-    && cp -r . "$BUILD_DIR" \
-    && sed -i "s@./configure@./configure --with-init-dir=/etc/init.d@g" ${PREFIX_DIR}/bin/build-guacd.sh \
-    && ${PREFIX_DIR}/bin/build-guacd.sh "$BUILD_DIR" "$PREFIX_DIR" \
-    && ${PREFIX_DIR}/bin/list-dependencies.sh ${PREFIX_DIR}/sbin/guacd ${PREFIX_DIR}/lib/libguac-client-*.so ${PREFIX_DIR}/lib/freerdp2/guac*.so > ${PREFIX_DIR}/DEPENDENCIES \
-    && apt-get -y install --no-install-recommends ghostscript fonts-liberation fonts-dejavu xfonts-terminus \
-    && apt-get -y install --no-install-recommends $(cat "${PREFIX_DIR}"/DEPENDENCIES) \
-    && ${PREFIX_DIR}/bin/link-freerdp-plugins.sh ${PREFIX_DIR}/lib/freerdp2/libguac*.so \
-    && cd /config/docker-guacamole \
+    && ./configure --with-init-dir=/etc/init.d \
+    && make \
+    && make install \
+    && ldconfig \
+    && cd .. \
     && wget http://download.jumpserver.org/public/ssh-forward.tar.gz \
     && tar -xf ssh-forward.tar.gz -C /bin/ \
     && chmod 755 /bin/ssh-forward \
     && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
     && tar -xf guacamole-client-${Version}.tar.gz \
-    && rm -rf /var/lib/tomcat9/webapps/* \
-    && cp guacamole-client-${Version}/guacamole-*.war /var/lib/tomcat9/webapps/ROOT.war \
+    && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
     && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && cd /config \
     && mv /config/docker-guacamole/guacamole.properties /config/guacamole/ \
+    && yum -y remove libwinpr \
+    && yum localinstall -y https://demo.jumpserver.org/download/centos/7/libwinpr-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/libwinpr-devel-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-libs-2.0.0-4.rc4.el7_8.x86_64.rpm https://demo.jumpserver.org/download/centos/7/freerdp-devel-2.0.0-4.rc4.el7_8.x86_64.rpm \
     && rm -rf /config/docker-guacamole \
-    && rm -rf "$BUILD_DIR" \
-    && sed -i "s@# export LS_OPTIONS@export LS_OPTIONS@g" ~/.bashrc \
-    && sed -i "s@# alias l@alias l@g" ~/.bashrc \
-    && apt-get -y autoclean \
-    && apt-get -y clean \
-    && apt-get -y autoremove \
-    && rm -rf /var/lib/apt/lists/*
+    && yum clean all \
+    && rm -rf /var/tmp/yum*
 
 COPY guacamole/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh

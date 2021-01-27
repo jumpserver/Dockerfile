@@ -1,43 +1,5 @@
 version: '3'
 services:
-  mysql:
-    image: jumpserver/jms_mysql:${Version}
-    container_name: jms_mysql
-    restart: always
-    tty: true
-    environment:
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-    healthcheck:
-      test: "mysql -h127.0.0.1 -P$$DB_PORT -u$$DB_USER -p$$DB_PASSWORD -e 'SHOW DATABASES;'"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - jumpserver
-
-  redis:
-    image: jumpserver/jms_redis:${Version}
-    container_name: jms_redis
-    restart: always
-    tty: true
-    environment:
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "info"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - redis-data:/var/lib/redis/
-    networks:
-      - jumpserver
-
   core:
     image: jumpserver/jms_core:${Version}
     container_name: jms_core
@@ -57,9 +19,6 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
-    depends_on:
-      - mysql
-      - redis
     healthcheck:
       test: ["CMD", "curl", "http://localhost:8080"]
       interval: 10s
@@ -83,8 +42,6 @@ services:
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
-      - mysql
-      - redis
     healthcheck:
       test: ["CMD", "curl", "http://localhost:5000"]
       interval: 10s
@@ -108,8 +65,6 @@ services:
       GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
-      - mysql
-      - redis
     healthcheck:
       test: ["CMD", "curl", "http://localhost:8080"]
       interval: 10s
@@ -128,8 +83,7 @@ services:
     depends_on:
       - core
       - koko
-      - mysql
-      - redis
+      - guacamole
     healthcheck:
       test: ["CMD", "test", "-f", "/var/run/nginx.pid"]
       interval: 10s
@@ -143,8 +97,6 @@ services:
       - jumpserver
 
 volumes:
-  mysql-data:
-  redis-data:
   core-data:
   koko-data:
   guacamole-data:

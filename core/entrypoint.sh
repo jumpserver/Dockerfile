@@ -13,6 +13,14 @@ do
     sleep 2s
 done
 
+if [ ! -f "/opt/jumpserver/config.yml" ]; then
+    echo > /opt/jumpserver/config.yml
+fi
+
+if [ ! "$LOG_LEVEL" ]; then
+    export LOG_LEVEL=ERROR
+fi
+
 action="${1-start}"
 if [ ! "${action}" ]; then
   action=start

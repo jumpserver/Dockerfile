@@ -50,16 +50,10 @@ fi
 echo "Guacamole version $Version, more see https://www.jumpserver.org"
 echo "Quit the server with CONTROL-C."
 
-export CATALINA_HOME=/usr/share/tomcat9
-export CATALINA_BASE=/var/lib/tomcat9
-export CATALINA_TMPDIR=/tmp
-export JAVA_OPTS=-Djava.awt.headless=true
-if grep -q "catalina.sh run " /usr/libexec/tomcat9/tomcat-start.sh; then
-    sed -i "s@catalina.sh run @catalina.sh start @g" /usr/libexec/tomcat9/tomcat-start.sh
-fi
+rm -rf /config/tomcat9/logs/*
 
 /etc/init.d/guacd start
-sh /usr/libexec/tomcat9/tomcat-start.sh
+cd /config/tomcat9/bin && ./startup.sh
 
 if [ ! -f "/config/guacamole/data/log/info.log" ]; then
     echo "" > /config/guacamole/data/log/info.log
