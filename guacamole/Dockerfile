@@ -1,6 +1,6 @@
 FROM debian:10
 WORKDIR /opt
-ARG Version=v2.7.0
+ARG Version=v2.6.2
 ENV Version=${Version} \
     LANG=en_US.utf8
 

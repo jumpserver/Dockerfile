@@ -42,6 +42,6 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=xxx \
   --privileged=true \
-  jumpserver/jms_all:v2.7.0
+  jumpserver/jms_all:v2.6.2
 
 ```

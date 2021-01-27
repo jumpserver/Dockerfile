@@ -115,10 +115,9 @@ services:
       - jumpserver
 
 volumes:
-  core-data: ${VOLUME_DIR}/core/data
-  koko-data: ${VOLUME_DIR}/koko/data
-  guacamole-data: ${VOLUME_DIR}/guacamole/data
+  core-data:
+  koko-data:
+  guacamole-data:
 
 networks:
-  net:
-    driver: bridge
+  jumpserver:

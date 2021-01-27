@@ -1,6 +1,6 @@
 FROM debian:10
 WORKDIR /opt
-ARG Version=v2.7.0
+ARG Version=v2.6.2
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -140,7 +140,7 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     REDIS_PORT=6379 \
     REDIS_PASSWORD= \
     CORE_HOST=http://127.0.0.1:8080 \
-    DEBUG=FALSE
+    DEBUG=FALSE \
     LOG_LEVEL=ERROR \
     JUMPSERVER_KEY_DIR=/config/guacamole/data/keys \
     GUACAMOLE_HOME=/config/guacamole \
