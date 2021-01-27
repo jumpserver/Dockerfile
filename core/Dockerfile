@@ -11,7 +11,7 @@ RUN set -ex \
     && apt-get -y install --no-install-recommends gcc netcat net-tools telnet \
     && apt-get -y install --no-install-recommends python3-venv python3.7-dev \
     && apt-get -y install --no-install-recommends default-libmysqlclient-dev libldap2-dev libsasl2-dev libsasl2-dev \
-    && wget https://demo.jumpserver.org/download/jumpserver/${Version}/jumpserver-${Version}.tar.gz \
+    && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
     && chown -R root:root jumpserver \
