@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.6.2
+ARG Version=v2.7.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -30,9 +30,9 @@ RUN set -ex \
     && rm -rf docker-guacamole-${Version}.tar.gz \
     && chown -R root:root /config/docker-guacamole \
     && cd /config/docker-guacamole \
-    && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
-    && tar -xf guacamole-server-1.2.0.tar.gz \
-    && cd guacamole-server-1.2.0 \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
+    && tar -xf guacamole-server-1.3.0.tar.gz \
+    && cd guacamole-server-1.3.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
     && make install \

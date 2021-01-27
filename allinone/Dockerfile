@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.6.2
+ARG Version=v2.7.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -32,9 +32,9 @@ RUN set -ex \
     && rm -rf /config/tomcat9/webapps/* \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat9/conf/server.xml \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
-    && wget http://download.jumpserver.org/public/guacamole-server-1.2.0.tar.gz \
-    && tar -xf guacamole-server-1.2.0.tar.gz \
-    && cd guacamole-server-1.2.0 \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
+    && tar -xf guacamole-server-1.3.0.tar.gz \
+    && cd guacamole-server-1.3.0 \
     && ./configure --with-init-dir=/etc/init.d \
     && make \
     && make install \
@@ -45,7 +45,7 @@ RUN set -ex \
     && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
     && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && yum clean all \
-    && rm -rf guacamole-server-1.2.0 guacamole-server-1.2.0.tar.gz guacamole-client-${Version} guacamole-client-${Version}.tar.gz \
+    && rm -rf guacamole-server-1.3.0 guacamole-server-1.3.0.tar.gz guacamole-client-${Version} guacamole-client-${Version}.tar.gz \
     && rm -rf /var/cache/yum/*
 
 RUN set -ex \
