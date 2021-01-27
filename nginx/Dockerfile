@@ -6,7 +6,7 @@ ENV Version=${Version} \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends curl wget \
+    && apt-get -y install --no-install-recommends curl wget ca-certificates \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get -y install --no-install-recommends netcat net-tools telnet \
     && echo "deb http://nginx.org/packages/debian buster nginx" >> /etc/apt/sources.list.d/nginx.list \
