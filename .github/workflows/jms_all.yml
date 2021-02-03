@@ -22,9 +22,17 @@ jobs:
       run: docker build --build-arg Version=${{ steps.get_tag.outputs.TAG }} . --file ./allinone/Dockerfile --tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
     - name: Docker Tag Rename
       run: docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_all:latest
-    - name: Logo into registry
+    - name: Logo into Docker registry
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u wojiushixiaobai --password-stdin
-    - name: Push image
+    - name: Push image to Docker registry
       run: |
         docker push jumpserver/jms_all:latest
         docker push jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
+    - name: Login into HuaweiCloud registry
+      run: echo "${{ secrets.HW_CLOUD_TOKEN }}" | docker login -u cn-south-1@${{ secrets.HW_CLOUD.ID }} swr.cn-south-1.myhuaweicloud.com --password-stdin
+    - name: Push image to HuaweiCloud registry
+      run: |
+        docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
+        docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_all:latest
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_all:latest
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
