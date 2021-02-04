@@ -29,7 +29,7 @@ jobs:
         docker push jumpserver/jms_all:latest
         docker push jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
     - name: Login into HuaweiCloud registry
-      run: echo "${{ secrets.HW_CLOUD_TOKEN }}" | docker login -u cn-south-1@${{ secrets.HW_CLOUD.ID }} swr.cn-south-1.myhuaweicloud.com --password-stdin
+      run: echo "${{ secrets.HW_CLOUD_TOKEN }}" | docker login -u cn-south-1@"${{ secrets.HW_CLOUD.ID }}" swr.cn-south-1.myhuaweicloud.com --password-stdin
     - name: Push image to HuaweiCloud registry
       run: |
         docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
