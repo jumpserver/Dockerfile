@@ -48,19 +48,19 @@ jobs:
         docker push jumpserver/jms_core:latest
         docker push jumpserver/jms_koko:latest
         docker push jumpserver/jms_guacamole:latest
-     - name: Logo into HuaweiCloud registry
-       run: echo "${{ secrets.HW_CLOUD_TOKEN }}" | docker login -u cn-south-1@"${{ secrets.HW_CLOUD.ID }}" swr.cn-south-1.myhuaweicloud.com --password-stdin
-     - name: Push image to HuaweiCloud registry
-       run: |
-         docker tag jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
-         docker tag jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
-         docker tag jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
-         docker tag jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
-         docker tag jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
-         docker tag jumpserver/jms_guacamole:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole${{ steps.get_tag.outputs.TAG }}
-         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
-         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
-         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
-         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
-         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
-         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole${{ steps.get_tag.outputs.TAG }}
+    - name: Logo into HuaweiCloud registry
+      run: echo "${{ secrets.HW_CLOUD_TOKEN }}" | docker login -u cn-south-1@"${{ secrets.HW_CLOUD.ID }}" swr.cn-south-1.myhuaweicloud.com --password-stdin
+    - name: Push image to HuaweiCloud registry
+      run: |
+        docker tag jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
+        docker tag jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
+        docker tag jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
+        docker tag jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
+        docker tag jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
+        docker tag jumpserver/jms_guacamole:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole${{ steps.get_tag.outputs.TAG }}
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
+        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole${{ steps.get_tag.outputs.TAG }}
