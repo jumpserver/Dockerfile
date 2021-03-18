@@ -1,7 +1,7 @@
 ## Jumpserver Docker-Compose
 
 ```sh
-git clone https://github.com/jumpserver/Dockerfile.git
+git clone https://github.com/wojiushixiaobai/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
 cat .env

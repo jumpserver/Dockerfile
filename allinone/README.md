@@ -15,9 +15,9 @@ The main reasons are:
 
 主要原因是：
 
-   - 数据库在docker内，建议通过docker的环境变量去使用外部数据库
+   - 数据库在 docker 内，建议通过 docker 的环境变量去使用外部数据库
    - 几乎丧失的横向扩展能力
-   - 没有HA的解决方案
+   - 没有 HA 的解决方案
    - 未知的一些问题
 
 ## How to start
@@ -28,7 +28,7 @@ The main reasons are:
     $ if [ "$SECRET_KEY" = "" ]; then SECRET_KEY=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 50`; echo "SECRET_KEY=$SECRET_KEY" >> ~/.bashrc; echo $SECRET_KEY; else echo $SECRET_KEY; fi
     $ if [ "$BOOTSTRAP_TOKEN" = "" ]; then BOOTSTRAP_TOKEN=`cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 16`; echo "BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN" >> ~/.bashrc; echo $BOOTSTRAP_TOKEN; else echo $BOOTSTRAP_TOKEN; fi
 
-    $ docker run --name jms_all -d -p 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN --privileged=true jumpserver/jms_all:v2.7.1
+    $ docker run --name jms_all -d -p 80:80 -p 2222:2222 -e SECRET_KEY=$SECRET_KEY -e BOOTSTRAP_TOKEN=$BOOTSTRAP_TOKEN --privileged=true jumpserver/jms_all:v2.8.0
 
     # macOS 生成随机 key 可以用下面的命令
     $ if [ "$SECRET_KEY" = "" ]; then SECRET_KEY=`LC_CTYPE=C tr -dc A-Za-z0-9 < /dev/urandom | head -c 50`; echo "SECRET_KEY=$SECRET_KEY" >> ~/.bash_profile; echo $SECRET_KEY; else echo $SECRET_KEY; fi
@@ -79,6 +79,6 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=password \
   --privileged=true \
-  jumpserver/jms_all:v2.7.1
+  jumpserver/jms_all:v2.8.0
 
 ```
