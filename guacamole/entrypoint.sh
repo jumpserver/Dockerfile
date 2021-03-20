@@ -26,14 +26,14 @@ fi
 if [ ! "$JUMPSERVER_RECORD_PATH" ]; then
     export JUMPSERVER_RECORD_PATH=/config/guacamole/data/record
 fi
-if [ ! -d "$JUMPSERVER_RECORD_PATH"]; then
-    mkdir $JUMPSERVER_RECORD_PATH
+if [ ! -d "$JUMPSERVER_RECORD_PATH" ]; then
+    mkdir -p $JUMPSERVER_RECORD_PATH
 fi
 
 if [ ! "$JUMPSERVER_DRIVE_PATH" ]; then
     export JUMPSERVER_DRIVE_PATH=/config/guacamole/data/drive
 fi
-if [ ! -d "$JUMPSERVER_DRIVE_PATH"]; then
+if [ ! -d "$JUMPSERVER_DRIVE_PATH" ]; then
     mkdir -p $JUMPSERVER_DRIVE_PATH
 fi
 

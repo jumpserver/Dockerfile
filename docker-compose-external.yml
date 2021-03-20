@@ -28,7 +28,7 @@ services:
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
-      - jumpserver
+      - net
 
   celery:
     image: jumpserver/jms_core:${Version}
@@ -50,17 +50,18 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
-      - core
+      core:
+        condition: service_healthy
     healthcheck:
-      test: "cd /opt/jumpserver/apps && /opt/py3/bin/python manage.py check_celery &> /dev/null"
+      test: "/opt/py3/bin/python /opt/jumpserver/apps/manage.py check_celery"
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 30s
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
-      - jumpserver
+      - net
 
   koko:
     image: jumpserver/jms_koko:${Version}
@@ -74,7 +75,8 @@ services:
       DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
-      - core
+      core:
+        condition: service_healthy
     healthcheck:
       test: "nc -z localhost 2222 && nc -z localhost 5000"
       interval: 10s
@@ -86,7 +88,7 @@ services:
     ports:
       - 2222:2222
     networks:
-      - jumpserver
+      - net
 
   guacamole:
     image: jumpserver/jms_guacamole:${Version}
@@ -98,7 +100,8 @@ services:
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
     depends_on:
-      - core
+      core:
+        condition: service_healthy
     healthcheck:
       test: "/etc/init.d/guacd status && curl -f http://localhost:8080"
       interval: 10s
@@ -108,7 +111,7 @@ services:
     volumes:
       - guacamole-data:/config/guacamole/data
     networks:
-      - jumpserver
+      - net
 
   nginx:
     image: jumpserver/jms_nginx:${Version}
@@ -116,10 +119,14 @@ services:
     restart: always
     tty: true
     depends_on:
-      - core
-      - celery
-      - koko
-      - guacamole
+      koko:
+        condition: service_healthy
+      guacamole:
+        condition: service_healthy
+      celery:
+        condition: service_healthy
+      core:
+        condition: service_healthy
     healthcheck:
       test: "curl -f http://localhost"
       interval: 10s
@@ -131,7 +138,7 @@ services:
     ports:
       - 80:80
     networks:
-      - jumpserver
+      - net
 
 volumes:
   core-data:
@@ -139,4 +146,9 @@ volumes:
   guacamole-data:
 
 networks:
-  jumpserver:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: $DOCKER_SUBNET

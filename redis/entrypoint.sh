@@ -15,3 +15,11 @@ function config_redis {
 config_redis
 redis-server --version
 redis-server /etc/redis.conf
+
+if [ ! -d "/var/log/redis" ]; then
+    mkdir -p /var/log/redis
+fi
+if [ ! -f "/var/log/redis/redis.log" ]; then
+    echo > /var/log/redis/redis.log
+fi
+tail -f /var/log/redis/redis.log

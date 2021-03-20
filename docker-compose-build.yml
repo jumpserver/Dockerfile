@@ -24,7 +24,7 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
-      - jumpserver
+      - net
 
   redis:
     build:
@@ -40,7 +40,7 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     healthcheck:
-      test: "redis-cli -h 127.0.0.1 -P $$REDIS_PORT -a $$REDIS_PASSWORD info"
+      test: "redis-cli -h 127.0.0.1 -p $$REDIS_PORT -a $$REDIS_PASSWORD info"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -48,7 +48,7 @@ services:
     volumes:
       - redis-data:/var/lib/redis/
     networks:
-      - jumpserver
+      - net
 
   core:
     build:
@@ -75,8 +75,10 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
-      - mysql
-      - redis
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
     healthcheck:
       test: "curl -f http://localhost:8080/api/health/"
       interval: 10s
@@ -86,7 +88,7 @@ services:
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
-      - jumpserver
+      - net
 
   celery:
     image: jumpserver/jms_core:${Version}
@@ -108,19 +110,22 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
-      - core
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
     healthcheck:
-      test: "cd /opt/jumpserver/apps && /opt/py3/bin/python manage.py check_celery &> /dev/null"
+      test: "/opt/py3/bin/python /opt/jumpserver/apps/manage.py check_celery"
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 60s
+      start_period: 30s
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
-      - jumpserver
+      - net
 
   koko:
     build:
@@ -139,10 +144,12 @@ services:
       DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
-      - core
-      - celery
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
     healthcheck:
       test: "nc -z localhost 2222 && nc -z localhost 5000"
       interval: 10s
@@ -154,7 +161,7 @@ services:
     ports:
       - 2222:2222
     networks:
-      - jumpserver
+      - net
 
   guacamole:
     build:
@@ -171,10 +178,12 @@ services:
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
     depends_on:
-      - core
-      - celery
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
     healthcheck:
       test: "/etc/init.d/guacd status && curl -f http://localhost:8080"
       interval: 10s
@@ -184,7 +193,7 @@ services:
     volumes:
       - guacamole-data:/config/guacamole/data
     networks:
-      - jumpserver
+      - net
 
   nginx:
     build:
@@ -197,11 +206,18 @@ services:
     restart: always
     tty: true
     depends_on:
-      - core
-      - celery
-      - koko
-      - mysql
-      - redis
+      koko:
+        condition: service_healthy
+      guacamole:
+        condition: service_healthy
+      celery:
+        condition: service_healthy
+      core:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
     healthcheck:
       test: "curl -f http://localhost"
       interval: 10s
@@ -213,7 +229,7 @@ services:
     ports:
       - 80:80
     networks:
-      - jumpserver
+      - net
 
 volumes:
   mysql-data:
@@ -223,4 +239,9 @@ volumes:
   guacamole-data:
 
 networks:
-  jumpserver:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: $DOCKER_SUBNET
