@@ -5,7 +5,7 @@ services:
     container_name: jms_core
     restart: always
     tty: true
-    command: start all
+    command: start web
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -20,10 +20,43 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:8080"]
+      test: "curl -f http://localhost:8080/api/health/"
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 60s
+    volumes:
+      - core-data:/opt/jumpserver/data
+    networks:
+      - jumpserver
+
+  celery:
+    image: jumpserver/jms_core:${Version}
+    container_name: jms_celery
+    restart: always
+    tty: true
+    command: start task
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
+      LOG_LEVEL: $LOG_LEVEL
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    depends_on:
+      - core
+    healthcheck:
+      test: "cd /opt/jumpserver/apps && /opt/py3/bin/python manage.py check_celery &> /dev/null"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
@@ -43,10 +76,11 @@ services:
     depends_on:
       - core
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:5000"]
+      test: "nc -z localhost 2222 && nc -z localhost 5000"
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 10s
     volumes:
       - koko-data:/opt/koko/data
     ports:
@@ -66,10 +100,11 @@ services:
     depends_on:
       - core
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:8080"]
+      test: "/etc/init.d/guacd status && curl -f http://localhost:8080"
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 10s
     volumes:
       - guacamole-data:/config/guacamole/data
     networks:
@@ -82,13 +117,15 @@ services:
     tty: true
     depends_on:
       - core
+      - celery
       - koko
       - guacamole
     healthcheck:
-      test: ["CMD", "test", "-f", "/var/run/nginx.pid"]
+      test: "curl -f http://localhost"
       interval: 10s
       timeout: 5s
-      retries: 2
+      retries: 3
+      start_period: 10s
     volumes:
       - core-data:/opt/jumpserver/data
     ports:

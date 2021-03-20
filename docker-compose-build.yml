@@ -19,7 +19,8 @@ services:
       test: "mysql -h127.0.0.1 -P$$DB_PORT -u$$DB_USER -p$$DB_PASSWORD -e 'SHOW DATABASES;'"
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 3
+      start_period: 10s
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -39,10 +40,11 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "info"]
+      test: "redis-cli -h 127.0.0.1 -P $$REDIS_PORT -a $$REDIS_PASSWORD info"
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 3
+      start_period: 10s
     volumes:
       - redis-data:/var/lib/redis/
     networks:
@@ -58,7 +60,7 @@ services:
     container_name: jms_core
     restart: always
     tty: true
-    command: start all
+    command: start web
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -76,10 +78,45 @@ services:
       - mysql
       - redis
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/"]
+      test: "curl -f http://localhost:8080/api/health/"
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 3
+      start_period: 60s
+    volumes:
+      - core-data:/opt/jumpserver/data
+    networks:
+      - jumpserver
+
+  celery:
+    image: jumpserver/jms_core:${Version}
+    container_name: jms_celery
+    restart: always
+    tty: true
+    command: start task
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
+      LOG_LEVEL: $LOG_LEVEL
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    depends_on:
+      - core
+      - mysql
+      - redis
+    healthcheck:
+      test: "cd /opt/jumpserver/apps && /opt/py3/bin/python manage.py check_celery &> /dev/null"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
@@ -103,13 +140,15 @@ services:
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
+      - celery
       - mysql
       - redis
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:5000"]
+      test: "nc -z localhost 2222 && nc -z localhost 5000"
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 10s
     volumes:
       - koko-data:/opt/koko/data
     ports:
@@ -133,13 +172,15 @@ services:
       GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
     depends_on:
       - core
+      - celery
       - mysql
       - redis
     healthcheck:
-      test: ["CMD", "curl", "http://localhost:8080"]
+      test: "/etc/init.d/guacd status && curl -f http://localhost:8080"
       interval: 10s
       timeout: 5s
       retries: 3
+      start_period: 10s
     volumes:
       - guacamole-data:/config/guacamole/data
     networks:
@@ -157,14 +198,16 @@ services:
     tty: true
     depends_on:
       - core
+      - celery
       - koko
       - mysql
       - redis
     healthcheck:
-      test: ["CMD", "test", "-f", "/var/run/nginx.pid"]
+      test: "curl -f http://localhost"
       interval: 10s
       timeout: 5s
-      retries: 2
+      retries: 3
+      start_period: 10s
     volumes:
       - core-data:/opt/jumpserver/data
     ports:

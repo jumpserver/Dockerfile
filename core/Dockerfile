@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.8.0
+ARG Version=v2.7.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -27,4 +27,4 @@ RUN set -ex \
 COPY core/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

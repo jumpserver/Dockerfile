@@ -1,6 +1,6 @@
 FROM centos:7
 WORKDIR /opt
-ARG Version=v2.8.0
+ARG Version=v2.7.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
