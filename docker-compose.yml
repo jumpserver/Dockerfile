@@ -1,45 +1,5 @@
 version: '3'
 services:
-  mysql:
-    image: jumpserver/jms_mysql:${Version}
-    container_name: jms_mysql
-    restart: always
-    tty: true
-    environment:
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-    healthcheck:
-      test: "mysql -h127.0.0.1 -P$$DB_PORT -u$$DB_USER -p$$DB_PASSWORD -e 'SHOW DATABASES;'"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - net
-
-  redis:
-    image: jumpserver/jms_redis:${Version}
-    container_name: jms_redis
-    restart: always
-    tty: true
-    environment:
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-    healthcheck:
-      test: "redis-cli -h 127.0.0.1 -p $$REDIS_PORT -a $$REDIS_PASSWORD info"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    volumes:
-      - redis-data:/var/lib/redis/
-    networks:
-      - net
-
   core:
     image: jumpserver/jms_core:${Version}
     container_name: jms_core
@@ -59,11 +19,6 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
-    depends_on:
-      redis:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
     healthcheck:
       test: "curl -f http://localhost:8080/api/health/"
       interval: 10s
@@ -97,10 +52,6 @@ services:
     depends_on:
       core:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
     healthcheck:
       test: "/opt/py3/bin/python /opt/jumpserver/apps/manage.py check_celery"
       interval: 10s
@@ -125,10 +76,6 @@ services:
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
       core:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      mysql:
         condition: service_healthy
     healthcheck:
       test: "nc -z localhost 2222 && nc -z localhost 5000"
@@ -155,10 +102,6 @@ services:
     depends_on:
       core:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
     healthcheck:
       test: "/etc/init.d/guacd status && curl -f http://localhost:8080"
       interval: 10s
@@ -182,10 +125,6 @@ services:
         condition: service_healthy
       core:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
     healthcheck:
       test: "curl -f http://localhost"
       interval: 10s
@@ -200,8 +139,6 @@ services:
       - net
 
 volumes:
-  mysql-data:
-  redis-data:
   core-data:
   koko-data:
   guacamole-data:
