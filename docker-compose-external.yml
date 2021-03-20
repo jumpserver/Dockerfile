@@ -123,8 +123,6 @@ services:
         condition: service_healthy
       guacamole:
         condition: service_healthy
-      celery:
-        condition: service_healthy
       core:
         condition: service_healthy
     healthcheck:
