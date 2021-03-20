@@ -26,8 +26,6 @@ jobs:
       run: docker-compose --file docker-compose-build.yml build
     - name: Docker Tag Rename
       run: |
-        docker tag jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_mysql:latest
-        docker tag jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_redis:latest
         docker tag jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_nginx:latest
         docker tag jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_core:latest
         docker tag jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_koko:latest
@@ -36,14 +34,10 @@ jobs:
       run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u wojiushixiaobai --password-stdin
     - name: Push image to Docker registry
       run: |
-        docker push jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
-        docker push jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
         docker push jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
         docker push jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
         docker push jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
         docker push jumpserver/jms_guacamole:${{ steps.get_tag.outputs.TAG }}
-        docker push jumpserver/jms_mysql:latest
-        docker push jumpserver/jms_redis:latest
         docker push jumpserver/jms_nginx:latest
         docker push jumpserver/jms_core:latest
         docker push jumpserver/jms_koko:latest
@@ -52,14 +46,10 @@ jobs:
       run: echo "${{ secrets.HW_CLOUD_TOKEN }}" | docker login -u cn-south-1@TZZDVNMCLUKINTT3FMLI swr.cn-south-1.myhuaweicloud.com --password-stdin
     - name: Push image to HuaweiCloud registry
       run: |
-        docker tag jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
-        docker tag jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
         docker tag jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
         docker tag jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
         docker tag jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
         docker tag jumpserver/jms_guacamole:${{ steps.get_tag.outputs.TAG }} swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole:${{ steps.get_tag.outputs.TAG }}
-        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_mysql:${{ steps.get_tag.outputs.TAG }}
-        docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_redis:${{ steps.get_tag.outputs.TAG }}
         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx:${{ steps.get_tag.outputs.TAG }}
         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core:${{ steps.get_tag.outputs.TAG }}
         docker push swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko:${{ steps.get_tag.outputs.TAG }}
