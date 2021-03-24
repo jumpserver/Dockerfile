@@ -14,7 +14,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.8.1
+Version=v2.8.2
 
 # Network
 DOCKER_SUBNET=172.16.238.0/24
