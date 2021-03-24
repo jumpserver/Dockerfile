@@ -1,0 +1,27 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - master
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get tag
+      id: get_tag
+      run: |
+        TAG=$(basename ${GITHUB_REF})
+        echo "::set-output name=TAG::$TAG"
+    - name: Set up Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v3
+    - name: Build Docker Image
+      run: docker buildx build --platform=linux/arm64 --output "type=image,push=false" --build-arg Version=${{ steps.get_tag.outputs.TAG }} . --file ./allinone/Dockerfile --tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
+    - name: Docker Tag Rename
+      run: docker tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }} jumpserver/jms_all:latest
