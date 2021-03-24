@@ -19,7 +19,11 @@ jobs:
         TAG=$(basename ${GITHUB_REF})
         echo "::set-output name=TAG::$TAG"
     - name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v3
+      id: buildx
+      uses: crazy-max/ghaction-docker-buildx@v3
+      with:
+        buildx-version: latest
+        qemu-version: latest
     - name: Build Docker Image
       run: docker buildx build --platform=linux/arm64 --output "type=image,push=false" --build-arg Version=${{ steps.get_tag.outputs.TAG }} . --file ./allinone/Dockerfile --tag jumpserver/jms_all:${{ steps.get_tag.outputs.TAG }}
     - name: Docker Tag Rename
