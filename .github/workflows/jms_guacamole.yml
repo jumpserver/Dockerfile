@@ -2,8 +2,8 @@ name: Guacamole Image Buildx
 
 on:
   push:
-    branches:
-      - master
+    # branches:
+      # - master
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
@@ -26,10 +26,10 @@ jobs:
         imageName: wojiushixiaobai/jms_guacamole
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
-        tag: test
+        tag: ${{ steps.get_tag.outputs.TAG }},latest
         dockerFile: guacamole/Dockerfile
         platform: linux/amd64,linux/arm64
-        buildArg: Version=v2.9.2
+        buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
     - name: Build Guacamole for JumpServer
       uses: ilteoood/docker_buildx@master
@@ -38,10 +38,10 @@ jobs:
         imageName: jumpserver/jms_guacamole
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
-        tag: test
+        tag: ${{ steps.get_tag.outputs.TAG }},latest
         dockerFile: guacamole/Dockerfile
         platform: linux/amd64,linux/arm64
-        buildArg: Version=v2.9.2
+        buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
     - name: Build Guacamole for HuaweiCloud
       uses: ilteoood/docker_buildx@master
@@ -51,7 +51,7 @@ jobs:
         imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole
         dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
         dockerPassword: ${{ secrets.HW_CLOUD_TOKEN }}
-        tag: test
+        tag: ${{ steps.get_tag.outputs.TAG }},latest
         dockerFile: guacamole/Dockerfile
         platform: linux/amd64
-        buildArg: Version=v2.9.2
+        buildArg: Version=${{ steps.get_tag.outputs.TAG }}
