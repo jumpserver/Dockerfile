@@ -1,15 +1,14 @@
-FROM centos:7
+FROM centos:8
 WORKDIR /opt
-ARG Version=v2.9.2
-ENV Version=${Version} \
-    LANG=en_US.utf8
+ARG TARGETARCH \
+    Version=v2.9.2
+ENV Version=${Version}
 
 RUN set -ex \
-    && yum install -y epel-release wget \
-    && yum clean all \
+    && yum install -y epel-release wget dnf-plugins-core glibc-langpack-en http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
+    && yum config-manager --set-enable powertools \
+    && yum config-manager --enable devel \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/locale.conf \
-    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
     && yum install -y make gcc java-1.8.0-openjdk nc \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
@@ -49,6 +48,7 @@ RUN set -ex \
     && mv /config/docker-guacamole/guacamole.properties /config/guacamole/ \
     && rm -rf /config/docker-guacamole \
     && yum clean all \
+    && yum config-manager --disable devel \
     && rm -rf /var/tmp/yum*
 
 COPY guacamole/entrypoint.sh .

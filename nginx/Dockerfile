@@ -1,13 +1,14 @@
-FROM centos:7
+FROM centos:8
 WORKDIR /opt
-ARG Version=v2.9.2
-ENV Version=${Version} \
-    LANG=en_US.utf8
+ARG TARGETARCH \
+    Version=v2.9.2
+ENV Version=${Version}
 
 RUN set -ex \
-    && yum install -y epel-release wget \
+    && yum install -y epel-release wget dnf-plugins-core glibc-langpack-en \
+    && yum config-manager --set-enable powertools \
+    && yum config-manager --enable devel \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/locale.conf \
     && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key\nmodule_hotfixes=true" > /etc/yum.repos.d/nginx.repo \
     && yum install -y nginx \
     && echo > /etc/nginx/conf.d/default.conf \
@@ -19,6 +20,7 @@ RUN set -ex \
     && mv lina-${Version} lina \
     && rm -rf /opt/*.tar.gz \
     && yum clean all \
+    && yum config-manager --disable devel \
     && rm -rf /var/tmp/yum*
 
 COPY nginx/nginx.conf /etc/nginx/

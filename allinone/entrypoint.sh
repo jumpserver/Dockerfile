@@ -1,20 +1,17 @@
 #!/bin/bash
 #
 
-if [ "$DB_HOST" == "127.0.0.1" ]; then
-    if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
-        mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
-        mysqld --daemonize --user=mysql
-        sleep 5s
-        mysql -uroot -e "create database jumpserver default charset 'utf8' collate 'utf8_bin'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
-    else
-        mysqld --daemonize --user=mysql
-    fi
-fi
+while ! nc -z $DB_HOST $DB_PORT;
+do
+    echo "wait for jms_mysql ${DB_HOST} ready"
+    sleep 2s
+done
 
-if [ "$REDIS_HOST" == "127.0.0.1" ]; then
-    redis-server &
-fi
+while ! nc -z $REDIS_HOST $REDIS_PORT;
+do
+    echo "wait for jms_redis ${REDIS_HOST} ready"
+    sleep 2s
+done
 
 if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml

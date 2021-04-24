@@ -1,0 +1,57 @@
+name: Nginx Image Buildx
+
+on:
+  push:
+    branches:
+      - master
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Get tag
+      id: get_tag
+      run: |
+        TAG=$(basename ${GITHUB_REF})
+        echo "::set-output name=TAG::$TAG"
+
+    - name: Build Nginx
+      uses: ilteoood/docker_buildx@master
+      with:
+        publish: true
+        imageName: wojiushixiaobai/jms_nginx
+        dockerUser: wojiushixiaobai
+        dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
+        tag: test
+        dockerFile: nginx/Dockerfile
+        platform: linux/amd64,linux/arm64
+        buildArg: Version=v2.9.2
+
+    - name: Build Nginx for JumpServer
+      uses: ilteoood/docker_buildx@master
+      with:
+        publish: true
+        imageName: jumpserver/jms_nginx
+        dockerUser: wojiushixiaobai
+        dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
+        tag: test
+        dockerFile: nginx/Dockerfile
+        platform: linux/amd64,linux/arm64
+        buildArg: Version=v2.9.2
+
+    - name: Build Nginx for HuaweiCloud
+      uses: ilteoood/docker_buildx@master
+      with:
+        publish: true
+        dockerServer: swr.cn-south-1.myhuaweicloud.com
+        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_nginx
+        dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
+        dockerPassword: ${{ secrets.HW_CLOUD_TOKEN }}
+        tag: test
+        dockerFile: nginx/Dockerfile
+        platform: linux/amd64
+        buildArg: Version=v2.9.2

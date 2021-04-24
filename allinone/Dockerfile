@@ -1,23 +1,21 @@
-FROM centos:7
+FROM centos:8
 WORKDIR /opt
-ARG Version=v2.9.2
-ENV Version=${Version} \
-    LANG=en_US.utf8
+ARG TARGETARCH \
+    Version=v2.9.2
+ENV Version=${Version}
 
 RUN set -ex \
+    && yum -y install epel-release wget dnf-plugins-core glibc-langpack-en glibc-langpack-en http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
+    && yum config-manager --set-enable powertools \
+    && yum config-manager --enable devel \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/locale.conf \
-    && yum -y install epel-release https://repo.ius.io/ius-release-el7.rpm \
-    && yum -y install wget gcc epel-release git yum-utils \
+    && yum -y install make gcc nc java-1.8.0-openjdk libffi-devel libxml2 libxslt-devel \
     && yum -y install python36 python36-devel \
-    && yum -y localinstall --nogpgcheck https://mirrors.aliyun.com/rpmfusion/free/el/rpmfusion-free-release-7.noarch.rpm \
-    && yum install -y java-1.8.0-openjdk \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo \
     && rpm --import https://nginx.org/keys/nginx_signing.key \
-    && yum -y localinstall http://mirrors.ustc.edu.cn/mysql-repo/mysql57-community-release-el7.rpm \
-    && yum -y install mysql-community-server redis5 nginx \
+    && yum -y install nginx \
     && python3.6 -m venv /opt/py3 \
     && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
     && rm -rf /etc/nginx/conf.d/default.conf \
@@ -52,9 +50,9 @@ RUN set -ex \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
-    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
-    && tar -xf koko-${Version}-linux-amd64.tar.gz \
-    && mv koko-${Version}-linux-amd64 koko \
+    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
+    && mv koko-${Version}-linux-${TARGETARCH} koko \
     && mv /opt/koko/kubectl /usr/local/bin/ \
     && wget https://download.jumpserver.org/public/kubectl.tar.gz \
     && tar -xf kubectl.tar.gz \
@@ -74,7 +72,7 @@ RUN set -ex \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna-${Version}.tar.gz \
     && tar -xf luna-${Version}.tar.gz \
     && mv luna-${Version} luna \
-    && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
+    && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt | sed "s/mysql.*//g") \
     && source /opt/py3/bin/activate \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd guacamole \
@@ -95,7 +93,6 @@ COPY allinone/readme.txt readme.txt
 COPY allinone/entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
 
-VOLUME /var/lib/mysql
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /config/guacamole/data

@@ -1,17 +1,18 @@
-FROM centos:7
+FROM centos:8
 WORKDIR /opt
-ARG Version=v2.9.2
-ENV Version=${Version} \
-    LANG=en_US.utf8
+ARG TARGETARCH \
+    Version=v2.9.2
+ENV Version=${Version}
 
 RUN set -ex \
-   && yum install -y wget \
+   && yum install -y wget dnf-plugins-core glibc-langpack-en \
+   && yum config-manager --set-enable powertools \
+   && yum config-manager --enable devel \
    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-   && echo "LANG=$LANG" > /etc/locale.conf \
    && yum -y install mariadb bash-completion nc \
-   && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-amd64.tar.gz \
-   && tar -xf koko-${Version}-linux-amd64.tar.gz \
-   && mv koko-${Version}-linux-amd64 koko \
+   && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
+   && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
+   && mv koko-${Version}-linux-${TARGETARCH} koko \
    && chown -R root:root koko \
    && mv /opt/koko/kubectl /usr/local/bin/ \
    && wget https://download.jumpserver.org/public/kubectl.tar.gz \
@@ -26,6 +27,7 @@ RUN set -ex \
    && chmod 755 /opt/koko/init-kubectl.sh \
    && rm -rf /opt/*.tar.gz \
    && yum clean all \
+   && yum config-manager --disable devel \
    && rm -rf /var/cache/yum*
 
 COPY koko/entrypoint.sh .
