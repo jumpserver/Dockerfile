@@ -5,20 +5,19 @@ ARG TARGETARCH \
 ENV Version=${Version}
 
 RUN set -ex \
-    && yum -y install epel-release wget dnf-plugins-core glibc-langpack-en glibc-langpack-en http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
+    && yum -y install epel-release wget dnf-plugins-core glibc-langpack-en glibc-langpack-en \
     && yum config-manager --set-enable powertools \
     && yum config-manager --enable devel \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && yum -y install make gcc nc java-1.8.0-openjdk libffi-devel libxml2 libxslt-devel \
+    && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key\nmodule_hotfixes=true" > /etc/yum.repos.d/nginx.repo \
+    && yum -y install nginx \
+    && echo > /etc/nginx/conf.d/default.conf \
+    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
+    && yum -y install make gcc nc java-1.8.0-openjdk libffi-devel libxml2 libxslt-devel bash-completion http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
     && yum -y install python36 python36-devel \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
-    && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key\nmodule_hotfixes=true" > /etc/yum.repos.d/nginx.repo \
-    && yum -y install nginx \
     && python3.6 -m venv /opt/py3 \
-    && echo -e "[easy_install]\nindex_url = https://mirrors.aliyun.com/pypi/simple/" > ~/.pydistutils.cfg \
-    && rm -rf /etc/nginx/conf.d/default.conf \
-    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && yum install -y bash-completion \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \

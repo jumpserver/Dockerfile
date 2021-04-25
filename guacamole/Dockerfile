@@ -5,11 +5,11 @@ ARG TARGETARCH \
 ENV Version=${Version}
 
 RUN set -ex \
-    && yum install -y epel-release wget dnf-plugins-core glibc-langpack-en http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
+    && yum install -y epel-release wget dnf-plugins-core glibc-langpack-en \
     && yum config-manager --set-enable powertools \
     && yum config-manager --enable devel \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && yum install -y make gcc java-1.8.0-openjdk nc \
+    && yum install -y make gcc java-1.8.0-openjdk nc http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
     && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
     && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
