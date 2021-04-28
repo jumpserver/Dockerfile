@@ -22,7 +22,7 @@ jobs:
     - name: Build Guacamole
       uses: ilteoood/docker_buildx@master
       with:
-        publish: false
+        publish: true
         imageName: wojiushixiaobai/jms_guacamole
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -34,7 +34,7 @@ jobs:
     - name: Build Guacamole for JumpServer
       uses: ilteoood/docker_buildx@master
       with:
-        publish: false
+        publish: true
         imageName: jumpserver/jms_guacamole
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
     - name: Build Guacamole for HuaweiCloud
       uses: ilteoood/docker_buildx@master
       with:
-        publish: false
+        publish: true
         dockerServer: swr.cn-south-1.myhuaweicloud.com
         imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole
         dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI

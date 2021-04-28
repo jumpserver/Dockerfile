@@ -22,7 +22,7 @@ jobs:
     - name: Build KoKo
       uses: ilteoood/docker_buildx@master
       with:
-        publish: false
+        publish: true
         imageName: wojiushixiaobai/jms_koko
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -34,7 +34,7 @@ jobs:
     - name: Build KoKo for JumpServer
       uses: ilteoood/docker_buildx@master
       with:
-        publish: false
+        publish: true
         imageName: jumpserver/jms_koko
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
     - name: Build KoKo for HuaweiCloud
       uses: ilteoood/docker_buildx@master
       with:
-        publish: false
+        publish: true
         dockerServer: swr.cn-south-1.myhuaweicloud.com
         imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_koko
         dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
