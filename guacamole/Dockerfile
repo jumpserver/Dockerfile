@@ -39,7 +39,7 @@ RUN set -ex \
     && wget https://download.jumpserver.org/public/ssh-forward-linux-${TARGETARCH}.tar.gz \
     && tar -xf ssh-forward-linux-${TARGETARCH}.tar.gz -C /bin/ \
     && chown root:root /bin/ssh-forward \
-    && chomd 755 /bin/ssh-forward \
+    && chmod 755 /bin/ssh-forward \
     && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
     && tar -xf guacamole-client-${Version}.tar.gz \
     && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
