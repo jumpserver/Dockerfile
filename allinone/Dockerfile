@@ -20,9 +20,9 @@ RUN set -ex \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
     && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
+    && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
     && rm -f apache-tomcat-${TOMCAT_VER}.tar.gz \
     && rm -rf /config/tomcat9/webapps/* \
-    && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat9/conf/server.xml \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
