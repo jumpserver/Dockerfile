@@ -48,7 +48,7 @@ docker run --name jms_all -d \
   -e BOOTSTRAP_TOKEN=xxxxxx \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
-  -e DB_USER=root \
+  -e DB_USER=jumpserver \
   -e DB_PASSWORD=weakPassword \
   -e DB_NAME=jumpserver \
   -e REDIS_HOST=192.168.x.x \

@@ -1,16 +1,19 @@
-FROM centos:8
+FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
     Version=v2.9.2
-ENV Version=${Version}
+ENV Version=${Version} \
+    LANG=en_US.utf8
 
 RUN set -ex \
-    && yum install -y epel-release wget dnf-plugins-core glibc-langpack-en \
-    && yum config-manager --set-enable powertools \
-    && yum config-manager --enable devel \
+    && apt-get update \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key\nmodule_hotfixes=true" > /etc/yum.repos.d/nginx.repo \
-    && yum install -y nginx \
+    && echo "LANG=$LANG" > /etc/default/locale \
+    && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
+    && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
+    && apt-get update \
+    && apt-get install -y nginx \
     && echo > /etc/nginx/conf.d/default.conf \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna-${Version}.tar.gz \
     && tar -xf luna-${Version}.tar.gz \
@@ -19,9 +22,8 @@ RUN set -ex \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
     && rm -rf /opt/*.tar.gz \
-    && yum clean all \
-    && yum config-manager --disable devel \
-    && rm -rf /var/tmp/yum*
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY nginx/nginx.conf /etc/nginx/
 

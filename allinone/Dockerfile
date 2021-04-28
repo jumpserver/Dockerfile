@@ -1,50 +1,47 @@
-FROM centos:8
+FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
     Version=v2.9.2
-ENV Version=${Version}
+ENV Version=${Version} \
+    LANG=en_US.utf8
 
 RUN set -ex \
-    && yum -y install epel-release wget dnf-plugins-core glibc-langpack-en glibc-langpack-en \
-    && yum config-manager --set-enable powertools \
-    && yum config-manager --enable devel \
+    && apt-get update \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo -e "[nginx-stable]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/\$releasever/\$basearch/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key\nmodule_hotfixes=true" > /etc/yum.repos.d/nginx.repo \
-    && yum -y install nginx \
-    && echo > /etc/nginx/conf.d/default.conf \
-    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
-    && yum -y install make gcc nc java-1.8.0-openjdk libffi-devel libxml2 libxslt-devel bash-completion http://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm \
-    && yum -y install python36 python36-devel \
-    && yum install -y cairo-devel libjpeg-turbo-devel libpng-devel libtool uuid-devel \
-    && yum install -y ffmpeg-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel libwebsockets-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel \
-    && python3.6 -m venv /opt/py3 \
-    && yum install -y bash-completion \
+    && echo "LANG=$LANG" > /etc/default/locale \
+    && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
+    && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
+    && apt-get install -y python3.8 python3.8-dev python3-venv libffi-dev libxml2 libxslt-dev libmariadb-dev libldap2-dev sshpass mariadb-client bash-completion make openjdk-8-jre-headless \
+    && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev \
+    && apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
+    && python3.8 -m venv /opt/py3 \
     && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
     && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
     && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
     && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
-    && rm -rf apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
+    && rm -f apache-tomcat-${TOMCAT_VER}.tar.gz \
     && rm -rf /config/tomcat9/webapps/* \
+    && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
     && sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat9/conf/server.xml \
     && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
     && tar -xf guacamole-server-1.3.0.tar.gz \
     && cd guacamole-server-1.3.0 \
-    && ./configure --with-init-dir=/etc/init.d \
+    && ./configure --with-init-dir=/etc/init.d  --disable-guaclog \
     && make \
     && make install \
     && ldconfig \
-    && cd .. \
     && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
     && tar -xf guacamole-client-${Version}.tar.gz \
     && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
     && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
-    && yum clean all \
+    && cd /opt \
     && rm -rf guacamole-server-1.3.0 guacamole-server-1.3.0.tar.gz guacamole-client-${Version} guacamole-client-${Version}.tar.gz \
-    && rm -rf /var/cache/yum/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
+    && apt-get update \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
@@ -52,8 +49,8 @@ RUN set -ex \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
     && mv /opt/koko/kubectl /usr/local/bin/ \
-    && wget https://download.jumpserver.org/public/kubectl.tar.gz \
-    && tar -xf kubectl.tar.gz \
+    && wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
+    && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
     && chmod 755 kubectl \
     && mv kubectl /usr/local/bin/rawkubectl \
     && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
@@ -70,21 +67,25 @@ RUN set -ex \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna-${Version}.tar.gz \
     && tar -xf luna-${Version}.tar.gz \
     && mv luna-${Version} luna \
-    && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt | sed "s/mysql.*//g") \
-    && source /opt/py3/bin/activate \
+    && . /opt/py3/bin/activate \
+    && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd guacamole \
     && mv /opt/guacamole/guacamole.properties /config/guacamole/ \
-    && wget http://download.jumpserver.org/public/ssh-forward.tar.gz \
-    && tar -xf ssh-forward.tar.gz -C /bin/ \
-    && chmod 755 /bin/ssh-forward \
+    && wget https://download.jumpserver.org/public/ssh-forward-linux-${TARGETARCH}.tar.gz \
+    && tar -xf ssh-forward-linux-${TARGETARCH}.tar.gz -C /bin/ \
+    && chown root:root /bin/ssh-forward \
+    && chomd 755 /bin/ssh-forward \
     && cd /opt \
+    && apt-get install -y nginx \
+    && echo > /etc/nginx/conf.d/default.conf \
+    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && chown -R root:root /opt/* \
-    && yum clean all \
-    && rm -rf /opt/guacamole \
-    && rm -rf /var/cache/yum/* \
+    && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
+    && apt-get clean all \
+    && rm -rf /opt/guacamole /opt/guacamole-server-1.3.0 \
     && rm -rf /opt/*.tar.gz \
-    && rm -rf /var/cache/yum/* \
+    && rm -rf /var/lib/apt/lists/* \
     && rm -rf ~/.cache/pip
 
 COPY allinone/readme.txt readme.txt
@@ -105,7 +106,7 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     DB_NAME=jumpserver \
     REDIS_HOST=127.0.0.1 \
     REDIS_PORT=6379 \
-    REDIS_PASSWORD= \
+    REDIS_PASSWORD=weakPassword \
     CORE_HOST=http://127.0.0.1:8080 \
     LOG_LEVEL=ERROR \
     JUMPSERVER_KEY_DIR=/config/guacamole/data/keys \

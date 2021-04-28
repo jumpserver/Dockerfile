@@ -42,7 +42,7 @@ fi
 if [[ "$action" == "bash" || "$action" == "sh" ]];then
     bash
 else
-    source /opt/py3/bin/activate
+    . /opt/py3/bin/activate
     cd /opt/jumpserver
     ./jms "${action}" "${service}"
 fi

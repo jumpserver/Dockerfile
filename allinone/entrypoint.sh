@@ -17,7 +17,7 @@ if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml
 fi
 
-source /opt/py3/bin/activate
+. /opt/py3/bin/activate
 cd /opt/jumpserver && ./jms start -d
 cd /opt/koko && ./koko -d
 /etc/init.d/guacd start
