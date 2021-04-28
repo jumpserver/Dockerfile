@@ -75,7 +75,7 @@ RUN set -ex \
     && wget https://download.jumpserver.org/public/ssh-forward-linux-${TARGETARCH}.tar.gz \
     && tar -xf ssh-forward-linux-${TARGETARCH}.tar.gz -C /bin/ \
     && chown root:root /bin/ssh-forward \
-    && chomd 755 /bin/ssh-forward \
+    && chmod 755 /bin/ssh-forward \
     && cd /opt \
     && apt-get install -y nginx \
     && echo > /etc/nginx/conf.d/default.conf \
