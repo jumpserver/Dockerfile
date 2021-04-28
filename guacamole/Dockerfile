@@ -6,7 +6,7 @@ ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && && apt-get update \
+    && apt-get update \
     && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
