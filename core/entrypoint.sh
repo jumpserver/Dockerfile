@@ -31,6 +31,11 @@ if [ ! "${service}" ]; then
   service=all
 fi
 
+if [ ! -d "/opt/jumpserver/data/static" ]; then
+    mkdir -p /opt/jumpserver/data/static
+    chmod 755 -R /opt/jumpserver/data/static
+fi
+
 if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml
 fi
