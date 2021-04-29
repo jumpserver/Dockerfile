@@ -8,7 +8,7 @@
 
 环境要求
 - MySQL Server >= 5.7
-- Redis Server >= 5.0
+- Redis Server >= 6.0
 
 > 请先自行创建 数据库 和 Redis, 版本要求参考上面环境要求说明
 

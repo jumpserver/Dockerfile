@@ -13,7 +13,7 @@ This project is Docker image build.
 使用外置 MySQL 数据库和 Redis:
 
     - 外置数据库要求 MySQL 版本大于等于 5.7
-    - 外置 Redis 要求 Redis 版本大于等于 5.0
+    - 外置 Redis 要求 Redis 版本大于等于 6.0
 
 **设置环境变量：**
 
