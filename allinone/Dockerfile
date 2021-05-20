@@ -63,7 +63,7 @@ RUN set -ex \
     && chown -R root:root /opt/* \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
     && apt-get clean all \
-    && rm -rf /opt/guacamole /opt/guacamole-server-1.3.0 \
+    && rm -rf /opt/guacamole-server-1.3.0 \
     && rm -rf /opt/*.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf ~/.cache/pip

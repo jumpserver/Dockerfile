@@ -21,6 +21,7 @@ RUN set -ex \
     && make install \
     && ldconfig \
     && cd /opt \
+    && rm -rf /opt/guacamole-server-1.3.0 \
     && wget https://github.com/jumpserver/lion-release/releases/download/${Version}/lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv lion-${Version}-linux-${TARGETARCH} lion \

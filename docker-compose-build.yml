@@ -120,7 +120,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "/etc/init.d/guacd status && curl -f http://localhost:8081"
+      test: "/etc/init.d/guacd status && curl -f http://localhost:8081/lion/health/"
       interval: 10s
       timeout: 5s
       retries: 3
