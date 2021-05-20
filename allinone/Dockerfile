@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.9.2
+    Version=v2.10.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -12,19 +12,10 @@ RUN set -ex \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
     && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
-    && apt-get install -y python3.8 python3.8-dev python3-venv libffi-dev libxml2 libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion make openjdk-8-jre-headless \
+    && apt-get install -y python3.8 python3.8-dev python3-venv libffi-dev libxml2 libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion make \
     && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev \
     && apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && python3.8 -m venv /opt/py3 \
-    && mkdir -p /config/guacamole/lib /config/guacamole/extensions /config/guacamole/data/log/ /config/guacamole/data/record /config/guacamole/data/drive \
-    && TOMCAT_VER=`curl -s http://tomcat.apache.org/tomcat-9.0-doc/ | grep 'Version ' | awk '{print $2}' | sed 's/.$//'` \
-    && wget https://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-9/v${TOMCAT_VER}/bin/apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && tar -xf apache-tomcat-${TOMCAT_VER}.tar.gz -C /config \
-    && mv /config/apache-tomcat-${TOMCAT_VER} /config/tomcat9 \
-    && rm -f apache-tomcat-${TOMCAT_VER}.tar.gz \
-    && rm -rf /config/tomcat9/webapps/* \
-    && sed -i 's/Connector port="8080"/Connector port="8081"/g' /config/tomcat9/conf/server.xml \
-    && echo "java.util.logging.ConsoleHandler.encoding = UTF-8" >> /config/tomcat9/conf/logging.properties \
     && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
     && tar -xf guacamole-server-1.3.0.tar.gz \
     && cd guacamole-server-1.3.0 \
@@ -32,12 +23,8 @@ RUN set -ex \
     && make \
     && make install \
     && ldconfig \
-    && wget http://download.jumpserver.org/release/${Version}/guacamole-client-${Version}.tar.gz \
-    && tar -xf guacamole-client-${Version}.tar.gz \
-    && cp guacamole-client-${Version}/guacamole-*.war /config/tomcat9/webapps/ROOT.war \
-    && cp guacamole-client-${Version}/guacamole-*.jar /config/guacamole/extensions/ \
     && cd /opt \
-    && rm -rf guacamole-server-1.3.0 guacamole-server-1.3.0.tar.gz guacamole-client-${Version} guacamole-client-${Version}.tar.gz \
+    && rm -rf guacamole-server-1.3.0 guacamole-server-1.3.0.tar.gz \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
@@ -58,9 +45,9 @@ RUN set -ex \
     && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
     && chown -R root:root /opt/kubectl-aliases/ \
     && chmod 755 /opt/koko/init-kubectl.sh \
-    && wget -O guacamole-${Version}.tar.gz https://github.com/jumpserver/docker-guacamole/archive/master.tar.gz \
-    && mkdir /opt/guacamole \
-    && tar -xf guacamole-${Version}.tar.gz -C /opt/guacamole --strip-components 1 \
+    && wget https://github.com/jumpserver/lion-release/releases/download/${Version}/lion-${Version}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf lion-${Version}-linux-${TARGETARCH}.tar.gz \
+    && mv lion-${Version}-linux-${TARGETARCH} lion \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
@@ -71,7 +58,6 @@ RUN set -ex \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd guacamole \
-    && mv /opt/guacamole/guacamole.properties /config/guacamole/ \
     && wget https://download.jumpserver.org/public/ssh-forward-linux-${TARGETARCH}.tar.gz \
     && tar -xf ssh-forward-linux-${TARGETARCH}.tar.gz -C /bin/ \
     && chown root:root /bin/ssh-forward \
@@ -94,7 +80,7 @@ RUN chmod +x ./entrypoint.sh
 
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
-VOLUME /config/guacamole/data
+VOLUME /opt/lion/data
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q \
@@ -108,20 +94,7 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     REDIS_PORT=6379 \
     REDIS_PASSWORD=weakPassword \
     CORE_HOST=http://127.0.0.1:8080 \
-    LOG_LEVEL=ERROR \
-    JUMPSERVER_KEY_DIR=/config/guacamole/data/keys \
-    GUACAMOLE_HOME=/config/guacamole \
-    GUACAMOLE_LOG_LEVEL=ERROR \
-    JUMPSERVER_ENABLE_DRIVE=true \
-    JUMPSERVER_RECORD_PATH=/config/guacamole/data/record \
-    JUMPSERVER_DRIVE_PATH=/config/guacamole/data/drive \
-    JUMPSERVER_CLEAR_DRIVE_SESSION=true \
-    JUMPSERVER_CLEAR_DRIVE_SCHEDULE=24 \
-    JUMPSERVER_SERVER=http://127.0.0.1:8080 \
-    JUMPSERVER_COLOR_DEPTH=32 \
-    JUMPSERVER_DPI=120 \
-    JUMPSERVER_DISABLE_BITMAP_CACHING=true \
-    JUMPSERVER_DISABLE_GLYPH_CACHING=true
+    LOG_LEVEL=ERROR
 
 EXPOSE 80 2222
 ENTRYPOINT ["./entrypoint.sh"]

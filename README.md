@@ -20,9 +20,12 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.9.2
+Version=v2.10.0
 
-# Network
+# Compose
+COMPOSE_PROJECT_NAME=jms
+COMPOSE_HTTP_TIMEOUT=3600
+DOCKER_CLIENT_TIMEOUT=3600
 DOCKER_SUBNET=172.16.238.0/24
 
 # MySQL  # 填写你的 Mysql 服务器信息

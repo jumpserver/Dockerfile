@@ -31,12 +31,9 @@ This project is Docker image build.
     - REDIS_PORT = 6379
     - REDIS_PASSWORD = xxxx
 
-    - JUMPSERVER_KEY_DIR=/config/guacamole/data/keys \
-    - GUACAMOLE_HOME=/config/guacamole \
-    - JUMPSERVER_SERVER=http://127.0.0.1:8080
-
     - VOLUME /opt/jumpserver/data
-    - VOLUME /var/lib/mysql
+    - VOLUME /opt/koko/data
+    - VOLUME /opt/lion/data
 
 
 ```bash
@@ -55,5 +52,5 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v2.9.2
+  jumpserver/jms_all:v2.10.0
 ```

@@ -6,6 +6,7 @@ services:
       dockerfile: core/Dockerfile
       args:
         Version: ${Version}
+        TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_core:${Version}
     container_name: jms_core
     restart: always
@@ -74,6 +75,7 @@ services:
       dockerfile: koko/Dockerfile
       args:
         Version: ${Version}
+        TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_koko:${Version}
     container_name: jms_koko
     restart: always
@@ -82,7 +84,6 @@ services:
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
       core:
@@ -100,31 +101,32 @@ services:
     networks:
       - net
 
-  guacamole:
+  lion:
     build:
       context: .
-      dockerfile: guacamole/Dockerfile
+      dockerfile: lion/Dockerfile
       args:
         Version: ${Version}
-    image: jumpserver/jms_guacamole:${Version}
-    container_name: jms_guacamole
+        TARGETARCH: ${TARGETARCH}
+    image: jumpserver/jms_lion:${Version}
+    container_name: jms_lion
     restart: always
     tty: true
     environment:
-      JUMPSERVER_SERVER: http://core:8080
+      CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
+      LOG_LEVEL: $LOG_LEVEL
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "/etc/init.d/guacd status && curl -f http://localhost:8080"
+      test: "/etc/init.d/guacd status && curl -f http://localhost:8081"
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 10s
     volumes:
-      - guacamole-data:/config/guacamole/data
+      - lion-data:/opt/lion/data
     networks:
       - net
 
@@ -134,6 +136,7 @@ services:
       dockerfile: nginx/Dockerfile
       args:
         Version: ${Version}
+        TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_nginx:${Version}
     container_name: jms_nginx
     restart: always
@@ -141,7 +144,7 @@ services:
     depends_on:
       koko:
         condition: service_healthy
-      guacamole:
+      lion:
         condition: service_healthy
       core:
         condition: service_healthy
@@ -161,7 +164,7 @@ services:
 volumes:
   core-data:
   koko-data:
-  guacamole-data:
+  lion-data:
 
 networks:
   net:

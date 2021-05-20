@@ -26,8 +26,7 @@ fi
 cd /opt/jumpserver && ./jms start -d
 cd /opt/koko && ./koko -d
 /etc/init.d/guacd start
-sh /config/tomcat9/bin/startup.sh
-/usr/sbin/nginx &
+cd /opt/lion && ./lion
 
 echo "Jumpserver ALL $Version"
 tail -f /opt/readme.txt
