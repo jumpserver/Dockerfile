@@ -1,4 +1,4 @@
-name: Guacamole Image Buildx
+name: Lion Image Buildx
 
 on:
   push:
@@ -19,39 +19,39 @@ jobs:
         TAG=$(basename ${GITHUB_REF})
         echo "::set-output name=TAG::$TAG"
 
-    - name: Build Guacamole
+    - name: Build Lion
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
-        imageName: wojiushixiaobai/jms_guacamole
+        imageName: wojiushixiaobai/jms_lion
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: guacamole/Dockerfile
+        dockerFile: lion/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
-    - name: Build Guacamole for JumpServer
+    - name: Build Lion for JumpServer
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
-        imageName: jumpserver/jms_guacamole
+        imageName: jumpserver/jms_lion
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: guacamole/Dockerfile
+        dockerFile: lion/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
-    - name: Build Guacamole for HuaweiCloud
+    - name: Build Lion for HuaweiCloud
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
         dockerServer: swr.cn-south-1.myhuaweicloud.com
-        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_guacamole
+        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_lion
         dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
         dockerPassword: ${{ secrets.HW_CLOUD_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: guacamole/Dockerfile
+        dockerFile: lion/Dockerfile
         platform: linux/amd64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
