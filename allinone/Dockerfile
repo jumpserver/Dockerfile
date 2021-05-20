@@ -57,15 +57,9 @@ RUN set -ex \
     && . /opt/py3/bin/activate \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
-    && cd guacamole \
-    && wget https://download.jumpserver.org/public/ssh-forward-linux-${TARGETARCH}.tar.gz \
-    && tar -xf ssh-forward-linux-${TARGETARCH}.tar.gz -C /bin/ \
-    && chown root:root /bin/ssh-forward \
-    && chmod 755 /bin/ssh-forward \
     && cd /opt \
     && apt-get install -y nginx \
     && echo > /etc/nginx/conf.d/default.conf \
-    && wget -O /etc/nginx/conf.d/jumpserver.conf https://demo.jumpserver.org/download/nginx/conf.d/latest/jumpserver.conf \
     && chown -R root:root /opt/* \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
     && apt-get clean all \
@@ -76,6 +70,7 @@ RUN set -ex \
 
 COPY allinone/readme.txt readme.txt
 COPY allinone/entrypoint.sh .
+COPY allinone/jumpserver.conf /etc/nginx/conf.d/
 RUN chmod +x ./entrypoint.sh
 
 VOLUME /opt/jumpserver/data
