@@ -20,7 +20,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.10.0
+Version=v2.10.1
 
 # Compose
 COMPOSE_PROJECT_NAME=jms
@@ -59,7 +59,11 @@ build
 cd Dockerfile
 cp config_example.conf .env
 vi .env
+```
+```vim
+# 构建参数, 支持 amd64/arm64
+TARGETARCH=amd64
+```
+```bash
 docker-compose -f docker-compose-build.yml up
 ```
-
-> 如果自己编译, 可以在 docker-compose 的 environment: 处加入 Version: $Version , 取代 Dockerfile 的 ARG
