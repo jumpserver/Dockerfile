@@ -24,9 +24,8 @@ fi
 
 . /opt/py3/bin/activate
 cd /opt/jumpserver && ./jms start -d
-cd /opt/koko && ./koko -d
-/etc/init.d/guacd start
-cd /opt/lion && ./lion
+/etc/init.d/supervisor start
+/etc/init.d/nginx start
 
 echo "Jumpserver ALL $Version"
 tail -f /opt/readme.txt

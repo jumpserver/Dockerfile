@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.10.2
+    Version=v2.10.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -58,7 +58,7 @@ RUN set -ex \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt \
-    && apt-get install -y nginx \
+    && apt-get install -y nginx supervisor \
     && echo > /etc/nginx/conf.d/default.conf \
     && chown -R root:root /opt/* \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
@@ -71,6 +71,7 @@ RUN set -ex \
 COPY allinone/readme.txt readme.txt
 COPY allinone/entrypoint.sh .
 COPY allinone/jumpserver.conf /etc/nginx/conf.d/
+COPY allinone/supervisord.conf /etc/supervisor/conf.d/
 RUN chmod +x ./entrypoint.sh
 
 VOLUME /opt/jumpserver/data
