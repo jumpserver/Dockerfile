@@ -142,10 +142,6 @@ services:
     restart: always
     tty: true
     depends_on:
-      koko:
-        condition: service_healthy
-      lion:
-        condition: service_healthy
       core:
         condition: service_healthy
     healthcheck:
