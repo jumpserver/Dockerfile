@@ -1,35 +1,31 @@
 #!/bin/bash
 #
 
-if [ $DB_HOST == 127.0.0.1 ]; then
-    if [ ! -d "/var/lib/mysql/$DB_NAME" ]; then
-        mysqld --initialize-insecure --user=mysql --datadir=/var/lib/mysql
-        mysqld --daemonize --user=mysql
-        sleep 5s
-        mysql -uroot -e "create database jumpserver default charset 'utf8' collate 'utf8_bin'; grant all on jumpserver.* to 'jumpserver'@'127.0.0.1' identified by '$DB_PASSWORD'; flush privileges;"
-    else
-        mysqld --daemonize --user=mysql
-    fi
-fi
+while ! nc -z $DB_HOST $DB_PORT;
+do
+    echo "wait for jms_mysql ${DB_HOST} ready"
+    sleep 2s
+done
 
-if [ $REDIS_HOST == 127.0.0.1 ]; then
-    redis-server &
-fi
+while ! nc -z $REDIS_HOST $REDIS_PORT;
+do
+    echo "wait for jms_redis ${REDIS_HOST} ready"
+    sleep 2s
+done
 
 if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml
 fi
 
-if [ ! $WINDOWS_SKIP_ALL_MANUAL_PASSWORD ]; then
-    export WINDOWS_SKIP_ALL_MANUAL_PASSWORD=True
+if [ ! -d "/opt/jumpserver/data/static" ]; then
+    mkdir -p /opt/jumpserver/data/static
+    chmod 755 -R /opt/jumpserver/data/static
 fi
 
-source /opt/py3/bin/activate
+. /opt/py3/bin/activate
 cd /opt/jumpserver && ./jms start -d
-cd /opt/koko && ./koko -d
-/etc/init.d/guacd start
-sh /config/tomcat9/bin/startup.sh
-/usr/sbin/nginx &
+/etc/init.d/supervisor start
+/etc/init.d/nginx start
 
 echo "Jumpserver ALL $Version"
 tail -f /opt/readme.txt

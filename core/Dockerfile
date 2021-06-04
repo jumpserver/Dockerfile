@@ -1,30 +1,31 @@
-FROM centos:7
+FROM ubuntu:focal
 WORKDIR /opt
-ARG Version=v2.5.3
+ARG TARGETARCH \
+    Version=v2.10.3
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && yum install -y epel-release wget \
+    && apt-get update \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=en_US.utf8" > /etc/locale.conf \
-    && yum -y install gcc nc \
-    && yum -y install python36 python36-devel \
+    && echo "LANG=$LANG" > /etc/default/locale \
+    && apt-get install -y python3.8 python3.8-dev python3-venv libffi-dev libxml2 libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass gcc make \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
     && chown -R root:root jumpserver \
-    && yum -y install $(cat /opt/jumpserver/requirements/rpm_requirements.txt) \
-    && python3.6 -m venv /opt/py3 \
-    && source /opt/py3/bin/activate \
+    && python3.8 -m venv /opt/py3 \
+    && . /opt/py3/bin/activate \
+    && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
-    && yum clean all \
-    && rm -rf /var/cache/yum/* \
+    && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/* \
     && rm -rf /opt/*.tar.gz \
-    && rm -rf /var/cache/yum* \
     && rm -rf ~/.cache/pip
 
 COPY core/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

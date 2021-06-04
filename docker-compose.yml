@@ -1,41 +1,45 @@
-version: '3'
+version: '2.4'
 services:
-  mysql:
-    image: jumpserver/jms_mysql:${Version}
-    container_name: jms_mysql
-    restart: always
-    tty: true
-    environment:
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - jumpserver
-
-  redis:
-    image: jumpserver/jms_redis:${Version}
-    container_name: jms_redis
-    restart: always
-    tty: true
-    environment:
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-    volumes:
-      - redis-data:/var/lib/redis/
-    networks:
-      - jumpserver
-
   core:
     image: jumpserver/jms_core:${Version}
     container_name: jms_core
     restart: always
     tty: true
+    command: start web
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
+      LOG_LEVEL: $LOG_LEVEL
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    healthcheck:
+      test: "curl -f http://localhost:8080/api/health/"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - core-data:/opt/jumpserver/data
+    networks:
+      - net
+
+  celery:
+    image: jumpserver/jms_core:${Version}
+    container_name: jms_celery
+    restart: always
+    tty: true
+    command: start task
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
@@ -46,12 +50,18 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "/opt/py3/bin/python /opt/jumpserver/apps/manage.py check_celery"
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     volumes:
       - core-data:/opt/jumpserver/data
     networks:
-      - jumpserver
+      - net
 
   koko:
     image: jumpserver/jms_koko:${Version}
@@ -64,33 +74,43 @@ services:
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
     depends_on:
-      - core
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "nc -z localhost 2222 && nc -z localhost 5000"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - koko-data:/opt/koko/data
     ports:
       - 2222:2222
     networks:
-      - jumpserver
+      - net
 
-  guacamole:
-    image: jumpserver/jms_guacamole:${Version}
-    container_name: jms_guacamole
+  lion:
+    image: jumpserver/jms_lion:${Version}
+    container_name: jms_lion
     restart: always
     tty: true
     environment:
-      JUMPSERVER_SERVER: http://core:8080
+      CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      GUACAMOLE_LOG_LEVEL: $LOG_LEVEL
+      LOG_LEVEL: $LOG_LEVEL
     depends_on:
-      - core
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "/etc/init.d/guacd status && curl -f http://localhost:8081/lion/health/"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
-      - guacamole-data:/config/guacamole/data
+      - lion-data:/opt/lion/data
     networks:
-      - jumpserver
+      - net
 
   nginx:
     image: jumpserver/jms_nginx:${Version}
@@ -98,23 +118,30 @@ services:
     restart: always
     tty: true
     depends_on:
-      - core
-      - koko
-      - mysql
-      - redis
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -f http://localhost"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - core-data:/opt/jumpserver/data
     ports:
       - 80:80
     networks:
-      - jumpserver
+      - net
 
 volumes:
-  mysql-data:
-  redis-data:
   core-data:
   koko-data:
-  guacamole-data:
+  lion-data:
 
 networks:
-  jumpserver:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: $DOCKER_SUBNET

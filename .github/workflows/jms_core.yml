@@ -1,4 +1,4 @@
-name: Allinone Image Buildx
+name: Core Image Buildx
 
 on:
   push:
@@ -19,39 +19,39 @@ jobs:
         TAG=$(basename ${GITHUB_REF})
         echo "::set-output name=TAG::$TAG"
 
-    - name: Build Docker Image
+    - name: Build Core
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
-        imageName: wojiushixiaobai/jms_all
+        imageName: wojiushixiaobai/jms_core
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: allinone/Dockerfile
+        dockerFile: core/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
-    - name: Build Docker Image for JumpServer
+    - name: Build Core for JumpServer
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
-        imageName: jumpserver/jms_all
+        imageName: jumpserver/jms_core
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: allinone/Dockerfile
+        dockerFile: core/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
-    - name: Build Docker Image for HuaweiCloud
+    - name: Build Core for HuaweiCloud
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
         dockerServer: swr.cn-south-1.myhuaweicloud.com
-        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_all
+        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core
         dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
         dockerPassword: ${{ secrets.HW_CLOUD_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: allinone/Dockerfile
+        dockerFile: core/Dockerfile
         platform: linux/amd64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}

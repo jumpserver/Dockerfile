@@ -1,18 +1,40 @@
 #!/bin/bash
 #
 
-sleep 5s
 while ! nc -z $DB_HOST $DB_PORT;
 do
-    echo "wait for jms_mysql ready"
+    echo "wait for jms_mysql ${DB_HOST} ready"
     sleep 2s
 done
 
 while ! nc -z $REDIS_HOST $REDIS_PORT;
 do
-    echo "wait for jms_redis ready"
+    echo "wait for jms_redis ${REDIS_HOST} ready"
     sleep 2s
 done
+
+if [ ! -f "/opt/jumpserver/config.yml" ]; then
+    echo > /opt/jumpserver/config.yml
+fi
+
+if [ ! "$LOG_LEVEL" ]; then
+    export LOG_LEVEL=ERROR
+fi
+
+action="${1-start}"
+if [ ! "${action}" ]; then
+  action=start
+fi
+
+service="${2-all}"
+if [ ! "${service}" ]; then
+  service=all
+fi
+
+if [ ! -d "/opt/jumpserver/data/static" ]; then
+    mkdir -p /opt/jumpserver/data/static
+    chmod 755 -R /opt/jumpserver/data/static
+fi
 
 if [ ! -f "/opt/jumpserver/config.yml" ]; then
     echo > /opt/jumpserver/config.yml
@@ -22,9 +44,10 @@ if [ ! $LOG_LEVEL ]; then
     export LOG_LEVEL=ERROR
 fi
 
-if [ ! $WINDOWS_SKIP_ALL_MANUAL_PASSWORD ]; then
-    export WINDOWS_SKIP_ALL_MANUAL_PASSWORD=True
+if [[ "$action" == "bash" || "$action" == "sh" ]];then
+    bash
+else
+    . /opt/py3/bin/activate
+    cd /opt/jumpserver
+    ./jms "${action}" "${service}"
 fi
-
-source /opt/py3/bin/activate
-cd /opt/jumpserver && ./jms start

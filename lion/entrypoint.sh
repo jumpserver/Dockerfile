@@ -10,6 +10,6 @@ done
 if [ ! "$LOG_LEVEL" ]; then
     export LOG_LEVEL=ERROR
 fi
-
-cd /opt/koko
-./koko
+/etc/init.d/guacd start
+cd /opt/lion
+./lion
