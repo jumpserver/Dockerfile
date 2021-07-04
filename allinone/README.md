@@ -19,6 +19,7 @@ This project is Docker image build.
 
     - SECRET_KEY = xxxxx
     - BOOTSTRAP_TOKEN = xxxxx
+    - LOG_LEVEL = ERROR
 
     - DB_ENGINE = mysql
     - DB_HOST = mysql_host
@@ -38,11 +39,14 @@ This project is Docker image build.
 
 ```bash
 docker run --name jms_all -d \
-  -v /opt/jumpserver/data:/opt/jumpserver/data \
+  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
+  -v /opt/jumpserver/koko/data:/opt/koko/data \
+  -v /opt/jumpserver/lion/data:/opt/lion/data \
   -p 80:80 \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
+  -e LOG_LEVEL=ERROR \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
   -e DB_USER=jumpserver \
