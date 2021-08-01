@@ -13,6 +13,23 @@
 > 请先自行创建 数据库 和 Redis, 版本要求参考上面环境要求说明
 
 ```sh
+# 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
+# mysql 创建用户并赋予权限, 请自行替换 nu4x599Wq7u0Bn8EABh3J91G 为自己的密码
+mysql -u root -p
+```
+
+```mysql
+create database jumpserver default charset 'utf8';
+create user 'jumpserver'@'%' identified by 'nu4x599Wq7u0Bn8EABh3J91G';
+grant all on jumpserver.* to 'jumpserver'@'%';
+flush privileges;
+```
+
+```sh
+# 自行部署 Redis 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#redis)
+```
+
+```sh
 git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
@@ -20,7 +37,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.12.0
+Version=v2.12.1
 
 # Compose
 COMPOSE_PROJECT_NAME=jms
@@ -56,6 +73,7 @@ docker-compose up
 
 build
 ```sh
+# 如果希望手动构建镜像, 可以使用下面的命令
 cd Dockerfile
 cp config_example.conf .env
 vi .env

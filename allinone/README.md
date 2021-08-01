@@ -15,6 +15,24 @@ This project is Docker image build.
     - 外置数据库要求 MySQL 版本大于等于 5.7
     - 外置 Redis 要求 Redis 版本大于等于 6.0
 
+
+```sh
+# 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
+# mysql 创建用户并赋予权限, 请自行替换 nu4x599Wq7u0Bn8EABh3J91G 为自己的密码
+mysql -u root -p
+```
+
+```mysql
+create database jumpserver default charset 'utf8';
+create user 'jumpserver'@'%' identified by 'nu4x599Wq7u0Bn8EABh3J91G';
+grant all on jumpserver.* to 'jumpserver'@'%';
+flush privileges;
+```
+
+```sh
+# 自行部署 Redis 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#redis)
+```
+
 **设置环境变量：**
 
     - SECRET_KEY = xxxxx
@@ -56,5 +74,5 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v2.12.0
+  jumpserver/jms_all:v2.12.1
 ```
