@@ -12,6 +12,20 @@
 
 > 请先自行创建 数据库 和 Redis, 版本要求参考上面环境要求说明
 
+```mysql
+# mysql 创建数据库, 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
+create database jumpserver default charset 'utf8';
+
+# mysql 创建用户并赋予权限, 请自行替换 nu4x599Wq7u0Bn8EABh3J91G 为自己的密码
+create user 'jumpserver'@'%' identified by 'nu4x599Wq7u0Bn8EABh3J91G';
+grant all on jumpserver.* to 'jumpserver'@'%';
+flush privileges;
+```
+
+```sh
+# 自行部署 Redis 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#redis)
+```
+
 ```sh
 git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
 cd Dockerfile
