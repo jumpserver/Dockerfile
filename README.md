@@ -29,7 +29,6 @@ flush privileges;
 # 自行部署 Redis 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#redis)
 ```
 
-RUN
 ```sh
 git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
 cd Dockerfile
