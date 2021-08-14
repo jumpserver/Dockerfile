@@ -66,5 +66,5 @@ jobs:
         dockerPassword: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
         dockerFile: koko/Dockerfile
-        platform: linux/amd64
+        platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
