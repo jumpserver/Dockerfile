@@ -55,3 +55,16 @@ jobs:
         dockerFile: allinone/Dockerfile
         platform: linux/amd64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
+
+    - name: Build Docker Image for GitHub
+      uses: ilteoood/docker_buildx@master
+      with:
+        publish: true
+        dockerServer: ghcr.io
+        imageName: ghcr.io/wojiushixiaobai/jms_all
+        dockerUser: wojiushixiaobai
+        dockerPassword: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ steps.get_tag.outputs.TAG }},latest
+        dockerFile: allinone/Dockerfile
+        platform: linux/amd64
+        buildArg: Version=${{ steps.get_tag.outputs.TAG }}
