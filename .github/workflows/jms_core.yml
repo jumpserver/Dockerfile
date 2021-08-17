@@ -55,3 +55,16 @@ jobs:
         dockerFile: core/Dockerfile
         platform: linux/amd64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
+
+    - name: Build Core for GitHub
+      uses: ilteoood/docker_buildx@master
+      with:
+        publish: true
+        dockerServer: ghcr.io
+        imageName: ghcr.io/wojiushixiaobai/jms_core
+        dockerUser: wojiushixiaobai
+        dockerPassword: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ steps.get_tag.outputs.TAG }},latest
+        dockerFile: core/Dockerfile
+        platform: linux/amd64,linux/arm64
+        buildArg: Version=${{ steps.get_tag.outputs.TAG }}
