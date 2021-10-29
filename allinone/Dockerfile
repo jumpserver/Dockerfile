@@ -59,9 +59,11 @@ RUN set -ex \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt/jumpserver/apps \
+    && echo "SECRET_KEY: $(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49)" > /opt/jumpserver/config.yml \
     && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo \
     && python manage.py makemessages -a \
     && python manage.py compilemessages \
+    && rm -f /opt/jumpserver/config.yml \
     && cd /opt \
     && apt-get install -y nginx supervisor \
     && echo > /etc/nginx/conf.d/default.conf \
