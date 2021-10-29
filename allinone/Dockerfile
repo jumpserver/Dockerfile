@@ -7,7 +7,7 @@ ENV Version=${Version} \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
@@ -59,11 +59,13 @@ RUN set -ex \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt/jumpserver/apps \
+    && /etc/init.d/redis-server start \
     && echo "SECRET_KEY: $(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49)" > /opt/jumpserver/config.yml \
     && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo \
     && python manage.py makemessages -a \
     && python manage.py compilemessages \
     && rm -f /opt/jumpserver/config.yml \
+    && /etc/init.d/redis-server stop \
     && cd /opt \
     && apt-get install -y nginx supervisor \
     && echo > /etc/nginx/conf.d/default.conf \
