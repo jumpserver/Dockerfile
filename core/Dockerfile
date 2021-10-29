@@ -20,6 +20,11 @@ RUN set -ex \
     && . /opt/py3/bin/activate \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
+    && cd /opt/jumpserver/apps \
+    && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo \
+    && python manage.py makemessages -a \
+    && python manage.py compilemessages \
+    && cd /opt \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/* \
