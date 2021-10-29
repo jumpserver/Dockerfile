@@ -7,7 +7,7 @@ ENV Version=${Version} \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext-base \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && apt-get install -y python3.8 python3.8-dev python3-venv libpq-dev libffi-dev libxml2 libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass g++ make \
