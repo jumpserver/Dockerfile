@@ -1,13 +1,13 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.14.1
+    Version=v2.15.2
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
@@ -32,6 +32,7 @@ RUN set -ex \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
+    && wget https://download.jumpserver.org/files/GeoLite2-City.mmdb -O /opt/jumpserver/apps/common/utils/geoip/GeoLite2-City.mmdb \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
@@ -57,6 +58,14 @@ RUN set -ex \
     && . /opt/py3/bin/activate \
     && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
+    && cd /opt/jumpserver/apps \
+    && /etc/init.d/redis-server start \
+    && echo "SECRET_KEY: $(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49)" > /opt/jumpserver/config.yml \
+    && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo \
+    && python manage.py makemessages -a \
+    && python manage.py compilemessages \
+    && rm -f /opt/jumpserver/config.yml \
+    && /etc/init.d/redis-server stop \
     && cd /opt \
     && apt-get install -y nginx supervisor \
     && echo > /etc/nginx/conf.d/default.conf \
