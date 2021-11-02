@@ -20,6 +20,8 @@ RUN set -ex \
     && . /opt/py3/bin/activate \
     && pip install --upgrade pip \
     && pip install --upgrade setuptools \
+    && pip install --upgrade wheel \
+    && pip install $(grep -E 'PyNaCl' /opt/jumpserver/requirements/requirements.txt) \
     && pip install grpcio==1.41.1 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt/jumpserver/apps \
