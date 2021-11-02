@@ -56,7 +56,9 @@ RUN set -ex \
     && tar -xf luna-${Version}.tar.gz \
     && mv luna-${Version} luna \
     && . /opt/py3/bin/activate \
-    && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
+    && pip install --upgrade pip \
+    && pip install --upgrade setuptools \
+    && pip install grpcio==1.41.1 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt/jumpserver/apps \
     && /etc/init.d/redis-server start \
