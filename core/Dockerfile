@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.15.3
+    Version=v2.15.4
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -18,7 +18,11 @@ RUN set -ex \
     && chown -R root:root jumpserver \
     && python3.8 -m venv /opt/py3 \
     && . /opt/py3/bin/activate \
-    && pip install --upgrade pip==20.2.4 setuptools==49.6.0 wheel==0.34.2 \
+    && pip install --upgrade pip \
+    && pip install --upgrade setuptools \
+    && pip install --upgrade wheel \
+    && pip install $(grep -E 'PyNaCl' /opt/jumpserver/requirements/requirements.txt) \
+    && pip install grpcio==1.41.1 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt/jumpserver/apps \
     && /etc/init.d/redis-server start \
