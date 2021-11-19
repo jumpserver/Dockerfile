@@ -1,0 +1,25 @@
+version: '2.4'
+services:
+  core:
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  redis:
+    image: redis:6
+    container_name: jms_redis
+    restart: always
+    command: redis-server --requirepass $REDIS_PASSWORD --loglevel warning --maxmemory-policy allkeys-lru
+    environment:
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    healthcheck:
+      test: "redis-cli -h 127.0.0.1 -p $$REDIS_PORT -a $$REDIS_PASSWORD info Replication"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - redis-data:/data
+    networks:
+      - net
