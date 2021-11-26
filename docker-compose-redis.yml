@@ -23,3 +23,6 @@ services:
       - redis-data:/data
     networks:
       - net
+
+volumes:
+  redis-data:

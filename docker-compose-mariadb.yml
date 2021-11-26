@@ -24,3 +24,6 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - net
+
+volumes:
+  mysql-data:
