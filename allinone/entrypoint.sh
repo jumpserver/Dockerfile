@@ -7,6 +7,11 @@ do
     sleep 2s
 done
 
+if [ $REDIS_HOST == 127.0.0.1 ]; then
+    sed -i "s@# requirepass .*@requirepass $REDIS_PASSWORD@g" /etc/redis.conf
+    /etc/init.d/redis-server start
+fi
+
 while ! nc -z $REDIS_HOST $REDIS_PORT;
 do
     echo "wait for jms_redis ${REDIS_HOST} ready"

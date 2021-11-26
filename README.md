@@ -8,7 +8,18 @@
 
 环境要求
 - MySQL Server >= 5.7
-- Redis Server >= 6.0
+- Redis Server >= 5.0
+
+快速部署
+```sh
+# 测试环境可以使用，生产环境推荐外置数据
+git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
+cd Dockerfile
+cp config_example.conf .env
+docker-compose -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up
+```
+
+标准部署
 
 > 请先自行创建 数据库 和 Redis, 版本要求参考上面环境要求说明
 
@@ -37,7 +48,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.16.1
+Version=v2.16.3
 
 # Compose
 COMPOSE_PROJECT_NAME=jms

@@ -1,0 +1,52 @@
+Version: '2.4'
+
+services:
+  omnidb:
+    image: registry.fit2cloud.com/jumpserver/omnidb:${Version}
+    container_name: jms_omnidb
+    restart: always
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "ps axu | grep -v 'grep' | grep 'omnidb'"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - omnidb-data:/opt/omnidb/data
+    networks:
+      - net
+
+  xrdp:
+    image: registry.fit2cloud.com/jumpserver/xrdp:${Version}
+    container_name: jms_xrdp
+    restart: always
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "ps axu | grep -v 'grep' | grep 'xrdp'"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    ports:
+      - 3389:3389
+    volumes:
+      - xrdp-data:/opt/xrdp/data
+    networks:
+      - net
+
+volumes:
+  omnidb-data:
+  xrdp-data:
