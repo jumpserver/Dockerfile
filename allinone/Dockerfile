@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.16.3
+    Version=v2.17.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -12,7 +12,7 @@ RUN set -ex \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
     && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
-    && apt-get install -y python3.8 python3.8-dev python3-venv libpq-dev libffi-dev libxml2 libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
+    && apt-get install -y python3.8 python3.8-dev python3-venv pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
     && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev \
     && apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && python3.8 -m venv /opt/py3 \
@@ -63,7 +63,7 @@ RUN set -ex \
     && pip install grpcio==1.41.1 \
     && pip install -r /opt/jumpserver/requirements/requirements.txt \
     && cd /opt/jumpserver/apps \
-    && sed -i "561i maxmemory-policy allkeys-lru" /etc/redis.conf \
+    && sed -i "561i maxmemory-policy allkeys-lru" /etc/redis/redis.conf \
     && /etc/init.d/redis-server start \
     && echo "SECRET_KEY: $(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49)" > /opt/jumpserver/config.yml \
     && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo \
