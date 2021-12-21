@@ -26,7 +26,8 @@ services:
       retries: 3
       start_period: 60s
     volumes:
-      - core-data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
@@ -59,7 +60,8 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - core-data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
@@ -83,7 +85,7 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - koko-data:/opt/koko/data
+      - ${VOLUME_DIR}/koko/data:/opt/koko/data
     ports:
       - 2222:2222
     networks:
@@ -108,7 +110,7 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - lion-data:/opt/lion/data
+      - ${VOLUME_DIR}/lion/data:/opt/lion/data
     networks:
       - net
 
@@ -127,16 +129,12 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - core-data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/nginx/data/logs:/var/log/nginx
     ports:
       - 80:80
     networks:
       - net
-
-volumes:
-  core-data:
-  koko-data:
-  lion-data:
 
 networks:
   net:

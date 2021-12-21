@@ -20,9 +20,6 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - redis-data:/data
+      - ${VOLUME_DIR}/redis/data:/data
     networks:
       - net
-
-volumes:
-  redis-data:
