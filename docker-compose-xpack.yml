@@ -19,7 +19,7 @@ services:
       retries: 3
       start_period: 10s
     volumes:
-      - omnidb-data:/opt/omnidb/data
+      - ${VOLUME_DIR}/omnidb/data:/opt/omnidb/data
     networks:
       - net
 
@@ -43,10 +43,6 @@ services:
     ports:
       - 3389:3389
     volumes:
-      - xrdp-data:/opt/xrdp/data
+      - ${VOLUME_DIR}/xrdp/data:/opt/xrdp/data
     networks:
       - net
-
-volumes:
-  omnidb-data:
-  xrdp-data:
