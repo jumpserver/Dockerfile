@@ -10,7 +10,11 @@ RUN set -ex \
     && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y python3.8 python3.8-dev python3-venv pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass g++ make \
+    && apt-get install -y python3.8 python3.8-dev python3-venv freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass g++ make \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -ex \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
@@ -34,8 +38,6 @@ RUN set -ex \
     && /etc/init.d/redis-server stop \
     && cd /opt \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/* \
     && rm -rf /opt/*.tar.gz \
     && rm -rf ~/.cache/pip
 

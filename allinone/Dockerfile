@@ -12,19 +12,19 @@ RUN set -ex \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
     && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
-    && apt-get install -y python3.8 python3.8-dev python3-venv pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
-    && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev \
+    && apt-get install -y python3.8 python3.8-dev python3-venv freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
+    && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin uuid-dev \
     && apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && python3.8 -m venv /opt/py3 \
-    && wget http://download.jumpserver.org/public/guacamole-server-1.3.0.tar.gz \
-    && tar -xf guacamole-server-1.3.0.tar.gz \
-    && cd guacamole-server-1.3.0 \
+    && wget http://download.jumpserver.org/public/guacamole-server-1.4.0.tar.gz \
+    && tar -xf guacamole-server-1.4.0.tar.gz \
+    && cd guacamole-server-1.4.0 \
     && ./configure --with-init-dir=/etc/init.d  --disable-guaclog \
     && make \
     && make install \
     && ldconfig \
     && cd /opt \
-    && rm -rf guacamole-server-1.3.0 guacamole-server-1.3.0.tar.gz \
+    && rm -rf guacamole-server-1.4.0 guacamole-server-1.4.0.tar.gz \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
@@ -76,7 +76,7 @@ RUN set -ex \
     && chown -R root:root /opt/* \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
     && apt-get clean all \
-    && rm -rf /opt/guacamole-server-1.3.0 \
+    && rm -rf /opt/guacamole-server-1.4.0 \
     && rm -rf /opt/*.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf ~/.cache/pip
