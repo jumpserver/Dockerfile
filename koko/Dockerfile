@@ -10,7 +10,7 @@ RUN set -ex \
     && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y mariadb-client bash-completion \
+    && apt-get install -y mariadb-client bash-completion redis \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
