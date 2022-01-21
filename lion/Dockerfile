@@ -6,7 +6,6 @@ ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && sed -i "s@http://.*.ubuntu.com@http://mirrors.aliyun.com@g" /etc/apt/sources.list \
     && apt-get update \
     && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
