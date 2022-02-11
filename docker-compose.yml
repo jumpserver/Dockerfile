@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   core:
-    image: jumpserver/jms_core:${Version}
+    image: jumpserver/core:${Version}
     container_name: jms_core
     restart: always
     tty: true
@@ -24,7 +24,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-      start_period: 60s
+      start_period: 90s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
       - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
@@ -32,7 +32,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/jms_core:${Version}
+    image: jumpserver/core:${Version}
     container_name: jms_celery
     restart: always
     tty: true
@@ -56,7 +56,7 @@ services:
     healthcheck:
       test: "bash /opt/jumpserver/utils/check_celery.sh"
       interval: 10s
-      timeout: 10s
+      timeout: 5s
       retries: 3
       start_period: 30s
     volumes:
@@ -66,7 +66,7 @@ services:
       - net
 
   koko:
-    image: jumpserver/jms_koko:${Version}
+    image: jumpserver/koko:${Version}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -79,7 +79,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "nc -z localhost 2222 && curl -fsL http://localhost:5000/koko/health/ > /dev/null"
+      test: "curl -fsL http://localhost:5000/koko/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -92,7 +92,7 @@ services:
       - net
 
   lion:
-    image: jumpserver/jms_lion:${Version}
+    image: jumpserver/lion:${Version}
     container_name: jms_lion
     restart: always
     tty: true
@@ -104,7 +104,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "/etc/init.d/guacd status && curl -fsL http://localhost:8081/lion/health/ > /dev/null"
+      test: "curl -fsL http://localhost:8081/lion/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -114,16 +114,16 @@ services:
     networks:
       - net
 
-  nginx:
-    image: jumpserver/jms_nginx:${Version}
-    container_name: jms_nginx
+  web:
+    image: jumpserver/web:${Version}
+    container_name: jms_web
     restart: always
     tty: true
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost > /dev/null"
+      test: "curl -fsL http://localhost/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
