@@ -56,6 +56,30 @@ flush privileges;
 
 注意：自己上面设置的这些信息一定要记录下来。升级需要重新输入使用
 
+**初始化数据库**
+```bash
+docker run --name jms_all -d \
+  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
+  -v /opt/jumpserver/koko/data:/opt/koko/data \
+  -v /opt/jumpserver/lion/data:/opt/lion/data \
+  -p 80:80 \
+  -p 2222:2222 \
+  -e SECRET_KEY=xxxxxx \
+  -e BOOTSTRAP_TOKEN=xxxxxx \
+  -e LOG_LEVEL=ERROR \
+  -e DB_HOST=192.168.x.x \
+  -e DB_PORT=3306 \
+  -e DB_USER=jumpserver \
+  -e DB_PASSWORD=weakPassword \
+  -e DB_NAME=jumpserver \
+  -e REDIS_HOST=192.168.x.x \
+  -e REDIS_PORT=6379 \
+  -e REDIS_PASSWORD=weakPassword \
+  --privileged=true \
+  jumpserver/jms_all:v2.20.0 init_db   # 确定无报错
+```
+
+**启动 JumpServer**
 ```bash
 docker run --name jms_all -d \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
@@ -78,29 +102,6 @@ docker run --name jms_all -d \
   jumpserver/jms_all:v2.20.0
 ```
 
-**示例**
-```bash
-docker run --name jms_all -d \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -p 80:80 \
-  -p 2222:2222 \
-  -e SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
-  -e BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q \
-  -e LOG_LEVEL=ERROR \
-  -e DB_HOST=192.168.100.11 \
-  -e DB_PORT=3306 \
-  -e DB_USER=jumpserver \
-  -e DB_PASSWORD=nu4x599Wq7u0Bn8EABh3J91G \
-  -e DB_NAME=jumpserver \
-  -e REDIS_HOST=192.168.100.11 \
-  -e REDIS_PORT=6379 \
-  -e REDIS_PASSWORD=nu4x599Wq7u0Bn8EABh3J91G \
-  --privileged=true \
-  jumpserver/jms_all:v2.20.0
-```
-
 **升级**
 ```bash
 # 查询定义的 JumpServer 配置
@@ -119,7 +120,28 @@ docker pull jumpserver/jms_all:v2.20.0
 # 删掉旧版本容器
 docker rm jms_all
 
-# 运行新版本
+# 处理数据库合并
+docker run --name jms_all -d \
+  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
+  -v /opt/jumpserver/koko/data:/opt/koko/data \
+  -v /opt/jumpserver/lion/data:/opt/lion/data \
+  -p 80:80 \
+  -p 2222:2222 \
+  -e SECRET_KEY=****** \                 # 自行修改成你的旧版本 SECRET_KEY, 丢失此 key 会导致数据无法解密
+  -e BOOTSTRAP_TOKEN=****** \            # 自行修改成你的旧版本 BOOTSTRAP_TOKEN
+  -e LOG_LEVEL=ERROR \
+  -e DB_HOST=192.168.x.x \               # 自行修改成你的旧版本 MySQL 服务器, 设置不对数据丢失
+  -e DB_PORT=3306 \
+  -e DB_USER=jumpserver \
+  -e DB_PASSWORD=****** \
+  -e DB_NAME=jumpserver \
+  -e REDIS_HOST=192.168.x.x \            # 自行修改成你的旧版本 Redis 服务器
+  -e REDIS_PORT=6379 \
+  -e REDIS_PASSWORD=****** \
+  --privileged=true \
+  jumpserver/jms_all:v2.20.0 upgrade     # 确定无报错
+
+# 启动新版本
 docker run --name jms_all -d \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \

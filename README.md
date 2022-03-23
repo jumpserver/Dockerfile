@@ -1,10 +1,16 @@
 ## Jumpserver Docker-Compose
 
+- [JumpServer Allinone](https://github.com/jumpserver/Dockerfile/tree/master/allinone)
+
 - 全面支持 arm64 国产化操作系统
 
 系统架构
+- [x] windows/amd64
+- [x] windows/arm64
 - [x] Linux/amd64
 - [x] Linux/arm64
+- [x] macOS/amd64
+- [x] macOS/arm64
 
 环境要求
 - MySQL Server >= 5.7

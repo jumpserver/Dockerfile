@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+action="${1}"
 echo
 while ! nc -z $DB_HOST $DB_PORT;
 do
@@ -40,6 +41,14 @@ fi
 sed -i "s@Version:*@Version: ${Version}@g" /opt/readme.txt
 rm -f /opt/jumpserver/tmp/*.pid
 
+if [ "$action" == "upgrade" || "$action" == "init_db" ]; then
+    cd /opt/jumpserver
+    . /opt/py3/bin/activate
+    ./jms upgrade_db || {
+        echo -e "\033[31m 数据库处理失败, 请根据错误排查问题. \033[0m"
+        exit 1
+   }
+fi
 /etc/init.d/supervisor start
 /etc/init.d/nginx start
 
