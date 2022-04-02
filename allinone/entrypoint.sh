@@ -41,7 +41,7 @@ fi
 sed -i "s@Version:*@Version: ${Version}@g" /opt/readme.txt
 rm -f /opt/jumpserver/tmp/*.pid
 
-if [ "$action" == "upgrade" || "$action" == "init_db" ]; then
+if [ "$action" == "upgrade" ] || [ "$action" == "init_db" ]; then
     cd /opt/jumpserver
     . /opt/py3/bin/activate
     ./jms upgrade_db || {
