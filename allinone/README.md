@@ -76,7 +76,7 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v2.20.1 init_db   # 确定无报错
+  jumpserver/jms_all:v2.20.2 init_db   # 确定无报错
 ```
 
 **启动 JumpServer**
@@ -99,7 +99,7 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v2.20.1
+  jumpserver/jms_all:v2.20.2
 ```
 
 **升级**
@@ -115,7 +115,7 @@ mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpse
 # 例: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
 
 # 拉取新版本镜像
-docker pull jumpserver/jms_all:v2.20.1
+docker pull jumpserver/jms_all:v2.20.2
 
 # 删掉旧版本容器
 docker rm jms_all
@@ -139,7 +139,7 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=****** \
   --privileged=true \
-  jumpserver/jms_all:v2.20.1 upgrade     # 确定无报错
+  jumpserver/jms_all:v2.20.2 upgrade     # 确定无报错
 
 # 启动新版本
 docker run --name jms_all -d \
@@ -160,5 +160,5 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=****** \
   --privileged=true \
-  jumpserver/jms_all:v2.20.1
+  jumpserver/jms_all:v2.20.2
 ```
