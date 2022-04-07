@@ -48,6 +48,7 @@ if [ "$action" == "upgrade" ] || [ "$action" == "init_db" ]; then
         echo -e "\033[31m 数据库处理失败, 请根据错误排查问题. \033[0m"
         exit 1
    }
+   exit 0
 fi
 /etc/init.d/supervisor start
 /etc/init.d/nginx start

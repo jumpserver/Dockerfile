@@ -10,11 +10,52 @@ This project is Docker image build.
 
 环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密
 
+### Quick start
+
+仅在测试环境中快速部署验证功能使用, 生产环境请使用 [标准部署](https://github.com/jumpserver/Dockerfile)
+
+```sh
+docker network create jms_net --subnet=192.168.250.0/24
+
+docker run --name jms_mysql --network jms_net -d \
+  -e MARIADB_ROOT_PASSWORD=weakPassword \
+  -e MARIADB_DATABASE=jumpserver \
+  mariadb:10
+
+docker run --name jms_all --network jms_net --rm \
+  -e DB_HOST=jms_mysql \
+  -e DB_USER=root \
+  -e DB_PASSWORD=weakPassword \
+  --privileged=true \
+  jumpserver/jms_all:v2.20.2 init_db
+
+docker run --name jms_all --network jms_net -d \
+  -p 80:80 \
+  -p 2222:2222 \
+  -e LOG_LEVEL=ERROR \
+  -e DB_HOST=jms_mysql \
+  -e DB_USER=root \
+  -e DB_PASSWORD=weakPassword \
+  -e DB_NAME=jumpserver \
+  --privileged=true \
+  jumpserver/jms_all:v2.20.2
+```
+```sh
+# 测试完毕后清理环境
+docker stop jms_all
+docker rm jms_all
+docker stop jms_mysql
+docker rm jms_mysql
+docker volume prune -f
+docker network prune -f
+```
+
+### Standard start
+
 使用外置 MySQL 数据库和 Redis:
 
     - 外置数据库要求 MySQL 版本大于等于 5.7
     - 外置 Redis 要求 Redis 版本大于等于 6.0
-
 
 ```sh
 # 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
@@ -58,12 +99,10 @@ flush privileges;
 
 **初始化数据库**
 ```bash
-docker run --name jms_all -d \
+docker run --name jms_all \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -p 80:80 \
-  -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
   -e LOG_LEVEL=ERROR \
@@ -121,12 +160,10 @@ docker pull jumpserver/jms_all:v2.20.2
 docker rm jms_all
 
 # 处理数据库合并
-docker run --name jms_all -d \
+docker run --name jms_all \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -p 80:80 \
-  -p 2222:2222 \
   -e SECRET_KEY=****** \                 # 自行修改成你的旧版本 SECRET_KEY, 丢失此 key 会导致数据无法解密
   -e BOOTSTRAP_TOKEN=****** \            # 自行修改成你的旧版本 BOOTSTRAP_TOKEN
   -e LOG_LEVEL=ERROR \
