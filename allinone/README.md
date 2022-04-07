@@ -99,7 +99,7 @@ flush privileges;
 
 **初始化数据库**
 ```bash
-docker run --name jms_all \
+docker run --name jms_all --rm \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
