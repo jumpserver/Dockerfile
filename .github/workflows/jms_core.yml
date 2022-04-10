@@ -55,16 +55,3 @@ jobs:
         dockerFile: core/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
-
-    - name: Build Core for HuaweiCloud
-      uses: ilteoood/docker_buildx@master
-      with:
-        publish: true
-        dockerServer: swr.cn-south-1.myhuaweicloud.com
-        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_core
-        dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
-        dockerPassword: ${{ secrets.HW_CLOUD_TOKEN }}
-        tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: core/Dockerfile
-        platform: linux/amd64
-        buildArg: Version=${{ steps.get_tag.outputs.TAG }}
