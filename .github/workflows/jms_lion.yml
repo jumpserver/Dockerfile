@@ -55,16 +55,3 @@ jobs:
         dockerFile: lion/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
-
-    - name: Build Lion for HuaweiCloud
-      uses: ilteoood/docker_buildx@master
-      with:
-        publish: true
-        dockerServer: swr.cn-south-1.myhuaweicloud.com
-        imageName: swr.cn-south-1.myhuaweicloud.com/jumpserver/jms_lion
-        dockerUser: cn-south-1@TZZDVNMCLUKINTT3FMLI
-        dockerPassword: ${{ secrets.HW_CLOUD_TOKEN }}
-        tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: lion/Dockerfile
-        platform: linux/amd64
-        buildArg: Version=${{ steps.get_tag.outputs.TAG }}

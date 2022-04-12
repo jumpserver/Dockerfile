@@ -114,7 +114,6 @@ docker run --name jms_all --rm \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
-  --privileged=true \
   jumpserver/jms_all:v2.20.2 init_db   # 确定无报错
 ```
 
@@ -160,7 +159,7 @@ docker pull jumpserver/jms_all:v2.20.2
 docker rm jms_all
 
 # 处理数据库合并
-docker run --name jms_all \
+docker run --name jms_all --rm \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
@@ -175,7 +174,6 @@ docker run --name jms_all \
   -e REDIS_HOST=192.168.x.x \            # 自行修改成你的旧版本 Redis 服务器
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=****** \
-  --privileged=true \
   jumpserver/jms_all:v2.20.2 upgrade     # 确定无报错
 
 # 启动新版本
