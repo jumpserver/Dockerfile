@@ -16,10 +16,11 @@ RUN set -ex \
 
 RUN set -ex \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
-    && mkdir /opt/magnus \
-    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/magnus \
-    && mv /opt/magnus/magnus-linux-${TARGETARCH} /opt/magnus/magnus \
-    && chmod +x /opt/magnus/magnus
+    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
+    && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \
+    && chmod 755 /opt/magnus/magnus \
+    && chown -R root:root /opt/magnus \
+    && rm -rf /opt/*.tar.gz
 
 COPY magnus/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh

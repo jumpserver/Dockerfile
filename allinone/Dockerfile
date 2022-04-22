@@ -50,10 +50,10 @@ RUN set -ex \
     && tar -xf lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv lion-${Version}-linux-${TARGETARCH} lion \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
-    && mkdir /opt/magnus \
-    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/magnus \
-    && mv /opt/magnus/magnus-linux-${TARGETARCH} /opt/magnus/magnus \
-    && chmod +x /opt/magnus/magnus \
+    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
+    && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \
+    && chmod 755 /opt/magnus/magnus \
+    && chown -R root:root /opt/magnus \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
