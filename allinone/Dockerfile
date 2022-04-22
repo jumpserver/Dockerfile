@@ -49,6 +49,11 @@ RUN set -ex \
     && wget https://github.com/jumpserver/lion-release/releases/download/${Version}/lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv lion-${Version}-linux-${TARGETARCH} lion \
+    && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
+    && mkdir /opt/magnus \
+    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/magnus \
+    && mv /opt/magnus/magnus-linux-${TARGETARCH} /opt/magnus/magnus \
+    && chmod +x /opt/magnus/magnus \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
@@ -90,6 +95,7 @@ RUN chmod +x ./entrypoint.sh
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /opt/lion/data
+VOLUME /opt/magnus/data
 
 ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     BOOTSTRAP_TOKEN=KXOeyNgDeTdpeu9q \
@@ -105,5 +111,5 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     CORE_HOST=http://127.0.0.1:8080 \
     LOG_LEVEL=ERROR
 
-EXPOSE 80 2222
+EXPOSE 80 2222 33060 33061
 ENTRYPOINT ["./entrypoint.sh"]

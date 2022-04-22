@@ -132,15 +132,47 @@ services:
     networks:
       - net
 
-  nginx:
+  magnus:
+    build:
+      context: .
+      dockerfile: magnus/Dockerfile
+      args:
+        Version: ${Version}
+        TARGETARCH: ${TARGETARCH}
+    image: jumpserver/jms_magnus:${Version}
+    container_name: jms_magnus
+    restart: always
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "nc -z localhost 33060 && nc -z localhost 33061"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
+    ports:
+      - 33060:33060
+      - 33061:33061
+    networks:
+      - net
+
+  web:
     build:
       context: .
       dockerfile: nginx/Dockerfile
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_nginx:${Version}
-    container_name: jms_nginx
+    image: jumpserver/jms_web:${Version}
+    container_name: jms_web
     restart: always
     tty: true
     depends_on:

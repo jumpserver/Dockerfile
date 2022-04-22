@@ -114,6 +114,32 @@ services:
     networks:
       - net
 
+  magnus:
+    image: jumpserver/magnus:${Version}
+    container_name: jms_magnus
+    restart: always
+    tty: true
+    environment:
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "ps axu | grep -v 'grep' | grep magnus"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
+    ports:
+      - 33060:33060
+      - 33061:33061
+    networks:
+      - net
+
   web:
     image: jumpserver/web:${Version}
     container_name: jms_web

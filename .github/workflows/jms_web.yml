@@ -23,7 +23,7 @@ jobs:
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
-        imageName: wojiushixiaobai/jms_nginx
+        imageName: wojiushixiaobai/jms_web
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
@@ -35,7 +35,7 @@ jobs:
       uses: ilteoood/docker_buildx@master
       with:
         publish: true
-        imageName: jumpserver/jms_nginx
+        imageName: jumpserver/jms_web
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
@@ -48,7 +48,7 @@ jobs:
       with:
         publish: true
         dockerServer: ghcr.io
-        imageName: ghcr.io/wojiushixiaobai/jms_nginx
+        imageName: ghcr.io/wojiushixiaobai/jms_web
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
