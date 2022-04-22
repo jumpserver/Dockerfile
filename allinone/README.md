@@ -27,18 +27,20 @@ docker run --name jms_all --network jms_net --rm \
   -e DB_USER=root \
   -e DB_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v2.20.2 init_db
+  jumpserver/jms_all:v2.20.3 init_db
 
 docker run --name jms_all --network jms_net -d \
   -p 80:80 \
   -p 2222:2222 \
+  -p 33060:33060 \
+  -p 33061:33061 \
   -e LOG_LEVEL=ERROR \
   -e DB_HOST=jms_mysql \
   -e DB_USER=root \
   -e DB_PASSWORD=weakPassword \
   -e DB_NAME=jumpserver \
   --privileged=true \
-  jumpserver/jms_all:v2.20.2
+  jumpserver/jms_all:v2.20.3
 ```
 ```sh
 # 测试完毕后清理环境
@@ -114,7 +116,7 @@ docker run --name jms_all --rm \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
-  jumpserver/jms_all:v2.20.2 init_db   # 确定无报错
+  jumpserver/jms_all:v2.20.3 init_db   # 确定无报错
 ```
 
 **启动 JumpServer**
@@ -125,6 +127,8 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
   -p 80:80 \
   -p 2222:2222 \
+  -p 33060:33060 \
+  -p 33061:33061 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
   -e LOG_LEVEL=ERROR \
@@ -137,7 +141,7 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v2.20.2
+  jumpserver/jms_all:v2.20.3
 ```
 
 **升级**
@@ -153,7 +157,7 @@ mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpse
 # 例: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
 
 # 拉取新版本镜像
-docker pull jumpserver/jms_all:v2.20.2
+docker pull jumpserver/jms_all:v2.20.3
 
 # 删掉旧版本容器
 docker rm jms_all
@@ -174,7 +178,7 @@ docker run --name jms_all --rm \
   -e REDIS_HOST=192.168.x.x \            # 自行修改成你的旧版本 Redis 服务器
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=****** \
-  jumpserver/jms_all:v2.20.2 upgrade     # 确定无报错
+  jumpserver/jms_all:v2.20.3 upgrade     # 确定无报错
 
 # 启动新版本
 docker run --name jms_all -d \
@@ -183,6 +187,8 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
   -p 80:80 \
   -p 2222:2222 \
+  -p 33060:33060 \
+  -p 33061:33061 \
   -e SECRET_KEY=****** \                 # 自行修改成你的旧版本 SECRET_KEY, 丢失此 key 会导致数据无法解密
   -e BOOTSTRAP_TOKEN=****** \            # 自行修改成你的旧版本 BOOTSTRAP_TOKEN
   -e LOG_LEVEL=ERROR \
@@ -195,5 +201,5 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=****** \
   --privileged=true \
-  jumpserver/jms_all:v2.20.2
+  jumpserver/jms_all:v2.20.3
 ```
