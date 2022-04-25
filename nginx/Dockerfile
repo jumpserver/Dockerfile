@@ -1,7 +1,10 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.21.0
+    Version=v2.21.1 \
+    Jmservisor_VERSION=v1.2.3 \
+    Client_VERSION=v1.1.4 \
+    MRD_VERSION=10.6.7
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -21,6 +24,13 @@ RUN set -ex \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
+    && mkdir -p /opt/download \
+    && cd /opt/download \
+    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg \
+    && wget -qO /opt/download/Jmservisor.msi https://download.jumpserver.org/public/Jmservisor-${Jmservisor_VERSION}.msi \
+    && wget -qO /opt/download/JumpServer-Client-Installer-x86_64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
+    && wget -qO /opt/download/JumpServer-Client-Installer-arm64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.msi \
+    && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
     && rm -rf /opt/*.tar.gz \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
