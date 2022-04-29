@@ -54,7 +54,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.21.1
+Version=v2.21.2
 
 # Compose
 COMPOSE_PROJECT_NAME=jms
