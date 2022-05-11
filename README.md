@@ -22,7 +22,9 @@
 git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
-docker-compose -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up
+docker-compose -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up -d
+docker exec -i jms_core bash -c './jms upgrade_db'
+docker-compose -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up -d
 ```
 
 标准部署
@@ -54,7 +56,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-Version=v2.21.3
+Version=v2.21.4
 
 # Compose
 COMPOSE_PROJECT_NAME=jms
@@ -88,7 +90,9 @@ LOG_LEVEL=ERROR
 # BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko、guacamole
 ```
 ```sh
-docker-compose up
+docker-compose -f docker-compose-init-db.yml up -d
+docker exec -i jms_core bash -c './jms upgrade_db'
+docker-compose up -d
 ```
 
 build

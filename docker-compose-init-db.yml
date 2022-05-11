@@ -1,0 +1,26 @@
+version: '2.4'
+
+services:
+  core:
+    image: jumpserver/core:${VERSION}
+    container_name: jms_core
+    tty: true
+    command: sleep
+    environment:
+      SECRET_KEY: $SECRET_KEY
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      DEBUG: $DEBUG
+      LOG_LEVEL: $LOG_LEVEL
+      DB_HOST: $DB_HOST
+      DB_PORT: $DB_PORT
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PORT: $REDIS_PORT
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    volumes:
+      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
+    networks:
+      - net
