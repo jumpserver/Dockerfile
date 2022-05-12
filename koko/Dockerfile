@@ -19,6 +19,7 @@ RUN set -ex \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
     && mv /opt/koko/kubectl /usr/local/bin/ \
+    && chown root:root /usr/local/bin/kubectl \
     && wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
     && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
     && chmod 755 kubectl \
