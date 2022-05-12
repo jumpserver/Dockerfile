@@ -1,7 +1,8 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.21.4
+    Version=v2.21.4 \
+    WISP_VERSION=v0.0.6
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -15,6 +16,11 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
+    && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && mv wisp-${WISP_VERSION}-linux-${TARGETARCH}/wisp /usr/local/bin/ \
+    && chown root:root /usr/local/bin/wisp \
+    && chmod 755 /usr/local/bin/wisp \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \

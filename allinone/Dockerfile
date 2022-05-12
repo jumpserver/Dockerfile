@@ -40,6 +40,7 @@ RUN set -ex \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
     && mv /opt/koko/kubectl /usr/local/bin/ \
+    && chown root:root /usr/local/bin/kubectl \
     && wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
     && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
     && chmod 755 kubectl \
@@ -52,6 +53,11 @@ RUN set -ex \
     && wget https://github.com/jumpserver/lion-release/releases/download/${Version}/lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv lion-${Version}-linux-${TARGETARCH} lion \
+    && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && mv wisp-${WISP_VERSION}-linux-${TARGETARCH}/wisp /usr/local/bin/ \
+    && chown root:root /usr/local/bin/wisp \
+    && chmod 755 /usr/local/bin/wisp \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \
