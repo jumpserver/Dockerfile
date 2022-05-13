@@ -161,11 +161,3 @@ services:
       - 80:80
     networks:
       - net
-
-networks:
-  net:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: $DOCKER_SUBNET
