@@ -1,0 +1,9 @@
+version: '2.4'
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: $DOCKER_SUBNET
