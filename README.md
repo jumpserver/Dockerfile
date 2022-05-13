@@ -22,9 +22,9 @@
 git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
-docker-compose -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up -d
+docker-compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up -d
 docker exec -i jms_core bash -c './jms upgrade_db'
-docker-compose -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up -d
+docker-compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up -d
 ```
 
 标准部署
@@ -90,9 +90,9 @@ LOG_LEVEL=ERROR
 # BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko、guacamole
 ```
 ```sh
-docker-compose -f docker-compose-init-db.yml up -d
+docker-compose -f docker-compose-network.yml -f docker-compose-init-db.yml up -d
 docker exec -i jms_core bash -c './jms upgrade_db'
-docker-compose up -d
+docker-compose -f docker-compose-network.yml -f docker-compose.yml up -d
 ```
 
 build
