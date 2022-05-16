@@ -8,6 +8,9 @@ do
 done
 
 if [ $REDIS_HOST == 127.0.0.1 ]; then
+    if [[ "$(uname -m)" == "aarch64" ]]; then
+        sed -i "s/# ignore-warnings ARM64-COW-BUG/ignore-warnings ARM64-COW-BUG/g" /etc/redis/redis.conf
+    fi
     sed -i "s@# requirepass .*@requirepass $REDIS_PASSWORD@g" /etc/redis.conf
     /etc/init.d/redis-server start
 fi
