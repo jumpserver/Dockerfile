@@ -6,11 +6,11 @@ ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
-    && echo "deb http://ppa.launchpad.net/redislabs/redis/ubuntu focal main" > /etc/apt/sources.list.d/redislabs-ubuntu-redis-focal.list \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat software-properties-common \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
+    && add-apt-repository -y ppa:redislabs/redis \
     && apt-get install -y mariadb-client bash-completion redis-tools \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
