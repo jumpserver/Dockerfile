@@ -10,6 +10,7 @@ ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
+    && echo "deb http://ppa.launchpad.net/redislabs/redis/ubuntu focal main" > /etc/apt/sources.list.d/redislabs-ubuntu-redis-focal.list \
     && apt-get update \
     && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
