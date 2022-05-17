@@ -11,12 +11,14 @@ ENV Version=${Version} \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
+    && apt-get install -y wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-en netcat gettext software-properties-common \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
     && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
-    && apt-get install -y python3.8 python3.8-dev python3-venv libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
+    && add-apt-repository -y ppa:redislabs/redis \
+    && apt-get install -y redis-server nginx supervisor \
+    && apt-get install -y libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
     && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin uuid-dev \
     && apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && python3.8 -m venv /opt/py3 \
@@ -32,7 +34,6 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
-    && apt-get update \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
     && tar -xf jumpserver-${Version}.tar.gz \
     && mv jumpserver-${Version} jumpserver \
@@ -86,7 +87,6 @@ RUN set -ex \
     && rm -f /opt/jumpserver/config.yml \
     && /etc/init.d/redis-server stop \
     && cd /opt \
-    && apt-get install -y nginx supervisor \
     && echo > /etc/nginx/conf.d/default.conf \
     && chown -R root:root /opt/* \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
@@ -97,10 +97,8 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Client-Installer-x86_64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer-arm64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
-    && apt-get clean all \
     && rm -rf /opt/guacamole-server-1.4.0 \
     && rm -rf /opt/*.tar.gz \
-    && rm -rf /var/lib/apt/lists/* \
     && rm -rf ~/.cache/pip
 
 COPY allinone/readme.txt readme.txt

@@ -7,10 +7,11 @@ ENV Version=${Version} \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat software-properties-common \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y mariadb-client bash-completion redis \
+    && add-apt-repository -y ppa:redislabs/redis \
+    && apt-get install -y mariadb-client bash-completion redis-tools \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
