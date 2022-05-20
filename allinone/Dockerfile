@@ -39,7 +39,7 @@ RUN set -ex \
     && mv jumpserver-${Version} jumpserver \
     && rm -f /opt/jumpserver/apps/common/utils/ip/geoip/GeoLite2-City.mmdb /opt/jumpserver/apps/common/utils/ip/ipip/ipipfree.ipdb \
     && wget https://download.jumpserver.org/files/ip/GeoLite2-City.mmdb -O /opt/jumpserver/apps/common/utils/ip/geoip/GeoLite2-City.mmdb \
-    && wget https://download.jumpserver.org/files/ip/ipipfree.ipdb /opt/jumpserver/apps/common/utils/ip/ipip/ipipfree.ipdb \
+    && wget https://download.jumpserver.org/files/ip/ipipfree.ipdb -O /opt/jumpserver/apps/common/utils/ip/ipip/ipipfree.ipdb \
     && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
