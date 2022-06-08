@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.22.1 \
+    Version=v2.22.2 \
     WISP_VERSION=v0.0.6 \
     Jmservisor_VERSION=v1.2.3 \
     Client_VERSION=v1.1.4 \
