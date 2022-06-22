@@ -1,9 +1,9 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.23.0 \
+    Version=v2.23.1 \
     Jmservisor_VERSION=v1.2.3 \
-    Client_VERSION=v1.1.4 \
+    Client_VERSION=v1.1.6 \
     MRD_VERSION=10.6.7
 ENV Version=${Version} \
     LANG=en_US.utf8
@@ -29,8 +29,9 @@ RUN set -ex \
     && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg \
     && wget -qO /opt/download/Jmservisor.msi https://download.jumpserver.org/public/Jmservisor-${Jmservisor_VERSION}.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer-x86_64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
-    && wget -qO /opt/download/JumpServer-Client-Installer-arm64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
+    && wget -qO /opt/download/JumpServer-Client-Installer-amd64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
+    && wget -qO /opt/download/JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
     && rm -rf /opt/*.tar.gz \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
