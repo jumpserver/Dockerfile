@@ -41,7 +41,7 @@ if [ ! -d "/opt/jumpserver/data/static" ]; then
     chmod 755 -R /opt/jumpserver/data/static
 fi
 
-sed -i "s@Version:*@Version: ${Version}@g" /opt/readme.txt
+sed -i "s@Version:.*@Version: ${Version}@g" /opt/readme.txt
 rm -f /opt/jumpserver/tmp/*.pid
 
 if [ "$action" == "upgrade" ] || [ "$action" == "init_db" ]; then
