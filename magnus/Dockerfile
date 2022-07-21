@@ -1,8 +1,8 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.23.4 \
-    WISP_VERSION=v0.0.7
+    Version=v2.24.0 \
+    WISP_VERSION=v0.0.8
 ENV Version=${Version} \
     LANG=en_US.utf8
 

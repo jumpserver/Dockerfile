@@ -1,11 +1,12 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.23.4 \
+    Version=v2.24.0 \
     WISP_VERSION=v0.0.6 \
     Jmservisor_VERSION=v1.2.3 \
     Client_VERSION=v1.1.6 \
-    MRD_VERSION=10.6.7
+    MRD_VERSION=10.6.7 \
+    VIDEO_PLAYER_VERSION=0.1.5
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -44,11 +45,18 @@ RUN set -ex \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
     && mv /opt/koko/kubectl /usr/local/bin/ \
-    && chown root:root /usr/local/bin/kubectl \
+    && mv /opt/koko/helm /usr/local/bin/ \
+    && chown root:root /usr/local/bin/kubectl /usr/local/bin/helm \
     && wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
     && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
     && chmod 755 kubectl \
     && mv kubectl /usr/local/bin/rawkubectl \
+    && wget https://download.jumpserver.org/public/helm-v3.9.0-linux-${TARGETARCH}.tar.gz -O helm.tar.gz \
+    && tar -xf helm.tar.gz \
+    && mv linux-${TARGETARCH}/helm /usr/local/bin/rawhelm \
+    && chmod 755 /usr/local/bin/rawhelm \
+    && chown root:root /usr/local/bin/rawhelm \
+    && rm -rf linux-${TARGETARCH} \
     && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
     && mkdir /opt/kubectl-aliases/ \
     && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
@@ -100,6 +108,8 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Client-Installer-amd64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
     && wget -qO /opt/download/JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
+    && wget -qO /opt/download/JumpServer-Video-Player.dmg https://jms-pkg.oss-cn-beijing.aliyuncs.com/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO /opt/download/JumpServer-Video-Player.exe https://jms-pkg.oss-cn-beijing.aliyuncs.com/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
     && rm -rf /opt/guacamole-server-1.4.0 \
     && rm -rf /opt/*.tar.gz \
     && rm -rf ~/.cache/pip

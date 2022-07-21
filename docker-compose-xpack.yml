@@ -46,3 +46,9 @@ services:
       - ${VOLUME_DIR}/razor/data:/opt/razor/data
     networks:
       - net
+
+  magnus:
+    ports:
+      - 54320:54320
+      - 15211:15211
+      - 15212:15212
