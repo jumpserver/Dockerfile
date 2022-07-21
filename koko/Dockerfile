@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.23.4
+    Version=v2.24.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -20,11 +20,18 @@ RUN set -ex \
     && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv koko-${Version}-linux-${TARGETARCH} koko \
     && mv /opt/koko/kubectl /usr/local/bin/ \
-    && chown root:root /usr/local/bin/kubectl \
+    && mv /opt/koko/helm /usr/local/bin/ \
+    && chown root:root /usr/local/bin/kubectl /usr/local/bin/helm \
     && wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
     && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
     && chmod 755 kubectl \
     && mv kubectl /usr/local/bin/rawkubectl \
+    && wget https://download.jumpserver.org/public/helm-v3.9.0-linux-${TARGETARCH}.tar.gz -O helm.tar.gz \
+    && tar -xf helm.tar.gz \
+    && mv linux-${TARGETARCH}/helm /usr/local/bin/rawhelm \
+    && chmod 755 /usr/local/bin/rawhelm \
+    && chown root:root /usr/local/bin/rawhelm \
+    && rm -rf linux-${TARGETARCH} \
     && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
     && mkdir /opt/kubectl-aliases/ \
     && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
