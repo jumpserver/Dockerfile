@@ -27,7 +27,7 @@ jobs:
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: nginx/Dockerfile
+        dockerFile: web/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
@@ -39,7 +39,7 @@ jobs:
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.DOCKER_HUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: nginx/Dockerfile
+        dockerFile: web/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
 
@@ -52,6 +52,6 @@ jobs:
         dockerUser: wojiushixiaobai
         dockerPassword: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ steps.get_tag.outputs.TAG }},latest
-        dockerFile: nginx/Dockerfile
+        dockerFile: web/Dockerfile
         platform: linux/amd64,linux/arm64
         buildArg: Version=${{ steps.get_tag.outputs.TAG }}
