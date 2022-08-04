@@ -40,6 +40,6 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-COPY nginx/nginx.conf /etc/nginx/
+COPY web/nginx.conf /etc/nginx/
 
 CMD ["nginx", "-g", "daemon off;"]
