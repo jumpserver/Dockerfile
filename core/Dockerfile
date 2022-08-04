@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.0
+    Version=v2.24.1
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -34,7 +34,7 @@ RUN set -ex \
     && sed -i "561i maxmemory-policy allkeys-lru" /etc/redis/redis.conf \
     && /etc/init.d/redis-server start \
     && echo "SECRET_KEY: $(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49)" > /opt/jumpserver/config.yml \
-    && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo \
+    && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo /opt/jumpserver/apps/locale/zh/LC_MESSAGES/djangojs.mo \
     && python manage.py compilemessages \
     && rm -f /opt/jumpserver/config.yml \
     && /etc/init.d/redis-server stop \
