@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.0 \
+    Version=v2.24.2 \
     Jmservisor_VERSION=v1.2.3 \
     Client_VERSION=v1.1.6 \
     MRD_VERSION=10.6.7 \
@@ -40,6 +40,6 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-COPY nginx/nginx.conf /etc/nginx/
+COPY web/nginx.conf /etc/nginx/
 
 CMD ["nginx", "-g", "daemon off;"]

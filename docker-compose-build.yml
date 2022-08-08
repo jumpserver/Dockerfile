@@ -167,7 +167,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: nginx/Dockerfile
+      dockerfile: web/Dockerfile
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
