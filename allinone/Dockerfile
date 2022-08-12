@@ -1,12 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.2 \
-    WISP_VERSION=v0.0.6 \
-    Jmservisor_VERSION=v1.2.3 \
-    Client_VERSION=v1.1.6 \
-    MRD_VERSION=10.6.7 \
-    VIDEO_PLAYER_VERSION=0.1.5
+    Version=v2.24.2
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -33,6 +28,12 @@ RUN set -ex \
     && cd /opt \
     && rm -rf guacamole-server-1.4.0 guacamole-server-1.4.0.tar.gz \
     && rm -rf /var/lib/apt/lists/*
+
+ARG WISP_VERSION=v0.0.6 \
+    Jmservisor_VERSION=v1.2.3 \
+    Client_VERSION=v1.1.6 \
+    MRD_VERSION=10.6.7 \
+    VIDEO_PLAYER_VERSION=0.1.5
 
 RUN set -ex \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
@@ -70,6 +71,7 @@ RUN set -ex \
     && mv wisp-${WISP_VERSION}-linux-${TARGETARCH}/wisp /usr/local/bin/ \
     && chown root:root /usr/local/bin/wisp \
     && chmod 755 /usr/local/bin/wisp \
+    && rm -rf wisp-${WISP_VERSION}-linux-${TARGETARCH} \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \
