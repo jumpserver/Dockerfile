@@ -43,9 +43,7 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 COPY web/nginx.conf /etc/nginx/
+COPY web/entrypoint.sh .
+RUN chmod 755 ./entrypoint.sh
 
-EXPOSE 80
-
-ENTRYPOINT ["/etc/init.d/cron", "start"]
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD [ "./entrypoint.sh" ]
