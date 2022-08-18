@@ -1,19 +1,20 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.2 \
-    WISP_VERSION=v0.0.8
+    Version=v2.25.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y mariadb-client bash-completion \
+    && apt-get install -y --no-install-recommends mariadb-client bash-completion \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
+
+ARG WISP_VERSION=v0.0.8
 
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
@@ -21,6 +22,7 @@ RUN set -ex \
     && mv wisp-${WISP_VERSION}-linux-${TARGETARCH}/wisp /usr/local/bin/ \
     && chown root:root /usr/local/bin/wisp \
     && chmod 755 /usr/local/bin/wisp \
+    && rm -rf wisp-${WISP_VERSION}-linux-${TARGETARCH} \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
     && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \
