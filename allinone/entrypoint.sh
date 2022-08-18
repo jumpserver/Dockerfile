@@ -44,6 +44,10 @@ fi
 sed -i "s@Version:.*@Version: ${Version}@g" /opt/readme.txt
 rm -f /opt/jumpserver/tmp/*.pid
 
+if [ -f "/etc/init.d/cron" ]; then
+  /etc/init.d/cron start
+fi
+
 if [ "$action" == "upgrade" ] || [ "$action" == "init_db" ]; then
     cd /opt/jumpserver
     . /opt/py3/bin/activate

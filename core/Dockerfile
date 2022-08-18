@@ -1,16 +1,16 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.2
+    Version=v2.25.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
+    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat redis-server gettext \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y python3.8 python3.8-dev python3-venv libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass g++ make \
+    && apt-get install -y --no-install-recommends python3.8 python3.8-dev python3-venv libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass g++ make \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 

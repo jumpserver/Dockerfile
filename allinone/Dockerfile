@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.2
+    Version=v2.25.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -13,10 +13,10 @@ RUN set -ex \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
     && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
     && add-apt-repository -y ppa:redislabs/redis \
-    && apt-get install -y redis-server nginx supervisor \
-    && apt-get install -y libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
-    && apt-get install -y libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin uuid-dev \
-    && apt-get install -y libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
+    && apt-get install -y --no-install-recommends redis-server nginx supervisor logrotate \
+    && apt-get install -y --no-install-recommends libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev sshpass mariadb-client bash-completion g++ make \
+    && apt-get install -y --no-install-recommends libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin uuid-dev \
+    && apt-get install -y --no-install-recommends libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
     && python3.8 -m venv /opt/py3 \
     && wget http://download.jumpserver.org/public/guacamole-server-1.4.0.tar.gz \
     && tar -xf guacamole-server-1.4.0.tar.gz \
@@ -110,8 +110,8 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Client-Installer-amd64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
     && wget -qO /opt/download/JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
-    && wget -qO /opt/download/JumpServer-Video-Player.dmg https://jms-pkg.oss-cn-beijing.aliyuncs.com/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
-    && wget -qO /opt/download/JumpServer-Video-Player.exe https://jms-pkg.oss-cn-beijing.aliyuncs.com/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && wget -qO /opt/download/JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO /opt/download/JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
     && rm -rf /opt/guacamole-server-1.4.0 \
     && rm -rf /opt/*.tar.gz \
     && rm -rf ~/.cache/pip

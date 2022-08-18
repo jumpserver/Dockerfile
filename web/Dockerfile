@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.2
+    Version=v2.25.0
 
 ENV Version=${Version} \
     LANG=en_US.utf8
@@ -13,13 +13,13 @@ ARG Jmservisor_VERSION=v1.2.3 \
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
     && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
     && apt-get update \
-    && apt-get install -y nginx \
+    && apt-get --no-install-recommends install -y nginx logrotate \
     && echo > /etc/nginx/conf.d/default.conf \
     && wget https://github.com/jumpserver/luna/releases/download/${Version}/luna-${Version}.tar.gz \
     && tar -xf luna-${Version}.tar.gz \
@@ -35,13 +35,17 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Client-Installer-amd64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
     && wget -qO /opt/download/JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
-    && wget -qO /opt/download/JumpServer-Video-Player.dmg https://jms-pkg.oss-cn-beijing.aliyuncs.com/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
-    && wget -qO /opt/download/JumpServer-Video-Player.exe https://jms-pkg.oss-cn-beijing.aliyuncs.com/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && wget -qO /opt/download/JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO /opt/download/JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
     && rm -rf /var/log/nginx/*.log \
     && rm -rf /opt/*.tar.gz \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
 COPY web/nginx.conf /etc/nginx/
+
+EXPOSE 80
+
+ENTRYPOINT ["/etc/init.d/cron", "start"]
 
 CMD ["nginx", "-g", "daemon off;"]

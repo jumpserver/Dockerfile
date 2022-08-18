@@ -1,16 +1,16 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.24.2
+    Version=v2.25.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
+    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y mariadb-client bash-completion \
+    && apt-get install -y --no-install-recommends mariadb-client bash-completion \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
