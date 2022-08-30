@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.25.2
+    Version=v2.25.3
 ENV Version=${Version} \
     LANG=en_US.utf8
 
