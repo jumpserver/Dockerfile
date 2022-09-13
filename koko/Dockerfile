@@ -11,7 +11,7 @@ RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && add-apt-repository -y ppa:redislabs/redis \
-    && apt-get install -y --no-install-recommends mariadb-client bash-completion redis-tools \
+    && apt-get install -y --no-install-recommends openssh-client mariadb-client bash-completion redis-tools \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
