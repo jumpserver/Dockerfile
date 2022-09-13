@@ -1,13 +1,13 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.25.3
+    Version=v2.25.5
 
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 ARG Jmservisor_VERSION=v1.2.3 \
-    Client_VERSION=v1.1.6 \
+    Client_VERSION=v1.1.7 \
     MRD_VERSION=10.6.7 \
     VIDEO_PLAYER_VERSION=0.1.5
 
