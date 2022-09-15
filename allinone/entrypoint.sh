@@ -57,13 +57,16 @@ if [ "$action" == "upgrade" ] || [ "$action" == "init_db" ]; then
    }
    exit 0
 fi
-/etc/init.d/supervisor start
-/etc/init.d/nginx start
 
 echo
 echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
-cat /opt/readme.txt
+if [ -f "/opt/readme.txt" ]; then
+  cat /opt/readme.txt
+  rm -f /opt/readme.txt
+fi
 echo
 echo "LOG_LEVEL: ${LOG_LEVEL}"
 echo "JumpServer Logs:"
-tail -f /opt/jumpserver/logs/jumpserver.log
+
+/etc/init.d/nginx start
+/etc/init.d/supervisor start

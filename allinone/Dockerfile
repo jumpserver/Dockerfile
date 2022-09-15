@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.25.5
+    Version=v2.26.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -112,8 +112,9 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
     && wget -qO /opt/download/JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && rm -f /etc/cron.daily/apt-compat \
+    && rm -f /opt/*.tar.gz \
     && rm -rf /opt/guacamole-server-1.4.0 \
-    && rm -rf /opt/*.tar.gz \
     && rm -rf ~/.cache/pip
 
 COPY allinone/readme.txt readme.txt
