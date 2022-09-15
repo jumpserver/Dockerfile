@@ -37,8 +37,8 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
     && wget -qO /opt/download/JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
-    && rm -rf /var/log/nginx/*.log \
-    && rm -rf /opt/*.tar.gz \
+    && rm -f /etc/cron.daily/apt-compat \
+    && rm -f /opt/*.tar.gz \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
