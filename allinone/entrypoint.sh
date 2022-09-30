@@ -41,7 +41,10 @@ if [ ! -d "/opt/jumpserver/data/static" ]; then
     chmod 755 -R /opt/jumpserver/data/static
 fi
 
-sed -i "s@Version:.*@Version: ${Version}@g" /opt/readme.txt
+if [ -f "/opt/readme.txt" ]; then
+  sed -i "s@Version:.*@Version: ${Version}@g" /opt/readme.txt
+fi
+
 rm -f /opt/jumpserver/tmp/*.pid
 
 if [ -f "/etc/init.d/cron" ]; then
