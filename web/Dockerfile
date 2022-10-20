@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.26.1
+    Version=v2.27.0
 
 ENV Version=${Version} \
     LANG=en_US.utf8
@@ -9,7 +9,8 @@ ENV Version=${Version} \
 ARG Jmservisor_VERSION=v1.2.5 \
     Client_VERSION=v1.1.7 \
     MRD_VERSION=10.6.7 \
-    VIDEO_PLAYER_VERSION=0.1.5
+    VIDEO_PLAYER_VERSION=0.1.5 \
+    PLAY_VERSION=1.1.0-1
 
 RUN set -ex \
     && apt-get update \
@@ -27,9 +28,8 @@ RUN set -ex \
     && wget https://github.com/jumpserver/lina/releases/download/${Version}/lina-${Version}.tar.gz \
     && tar -xf lina-${Version}.tar.gz \
     && mv lina-${Version} lina \
-    && mkdir -p /opt/download \
+    && mkdir -p /opt/download /opt/player \
     && cd /opt/download \
-    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg \
     && wget -qO /opt/download/Jmservisor.msi https://download.jumpserver.org/public/Jmservisor-${Jmservisor_VERSION}.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer-x86_64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
@@ -38,6 +38,10 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
     && wget -qO /opt/download/OpenSSH-Win64.msi https://download.jumpserver.org/public/OpenSSH-Win64.msi \
+    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg \
+    && wget -q https://download.jumpserver.org/public/glyptodon-enterprise-player-${PLAY_VERSION}.tar.gz \
+    && tar -xf glyptodon-enterprise-player-${PLAY_VERSION}.tar.gz -C /opt/player --strip-components 1 \
+    && rm -f glyptodon-enterprise-player-${PLAY_VERSION}.tar.gz \
     && rm -f /etc/cron.daily/apt-compat \
     && rm -f /opt/*.tar.gz \
     && apt-get clean all \
