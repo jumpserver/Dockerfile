@@ -159,8 +159,7 @@ services:
     volumes:
       - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
     ports:
-      - 33060:33060
-      - 33061:33061
+      - 30000-30100:30000-30100
     networks:
       - net
 

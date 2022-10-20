@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.26.1
+    Version=v2.27.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -14,7 +14,7 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-ARG WISP_VERSION=v0.0.8
+ARG WISP_VERSION=v0.0.10
 
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \

@@ -1,13 +1,13 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.26.1
+    Version=v2.27.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-en netcat gettext software-properties-common \
+    && apt-get install -y wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-en netcat gettext software-properties-common iputils-ping telnet \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
@@ -29,11 +29,12 @@ RUN set -ex \
     && rm -rf guacamole-server-1.4.0 guacamole-server-1.4.0.tar.gz \
     && rm -rf /var/lib/apt/lists/*
 
-ARG WISP_VERSION=v0.0.6 \
+ARG WISP_VERSION=v0.0.10 \
     Jmservisor_VERSION=v1.2.5 \
     Client_VERSION=v1.1.7 \
     MRD_VERSION=10.6.7 \
-    VIDEO_PLAYER_VERSION=0.1.5
+    VIDEO_PLAYER_VERSION=0.1.5 \
+    PLAY_VERSION=1.1.0-1
 
 RUN set -ex \
     && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
@@ -102,9 +103,8 @@ RUN set -ex \
     && echo > /etc/nginx/conf.d/default.conf \
     && chown -R root:root /opt/* \
     && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
-    && mkdir -p /opt/download \
+    && mkdir -p /opt/download /opt/player \
     && cd /opt/download \
-    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg \
     && wget -qO /opt/download/Jmservisor.msi https://download.jumpserver.org/public/Jmservisor-${Jmservisor_VERSION}.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer-x86_64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
     && wget -qO /opt/download/JumpServer-Client-Installer.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}.dmg \
@@ -113,6 +113,10 @@ RUN set -ex \
     && wget -qO /opt/download/JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
     && wget -qO /opt/download/JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
     && wget -qO /opt/download/OpenSSH-Win64.msi https://download.jumpserver.org/public/OpenSSH-Win64.msi \
+    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg \
+    && wget -q https://download.jumpserver.org/public/glyptodon-enterprise-player-${PLAY_VERSION}.tar.gz \
+    && tar -xf glyptodon-enterprise-player-${PLAY_VERSION}.tar.gz -C /opt/player --strip-components 1 \
+    && rm -f glyptodon-enterprise-player-${PLAY_VERSION}.tar.gz \
     && rm -f /etc/cron.daily/apt-compat \
     && rm -f /opt/*.tar.gz \
     && rm -rf /opt/guacamole-server-1.4.0 \
