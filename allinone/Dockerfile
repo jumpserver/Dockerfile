@@ -1,19 +1,21 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.27.0
+    Version=v2.28.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-en netcat gettext software-properties-common iputils-ping telnet \
+    && apt-get install -y --no-install-recommends wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-en netcat gettext software-properties-common iputils-ping telnet \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
-    && wget -O /etc/apt/trusted.gpg.d/nginx_signing.asc https://nginx.org/keys/nginx_signing.key \
+    && echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-6.0.list \
+    && wget -qO - https://nginx.org/keys/nginx_signing.key | apt-key add - \
+    && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
     && add-apt-repository -y ppa:redislabs/redis \
-    && apt-get install -y --no-install-recommends redis-server nginx supervisor logrotate \
+    && apt-get install -y --no-install-recommends redis-server nginx supervisor logrotate mongodb-mongosh \
     && apt-get install -y --no-install-recommends libaio-dev freetds-dev freetds-dev libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev openssh-client pkg-config sshpass mariadb-client bash-completion g++ make \
     && apt-get install -y --no-install-recommends libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin uuid-dev \
     && apt-get install -y --no-install-recommends libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \

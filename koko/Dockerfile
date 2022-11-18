@@ -1,7 +1,7 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.27.0
+    Version=v2.28.0
 ENV Version=${Version} \
     LANG=en_US.utf8
 
@@ -10,8 +10,11 @@ RUN set -ex \
     && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-en netcat software-properties-common \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
+    && echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-6.0.list \
+    && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
     && add-apt-repository -y ppa:redislabs/redis \
-    && apt-get install -y --no-install-recommends openssh-client mariadb-client bash-completion redis-tools \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends openssh-client mariadb-client bash-completion redis-tools mongodb-mongosh \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
