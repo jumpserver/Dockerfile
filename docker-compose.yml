@@ -75,6 +75,7 @@ services:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
+      SSHD_PORT: ${SSH_PORT:-2222}
     depends_on:
       core:
         condition: service_healthy
@@ -87,7 +88,7 @@ services:
     volumes:
       - ${VOLUME_DIR}/koko/data:/opt/koko/data
     ports:
-      - 2222:2222
+      - ${SSH_PORT:-2222}:${SSH_PORT}
     networks:
       - net
 
@@ -144,6 +145,8 @@ services:
     container_name: jms_web
     restart: always
     tty: true
+    environment:
+      HTTP_PORT: ${HTTP_PORT:-80}
     depends_on:
       core:
         condition: service_healthy
@@ -157,6 +160,6 @@ services:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
       - ${VOLUME_DIR}/nginx/data/logs:/var/log/nginx
     ports:
-      - 80:80
+      - ${HTTP_PORT:-80}:${HTTP_PORT:-80}
     networks:
       - net
