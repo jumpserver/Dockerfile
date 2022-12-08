@@ -1,13 +1,13 @@
 FROM ubuntu:focal
 WORKDIR /opt
 ARG TARGETARCH \
-    Version=v2.28.1
+    Version=v2.28.2
 ENV Version=${Version} \
-    LANG=en_US.utf8
+    LANG=zh_CN.UTF-8
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y --no-install-recommends wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-en netcat gettext software-properties-common iputils-ping telnet \
+    && apt-get install -y --no-install-recommends wget python3.8 python3.8-dev python3-venv curl gnupg2 ca-certificates lsb-release language-pack-zh-hans netcat gettext software-properties-common iputils-ping telnet \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo "LANG=$LANG" > /etc/default/locale \
     && echo "deb http://nginx.org/packages/ubuntu focal nginx" > /etc/apt/sources.list.d/nginx.list \
@@ -149,5 +149,5 @@ ENV SECRET_KEY=kWQdmdCQKjaWlHYpPhkNQDkfaRulM6YnHctsHLlSPs8287o2kW \
     CORE_HOST=http://127.0.0.1:8080 \
     LOG_LEVEL=ERROR
 
-EXPOSE 80 2222 33060 33061
+EXPOSE 80 2222
 ENTRYPOINT ["./entrypoint.sh"]
