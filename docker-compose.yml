@@ -19,6 +19,7 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
+      MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
     healthcheck:
       test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
       interval: 10s
@@ -50,6 +51,7 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
+      MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
     depends_on:
       core:
         condition: service_healthy
@@ -124,6 +126,7 @@ services:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
+      MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
     depends_on:
       core:
         condition: service_healthy
@@ -136,7 +139,7 @@ services:
     volumes:
       - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
     ports:
-      - 30000-30100:30000-30100
+      - ${MAGNUS_PORT:-30000-30020}:${MAGNUS_PORT:-30000-30020}
     networks:
       - net
 
