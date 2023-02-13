@@ -31,7 +31,7 @@
 快速部署
 ```sh
 # 测试环境可以使用，生产环境推荐外置数据
-git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
+git clone --depth=1 https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
 docker-compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up -d
@@ -61,7 +61,7 @@ flush privileges;
 ```
 
 ```sh
-git clone --depth=1 https://github.com/wojiushixiaobai/Dockerfile.git
+git clone --depth=1 https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
 vi .env
