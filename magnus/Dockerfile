@@ -1,36 +1,52 @@
-FROM ubuntu:focal
-WORKDIR /opt
-ARG TARGETARCH \
-    Version=v2.28.7
-ENV Version=${Version} \
-    LANG=zh_CN.UTF-8
+FROM jumpserver/guacd:1.5.2
+ARG TARGETARCH
+ENV LANG=zh_CN.UTF-8
+
+ARG DEPENDENCIES="                    \
+        ca-certificates               \
+        curl                          \
+        locales                       \
+        telnet                        \
+        vim                           \
+        wget"
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-zh-hans netcat \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y --no-install-recommends mariadb-client bash-completion \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends ${$DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-ARG WISP_VERSION=v0.0.10
+WORKDIR /opt
 
+ARG WISP_VERSION=v0.1.7
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && mv wisp-${WISP_VERSION}-linux-${TARGETARCH}/wisp /usr/local/bin/ \
+    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
     && chown root:root /usr/local/bin/wisp \
     && chmod 755 /usr/local/bin/wisp \
-    && rm -rf wisp-${WISP_VERSION}-linux-${TARGETARCH} \
+    && rm -f /opt/*.tar.gz
+
+WORKDIR /opt/magnus
+
+ARG VERSION=v3.4.3
+ENV VERSION=${VERSION}
+
+RUN set -ex \
+    && cd /opt \
     && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz \
-    && mv magnus-${Version}-linux-${TARGETARCH} /opt/magnus \
+    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
     && chmod 755 /opt/magnus/magnus \
     && chown -R root:root /opt/magnus \
-    && rm -rf /opt/*.tar.gz
+    && rm -f /opt/*.tar.gz
 
 COPY magnus/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+EXPOSE 33061 33062 63790
 
 CMD [ "./entrypoint.sh" ]

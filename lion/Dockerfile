@@ -1,39 +1,43 @@
-FROM ubuntu:focal
-WORKDIR /opt
-ARG TARGETARCH \
-    Version=v2.28.7
-ENV Version=${Version} \
-    LANG=zh_CN.UTF-8
+FROM jumpserver/guacd:1.5.2
+ARG TARGETARCH
+ENV LANG=zh_CN.UTF-8
+
+ARG DEPENDENCIES="                    \
+        ca-certificates               \
+        curl                          \
+        locales                       \
+        supervisor                    \
+        telnet                        \
+        vim                           \
+        wget"
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-zh-hans netcat make \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y --no-install-recommends libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin uuid-dev \
-    && apt-get install -y --no-install-recommends libavcodec-dev libavformat-dev libavutil-dev libswscale-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends ${$DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-RUN set -ex \
-    && wget http://download.jumpserver.org/public/guacamole-server-1.4.0.tar.gz \
-    && tar -xf guacamole-server-1.4.0.tar.gz \
-    && cd guacamole-server-1.4.0 \
-    && ./configure --with-init-dir=/etc/init.d --disable-guaclog \
-    && make \
-    && make install \
-    && ldconfig \
-    && cd /opt \
-    && rm -rf /opt/guacamole-server-1.4.0 /opt/guacamole-server-1.4.0.tar.gz
+WORKDIR /opt/lion
+
+ARG VERSION=v3.4.3
+ENV VERSION=${VERSION}
 
 RUN set -ex \
-    && wget https://github.com/jumpserver/lion-release/releases/download/${Version}/lion-${Version}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf lion-${Version}-linux-${TARGETARCH}.tar.gz \
-    && mv lion-${Version}-linux-${TARGETARCH} lion \
+    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${VERSION}.tar.gz \
+    && tar -xf lion-${VERSION}-linux-${VERSION}.tar.gz -C /opt/lion --strip-components=1 \
     && chown -R root:root /opt/lion \
-    && rm -rf /opt/*.tar.gz
+    && rm -f /opt/*.tar.gz
+
+COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
 
 COPY lion/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+EXPOSE 8081
 
 CMD ["./entrypoint.sh"]
