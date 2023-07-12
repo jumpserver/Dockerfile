@@ -7,7 +7,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_core:${Version}
+    image: jumpserver/core:${Version}
     container_name: jms_core
     restart: always
     tty: true
@@ -25,8 +25,11 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
+      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
+      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
+      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
     healthcheck:
-      test: "curl -f http://localhost:8080/api/health/"
+      test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -38,7 +41,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/jms_core:${Version}
+    image: jumpserver/core:${Version}
     container_name: jms_celery
     restart: always
     tty: true
@@ -56,11 +59,14 @@ services:
       REDIS_HOST: $REDIS_HOST
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
+      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
+      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
+      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "/opt/py3/bin/python /opt/jumpserver/apps/manage.py check_celery"
+      test: "bash /opt/jumpserver/utils/check_celery.sh"
       interval: 10s
       timeout: 10s
       retries: 3
@@ -78,7 +84,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_koko:${Version}
+    image: jumpserver/koko:${Version}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -87,11 +93,12 @@ services:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
+      SSHD_PORT: ${SSH_PORT:-2222}
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "nc -z localhost 2222 && nc -z localhost 5000"
+      test: "curl -fsL http://localhost:5000/koko/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -99,7 +106,7 @@ services:
     volumes:
       - ${VOLUME_DIR}/koko/data:/opt/koko/data
     ports:
-      - 2222:2222
+      - ${SSH_PORT:-2222}:2222
     networks:
       - net
 
@@ -110,7 +117,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_lion:${Version}
+    image: jumpserver/lion:${Version}
     container_name: jms_lion
     restart: always
     tty: true
@@ -122,7 +129,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "/etc/init.d/guacd status && curl -f http://localhost:8081/lion/health/"
+      test: "curl -fsL http://localhost:8081/lion/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -139,7 +146,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_magnus:${Version}
+    image: jumpserver/magnus:${Version}
     container_name: jms_magnus
     restart: always
     tty: true
@@ -147,11 +154,14 @@ services:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
+      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
+      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
+      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "nc -z localhost 33060 && nc -z localhost 33061"
+      test: "nc -z 127.0.0.1 33061 || exit 1"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -159,7 +169,9 @@ services:
     volumes:
       - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
     ports:
-      - 30000-30100:30000-30100
+      - ${MAGNUS_MYSQL_PORT:-33061}:33061
+      - ${MAGNUS_MARIADB_PORT:-33062}:33062
+      - ${MAGNUS_REDIS_PORT:-63790}:63790
     networks:
       - net
 
@@ -170,7 +182,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_web:${Version}
+    image: jumpserver/web:${Version}
     container_name: jms_web
     restart: always
     tty: true
@@ -178,7 +190,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -f http://localhost"
+      test: "curl -fsL http://localhost/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -187,7 +199,7 @@ services:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
       - ${VOLUME_DIR}/nginx/data/logs:/var/log/nginx
     ports:
-      - 80:80
+      - ${HTTP_PORT:-80}:80
     networks:
       - net
 

@@ -6,7 +6,7 @@ services:
         condition: service_healthy
 
   redis:
-    image: redis:6
+    image: jumpserver/redis:6.2
     container_name: jms_redis
     restart: always
     command: redis-server --requirepass $REDIS_PASSWORD --loglevel warning --maxmemory-policy allkeys-lru

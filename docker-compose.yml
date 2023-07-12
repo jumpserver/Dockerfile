@@ -126,12 +126,14 @@ services:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
-      MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
+      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
+      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
+      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "ps axu | grep -v 'grep' | grep magnus"
+      test: "nc -z 127.0.0.1 33061 || exit 1"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -139,7 +141,9 @@ services:
     volumes:
       - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
     ports:
-      - ${MAGNUS_PORT:-30000-30020}:${MAGNUS_PORT:-30000-30020}
+      - ${MAGNUS_MYSQL_PORT:-33061}:33061
+      - ${MAGNUS_MARIADB_PORT:-33062}:33062
+      - ${MAGNUS_REDIS_PORT:-63790}:63790
     networks:
       - net
 
@@ -148,8 +152,6 @@ services:
     container_name: jms_web
     restart: always
     tty: true
-    environment:
-      HTTP_PORT: ${HTTP_PORT:-80}
     depends_on:
       core:
         condition: service_healthy

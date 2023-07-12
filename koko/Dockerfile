@@ -1,48 +1,98 @@
-FROM ubuntu:focal
-WORKDIR /opt
-ARG TARGETARCH \
-    Version=v2.28.7
-ENV Version=${Version} \
-    LANG=zh_CN.UTF-8
+FROM jumpserver/redis:6.2 as redis
+
+FROM debian:buster-slim
+ARG TARGETARCH
+ENV LANG=zh_CN.UTF-8
+
+ARG DEPENDENCIES="                    \
+        bash-completion               \
+        ca-certificates               \
+        curl                          \
+        libssl-dev                    \
+        locales                       \
+        mariadb-client                \
+        openssh-client                \
+        postgresql-client             \
+        vim                           \
+        wget"
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-zh-hans netcat software-properties-common \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/default/locale \
-    && echo "deb https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-6.0.list \
-    && wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - \
-    && add-apt-repository -y ppa:redislabs/redis \
     && apt-get update \
-    && apt-get install -y --no-install-recommends openssh-client mariadb-client bash-completion redis-tools mongodb-mongosh \
+    && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /opt
+
+ARG MONGOSH_VERSION=1.9.1
 RUN set -ex \
-    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz \
-    && mv koko-${Version}-linux-${TARGETARCH} koko \
-    && mv /opt/koko/kubectl /usr/local/bin/ \
-    && mv /opt/koko/helm /usr/local/bin/ \
-    && chown root:root /usr/local/bin/kubectl /usr/local/bin/helm \
+    && \
+    case "${TARGETARCH}" in \
+        amd64) \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            && tar -xf mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/mongosh/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-x64/mongosh/bin/* /usr/local/bin/ \
+            && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
+            ;; \
+        arm64) \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/mongosh/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/mongosh/bin/* /usr/local/bin/ \
+            && rm -rf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}* \
+            ;; \
+        *) \
+            echo "Unsupported architecture: ${TARGETARCH}" \
+            ;; \
+    esac
+
+COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
+
+ARG HELM_VERSION=v3.12.1
+
+RUN set -ex \
     && wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
     && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
-    && chmod 755 kubectl \
     && mv kubectl /usr/local/bin/rawkubectl \
-    && wget https://download.jumpserver.org/public/helm-v3.9.0-linux-${TARGETARCH}.tar.gz -O helm.tar.gz \
-    && tar -xf helm.tar.gz \
-    && mv linux-${TARGETARCH}/helm /usr/local/bin/rawhelm \
-    && chmod 755 /usr/local/bin/rawhelm \
-    && chown root:root /usr/local/bin/rawhelm \
-    && rm -rf linux-${TARGETARCH} \
     && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
     && mkdir /opt/kubectl-aliases/ \
     && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
     && chown -R root:root /opt/kubectl-aliases/ \
-    && chmod 755 /opt/koko/init-kubectl.sh \
-    && rm -rf /opt/*.tar.gz
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        wget https://github.com/wojiushixiaobai/helm-loongarch64/releases/download/${HELM_VERSION}/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
+    else \
+        wget https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
+    fi \
+    && mv helm /usr/local/bin/rawhelm \
+    && chmod 755 /usr/local/bin/rawhelm /usr/local/bin/rawkubectl /opt/koko/init-kubectl.sh \
+    && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl /usr/local/bin/kubectl \
+    && rm -f /opt/*.tar.gz
+
+WORKDIR /opt/koko
+
+ARG VERSION=v3.4.3
+ENV VERSION=${VERSION}
+
+RUN set -ex \
+    && cd /opt \
+    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/koko/ --strip-components=1 \
+    && mv /opt/koko/kubectl /usr/local/bin/ \
+    && mv /opt/koko/helm /usr/local/bin/ \
+    && chmod 755 /usr/local/bin/helm /usr/local/bin/kubectl \
+    && chown root:root /usr/local/bin/helm /usr/local/bin/kubectl \
+    && rm -f /opt/*.tar.gz
 
 COPY koko/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+EXPOSE 2222 5000
 
 CMD [ "./entrypoint.sh" ]

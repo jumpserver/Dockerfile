@@ -1,49 +1,88 @@
-FROM ubuntu:focal
-WORKDIR /opt
-ARG TARGETARCH \
-    Version=v2.28.7
-ENV Version=${Version} \
-    LANG=zh_CN.UTF-8
+FROM jumpserver/python:3.9-slim-buster
+ARG TARGETARCH
+ENV LANG=zh_CN.UTF-8
+
+ARG BUILD_DEPENDENCIES="              \
+        g++                           \
+        make                          \
+        pkg-config"
+
+ARG DEPENDENCIES="                    \
+        freetds-dev                   \
+        libpq-dev                     \
+        libffi-dev                    \
+        libjpeg-dev                   \
+        libldap2-dev                  \
+        libsasl2-dev                  \
+        libssl-dev                    \
+        libxml2-dev                   \
+        libxmlsec1-dev                \
+        libxmlsec1-openssl            \
+        libaio-dev"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
+        default-libmysqlclient-dev    \
+        default-mysql-client          \
+        git                           \
+        git-lfs                       \
+        iputils-ping                  \
+        locales                       \
+        netcat                        \
+        openssh-client                \
+        procps                        \
+        sshpass                       \
+        telnet                        \
+        unzip                         \
+        vim                           \
+        wget"
 
 RUN set -ex \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends wget curl gnupg2 ca-certificates lsb-release language-pack-zh-hans netcat redis-server gettext iputils-ping telnet \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo "LANG=$LANG" > /etc/default/locale \
-    && apt-get install -y --no-install-recommends python3.8 python3.8-dev python3-venv libaio-dev freetds-dev freetds-dev pkg-config libpq-dev libffi-dev libxml2-dev libxmlsec1-dev libxmlsec1-openssl libxslt-dev libmariadb-dev libldap2-dev libsasl2-dev openssh-client sshpass g++ make \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && mkdir -p /root/.ssh/ \
+    && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
+    && echo "set mouse-=a\nset ts=4\nset expandtab" > ~/.vimrc \
+    && echo "no" | dpkg-reconfigure dash \
+    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
+    && sed -i "s@# export @export @g" ~/.bashrc \
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-RUN set -ex \
-    && wget https://github.com/jumpserver/jumpserver/releases/download/${Version}/jumpserver-${Version}.tar.gz \
-    && tar -xf jumpserver-${Version}.tar.gz \
-    && mv jumpserver-${Version} jumpserver \
-    && rm -f /opt/jumpserver/apps/common/utils/ip/geoip/GeoLite2-City.mmdb /opt/jumpserver/apps/common/utils/ip/ipip/ipipfree.ipdb \
-    && wget https://download.jumpserver.org/files/ip/GeoLite2-City.mmdb -O /opt/jumpserver/apps/common/utils/ip/geoip/GeoLite2-City.mmdb \
-    && wget https://download.jumpserver.org/files/ip/ipipfree.ipdb -O /opt/jumpserver/apps/common/utils/ip/ipip/ipipfree.ipdb \
-    && chown -R root:root jumpserver \
-    && python3.8 -m venv /opt/py3 \
-    && . /opt/py3/bin/activate \
-    && pip install --upgrade pip \
-    && pip install --upgrade setuptools \
-    && pip install --upgrade wheel \
-    && pip install $(grep -E 'PyNaCl' /opt/jumpserver/requirements/requirements.txt) \
-    && pip install grpcio==1.41.1 \
-    && pip install -r /opt/jumpserver/requirements/requirements.txt \
-    && cd /opt/jumpserver/apps \
-    && sed -i "561i maxmemory-policy allkeys-lru" /etc/redis/redis.conf \
-    && /etc/init.d/redis-server start \
-    && echo "SECRET_KEY: $(cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49)" > /opt/jumpserver/config.yml \
-    && rm -f /opt/jumpserver/apps/locale/zh/LC_MESSAGES/django.mo /opt/jumpserver/apps/locale/zh/LC_MESSAGES/djangojs.mo \
-    && python manage.py compilemessages \
-    && rm -f /opt/jumpserver/config.yml \
-    && /etc/init.d/redis-server stop \
-    && cd /opt \
-    && echo ". /opt/py3/bin/activate" >> ~/.bashrc \
-    && rm -rf /opt/*.tar.gz \
-    && rm -rf ~/.cache/pip
+ARG VERSION=v3.4.3
+ENV VERSION=${VERSION}
 
-COPY core/entrypoint.sh .
-RUN chmod 755 ./entrypoint.sh
+RUN set -ex \
+    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
+    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
+    && chmod +x /opt/jumpserver/entrypoint.sh \
+    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
+
+WORKDIR /opt/jumpserver
+
+RUN set -ex \
+    && echo > /opt/jumpserver/config.yml \
+    && pip install --upgrade pip \
+    && pip install --upgrade setuptools wheel \
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl; \
+        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
+    fi \
+    && pip install -r requirements/requirements.txt \
+    && rm -rf /root/.cache/pip
+
+WORKDIR /opt/jumpserver
+VOLUME /opt/jumpserver/data
+VOLUME /opt/jumpserver/logs
+
+EXPOSE 8080
 
 ENTRYPOINT ["./entrypoint.sh"]

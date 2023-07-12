@@ -41,14 +41,14 @@ services:
       retries: 3
       start_period: 10s
     ports:
-      - 3389:3389
+      - ${RDP_PORT:-3389}:3389
     volumes:
       - ${VOLUME_DIR}/razor/data:/opt/razor/data
     networks:
       - net
 
   magnus:
+    image: registry.fit2cloud.com/jumpserver/magnus:${VERSION}
     ports:
-      - 54320:54320
-      - 15211:15211
-      - 15212:15212
+      - ${MAGNUS_POSTGRESQL_PORT:-54320}:54320
+      - ${MAGNUS_ORACLE_PORTS:-30000-30010}:${MAGNUS_ORACLE_PORTS:-30000-30010}

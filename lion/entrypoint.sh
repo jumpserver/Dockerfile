@@ -8,8 +8,30 @@ do
 done
 
 if [ ! "$LOG_LEVEL" ]; then
-    export LOG_LEVEL=ERROR
+    LOG_LEVEL=ERROR
 fi
-/etc/init.d/guacd start
-cd /opt/lion
-./lion
+
+case $LOG_LEVEL in
+    DEBUG)
+        export LOG_LEVEL=DEBUG
+        export GUACD_LOG_LEVEL=debug
+        ;;
+    INFO)
+        export LOG_LEVEL=INFO
+        export GUACD_LOG_LEVEL=info
+        ;;
+    WARN)
+        export LOG_LEVEL=WARN
+        export GUACD_LOG_LEVEL=warning
+        ;;
+    ERROR)
+        export LOG_LEVEL=ERROR
+        export GUACD_LOG_LEVEL=error
+        ;;
+    *)
+        export LOG_LEVEL=ERROR
+        export GUACD_LOG_LEVEL=error
+        ;;
+esac
+
+supervisord
