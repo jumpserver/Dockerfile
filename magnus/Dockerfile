@@ -1,4 +1,4 @@
-FROM jumpserver/guacd:1.5.2
+FROM debian:buster-slim
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
@@ -13,7 +13,7 @@ ARG DEPENDENCIES="                    \
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
-    && apt-get install -y --no-install-recommends ${$DEPENDENCIES} \
+    && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \

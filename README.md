@@ -70,19 +70,19 @@ DOCKER_SUBNET=192.168.250.0/24
 # 持久化存储
 VOLUME_DIR=/opt/jumpserver
 
-# MySQL
+# MySQL, 修改为你的外置 **数据库** 地址
 DB_HOST=mysql
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=nu4x599Wq7u0Bn8EABh3J91G
 DB_NAME=jumpserver
 
-# Redis
+# Redis, 修改为你的外置 **Redis** 地址
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_PASSWORD=8URXPL2x3HZMi7xoGTdk3Upj
 
-# Core
+# Core, 修改 SECRET_KEY 和 BOOTSTRAP_TOKEN
 SECRET_KEY=B3f2w8P2PfxIAS7s4URrD9YmSbtqX4vXdPUL217kL9XPUOWrmy
 BOOTSTRAP_TOKEN=7Q11Vz6R2J6BLAdO
 DEBUG=FALSE
@@ -102,7 +102,7 @@ MAGNUS_ORACLE_PORTS=30000-30010
 
 ##
 # SECRET_KEY 保护签名数据的密匙, 首次安装请一定要修改并牢记, 后续升级和迁移不可更改, 否则将导致加密的数据不可解密。
-# BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko、guacamole
+# BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko、lion、magnus 等。
 ```
 ```sh
 docker-compose -f docker-compose-network.yml -f docker-compose-init-db.yml up -d

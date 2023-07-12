@@ -7,7 +7,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_core:${Version}
+    image: jumpserver/core:${Version}
     container_name: jms_core
     restart: always
     tty: true
@@ -41,7 +41,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/jms_core:${Version}
+    image: jumpserver/core:${Version}
     container_name: jms_celery
     restart: always
     tty: true
@@ -84,7 +84,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_koko:${Version}
+    image: jumpserver/koko:${Version}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -117,7 +117,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_lion:${Version}
+    image: jumpserver/lion:${Version}
     container_name: jms_lion
     restart: always
     tty: true
@@ -146,7 +146,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_magnus:${Version}
+    image: jumpserver/magnus:${Version}
     container_name: jms_magnus
     restart: always
     tty: true
@@ -182,7 +182,7 @@ services:
       args:
         Version: ${Version}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_web:${Version}
+    image: jumpserver/web:${Version}
     container_name: jms_web
     restart: always
     tty: true
