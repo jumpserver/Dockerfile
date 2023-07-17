@@ -179,8 +179,6 @@ RUN set -ex \
 RUN set -ex \
     && cd /opt/jumpserver \
     && echo > /opt/jumpserver/config.yml \
-    && pip install --upgrade pip \
-    && pip install --upgrade setuptools wheel \
     && \
     if [ "${TARGETARCH}" == "loong64" ]; then \
         pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
