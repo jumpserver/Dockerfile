@@ -70,9 +70,10 @@ RUN set -ex \
     else \
         wget https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
     fi \
+    && tar -xf helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz --strip-components=1 linux-${TARGETARCH}/helm \
     && mv helm /usr/local/bin/rawhelm \
-    && chmod 755 /usr/local/bin/rawhelm /usr/local/bin/rawkubectl /opt/koko/init-kubectl.sh \
-    && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl /usr/local/bin/kubectl \
+    && chmod 755 /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
+    && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
     && rm -f /opt/*.tar.gz
 
 WORKDIR /opt/koko
@@ -82,11 +83,11 @@ ENV VERSION=${VERSION}
 
 RUN set -ex \
     && cd /opt \
-    && wget https://github.com/jumpserver/koko/releases/download/${Version}/koko-${Version}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf koko-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/koko/ --strip-components=1 \
+    && wget https://github.com/jumpserver/koko/releases/download/${VERSION}/koko-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf koko-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/koko/ --strip-components=1 \
     && mv /opt/koko/kubectl /usr/local/bin/ \
     && mv /opt/koko/helm /usr/local/bin/ \
-    && chmod 755 /usr/local/bin/helm /usr/local/bin/kubectl \
+    && chmod 755 /usr/local/bin/helm /usr/local/bin/kubectl /opt/koko/init-kubectl.sh \
     && chown root:root /usr/local/bin/helm /usr/local/bin/kubectl \
     && rm -f /opt/*.tar.gz
 

@@ -1,8 +1,8 @@
-Version: '2.4'
+version: '2.4'
 
 services:
   omnidb:
-    image: registry.fit2cloud.com/jumpserver/omnidb:${Version}
+    image: registry.fit2cloud.com/jumpserver/omnidb:${VERSION}
     container_name: jms_omnidb
     restart: always
     environment:
@@ -24,7 +24,7 @@ services:
       - net
 
   razor:
-    image: registry.fit2cloud.com/jumpserver/razor:${Version}
+    image: registry.fit2cloud.com/jumpserver/razor:${VERSION}
     container_name: jms_razor
     restart: always
     environment:

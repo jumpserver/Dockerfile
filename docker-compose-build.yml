@@ -5,9 +5,9 @@ services:
       context: .
       dockerfile: core/Dockerfile
       args:
-        Version: ${Version}
+        VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/core:${Version}
+    image: jumpserver/core:${VERSION}
     container_name: jms_core
     restart: always
     tty: true
@@ -41,7 +41,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/core:${Version}
+    image: jumpserver/core:${VERSION}
     container_name: jms_celery
     restart: always
     tty: true
@@ -82,9 +82,9 @@ services:
       context: .
       dockerfile: koko/Dockerfile
       args:
-        Version: ${Version}
+        VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/koko:${Version}
+    image: jumpserver/koko:${VERSION}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -115,9 +115,9 @@ services:
       context: .
       dockerfile: lion/Dockerfile
       args:
-        Version: ${Version}
+        VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/lion:${Version}
+    image: jumpserver/lion:${VERSION}
     container_name: jms_lion
     restart: always
     tty: true
@@ -144,9 +144,9 @@ services:
       context: .
       dockerfile: magnus/Dockerfile
       args:
-        Version: ${Version}
+        VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/magnus:${Version}
+    image: jumpserver/magnus:${VERSION}
     container_name: jms_magnus
     restart: always
     tty: true
@@ -180,9 +180,9 @@ services:
       context: .
       dockerfile: web/Dockerfile
       args:
-        Version: ${Version}
+        VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/web:${Version}
+    image: jumpserver/web:${VERSION}
     container_name: jms_web
     restart: always
     tty: true

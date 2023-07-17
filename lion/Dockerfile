@@ -30,8 +30,8 @@ ARG VERSION=v3.4.3
 ENV VERSION=${VERSION}
 
 RUN set -ex \
-    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${VERSION}.tar.gz \
-    && tar -xf lion-${VERSION}-linux-${VERSION}.tar.gz -C /opt/lion --strip-components=1 \
+    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
     && chown -R root:root /opt/lion \
     && rm -f /opt/*.tar.gz
 
