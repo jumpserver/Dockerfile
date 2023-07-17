@@ -23,7 +23,7 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG WISP_VERSION=v0.1.7
+ARG WISP_VERSION=v0.1.10
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -38,8 +38,8 @@ ENV VERSION=${VERSION}
 
 RUN set -ex \
     && cd /opt \
-    && wget https://github.com/jumpserver/magnus-release/releases/download/${Version}/magnus-${Version}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf magnus-${Version}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
+    && wget https://github.com/jumpserver/magnus-release/releases/download/${VERSION}/magnus-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf magnus-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
     && chmod 755 /opt/magnus/magnus \
     && chown -R root:root /opt/magnus \
     && rm -f /opt/*.tar.gz

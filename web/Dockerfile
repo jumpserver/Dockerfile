@@ -41,16 +41,15 @@ RUN set -ex \
 
 WORKDIR /opt/download/applets
 
-ARG TINKER_VERSION=v0.0.9
-ARG PYTHON_VERSION=3.10.8
-ARG CHROMIUM_VERSION=1100786
+ARG TINKER_VERSION=v0.1.0
+ARG PYTHON_VERSION=3.10.11
+ARG CHROME_VERSION=114.0.5735.134
 ARG DBEAVER_VERSION=22.3.4
-
 RUN set -ex \
-    && wget -qO chromedriver_win32.zip https://download.jumpserver.org/chromium-browser-snapshots/Win_x64/${CHROMIUM_VERSION}/Win_x64_${CHROMIUM_VERSION}_chromedriver_win32.zip \
-    && wget -qO chrome-win.zip https://download.jumpserver.org/chromium-browser-snapshots/Win_x64/${CHROMIUM_VERSION}/Win_x64_${CHROMIUM_VERSION}_chrome-win.zip \
     && wget -qO Tinker_Installer.exe https://download.jumpserver.org/public/Tinker_Installer_${TINKER_VERSION}.exe \
     && wget -qO dbeaver-patch.msi https://download.jumpserver.org/public/dbeaver-patch-${DBEAVER_VERSION}-x86_64-setup.msi \
+    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chromedriver_win32.zip \
+    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chrome-win.zip \
     && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
     && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
 

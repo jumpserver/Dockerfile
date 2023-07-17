@@ -2,7 +2,7 @@ version: '2.4'
 
 services:
   core:
-    image: jumpserver/core:${Version}
+    image: jumpserver/core:${VERSION}
     container_name: jms_core
     tty: true
     command: sleep

@@ -1,0 +1,90 @@
+version: '3.8'
+services:
+  mysql:
+    image: mariadb:10.6
+    container_name: jms_mysql
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD:-Np2qgqtiUayA857GpuVI0Wtg}
+      MARIADB_DATABASE: ${DB_NAME:-jumpserver}
+    healthcheck:
+      test: "mysql -h127.0.0.1 -uroot -p$$MARIADB_ROOT_PASSWORD -e 'SHOW DATABASES;'"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - ${VOLUME_DIR:-./data}/mariadb/data:/var/lib/mysql
+    networks:
+      - net
+
+  redis:
+    image: redis:6.2
+    container_name: jms_redis
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
+    healthcheck:
+      test: "redis-cli -h 127.0.0.1 -a $$REDIS_PASSWORD info Replication"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    volumes:
+      - ${VOLUME_DIR:-./data}/redis/data:/data
+    networks:
+      - net
+
+  jumpserver:
+    image: jumpserver/jms_all:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jms_all
+    privileged: true
+    restart: always
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-vYneAbsXUhe4BghEeedNL7nfWLwaTTmhnwQMvjYOIG25Ofzghk}
+      BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:-K1ffDfLSIK8SV2PZj6VaxOiv8KuawlJK}
+      DEBUG: ${DEBUG:-FALSE}
+      LOG_LEVEL: ${LOG_LEVEL:-ERROR}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Np2qgqtiUayA857GpuVI0Wtg}
+      DB_NAME: ${DB_NAME:-jumpserver}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
+      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
+      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
+      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
+    ports:
+      - ${HTTP_PORT:-80}:80/tcp
+      - ${SSH_PORT:-2222}:2222/tcp
+      - ${MAGNUS_MYSQL_PORT:-33061}:33061/tcp
+      - ${MAGNUS_MARIADB_PORT:-33062}:33062/tcp
+      - ${MAGNUS_REDIS_PORT:-63790}:63790/tcp
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -fsL http://localhost/api/health/ > /dev/null"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    volumes:
+      - ${VOLUME_DIR:-./data}/core/data:/opt/jumpserver/core/data
+      - ${VOLUME_DIR:-./data}/koko/data:/opt/jumpserver/koko/data
+      - ${VOLUME_DIR:-./data}/lion/data:/opt/jumpserver/lion/data
+      - ${VOLUME_DIR:-./data}/magnus/data:/opt/jumpserver/magnus/data
+      - ${VOLUME_DIR:-./data}/nginx/data:/var/log/nginx
+    networks:
+      - net
+
+networks:
+  net:

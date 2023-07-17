@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   core:
-    image: jumpserver/core:${Version}
+    image: jumpserver/core:${VERSION}
     container_name: jms_core
     restart: always
     tty: true
@@ -28,12 +28,11 @@ services:
       start_period: 90s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
-      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
   celery:
-    image: jumpserver/core:${Version}
+    image: jumpserver/core:${VERSION}
     container_name: jms_celery
     restart: always
     tty: true
@@ -63,12 +62,11 @@ services:
       start_period: 30s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
-      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
   koko:
-    image: jumpserver/koko:${Version}
+    image: jumpserver/koko:${VERSION}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -95,7 +93,7 @@ services:
       - net
 
   lion:
-    image: jumpserver/lion:${Version}
+    image: jumpserver/lion:${VERSION}
     container_name: jms_lion
     restart: always
     tty: true
@@ -118,7 +116,7 @@ services:
       - net
 
   magnus:
-    image: jumpserver/magnus:${Version}
+    image: jumpserver/magnus:${VERSION}
     container_name: jms_magnus
     restart: always
     tty: true
@@ -148,7 +146,7 @@ services:
       - net
 
   web:
-    image: jumpserver/web:${Version}
+    image: jumpserver/web:${VERSION}
     container_name: jms_web
     restart: always
     tty: true
