@@ -119,18 +119,19 @@ RUN set -ex \
 
 ARG Client_VERSION=v1.1.8
 ARG MRD_VERSION=10.6.7
-ARG VIDEO_PLAYER_VERSION=0.1.5
+ARG VIDEO_PLAYER_VERSION=0.1.9
+ARG OPENSSH_VERSION=v9.2.0.0
 RUN set -ex \
     && mkdir -p /opt/download/public \
     && cd /opt/download/public \
-    && wget -qO  JumpServer-Client-Installer-x86_64.msi https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
-    && wget -qO  JumpServer-Client-Installer-amd64.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
-    && wget -qO  JumpServer-Client-Installer-arm64.dmg https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
-    && wget -qO  JumpServer-Client-Installer-amd64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
-    && wget -qO  JumpServer-Client-Installer-arm64.run https://download.jumpserver.org/public/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
-    && wget -qO  JumpServer-Video-Player.dmg https://download.jumpserver.org/public/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
-    && wget -qO  JumpServer-Video-Player.exe https://download.jumpserver.org/public/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
-    && wget -qO  OpenSSH-Win64.msi https://download.jumpserver.org/public/OpenSSH-Win64.msi \
+    && wget -qO  JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
+    && wget -qO  JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
+    && wget -qO  JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
+    && wget -qO  JumpServer-Client-Installer-amd64.run https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
+    && wget -qO  JumpServer-Client-Installer-arm64.run https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
+    && wget -qO  JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO  JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && wget -qO  OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
     && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
 
 ARG TINKER_VERSION=v0.1.0
