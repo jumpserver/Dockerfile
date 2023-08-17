@@ -36,15 +36,15 @@ RUN set -ex \
         amd64) \
             wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
             && tar -xf mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
-            && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/mongosh/bin/* \
-            && mv mongosh-${MONGOSH_VERSION}-linux-x64/mongosh/bin/* /usr/local/bin/ \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/* /usr/local/bin/ \
             && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
             ;; \
         arm64) \
             wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
             && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
-            && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/mongosh/bin/* \
-            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/mongosh/bin/* /usr/local/bin/ \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* /usr/local/bin/ \
             && rm -rf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}* \
             ;; \
         *) \
