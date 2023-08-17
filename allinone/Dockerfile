@@ -231,6 +231,10 @@ RUN set -ex \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
+    && cd /opt/download/applets \
+    && wget -q https://github.com/jumpserver/applets/releases/download/${VERSION}/pip_packages.zip
+
+RUN set -ex \
     && apt-get update \
     && apt-get -y install --no-install-recommends gnupg1 \
     && dpkgArch="$(dpkg --print-architecture)" \
