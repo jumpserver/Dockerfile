@@ -175,6 +175,68 @@ services:
     networks:
       - net
 
+  chen:
+    build:
+      context: .
+      dockerfile: chen/Dockerfile
+      args:
+        VERSION: ${VERSION}
+        TARGETARCH: ${TARGETARCH}
+    image: jumpserver/chen:${VERSION}
+    container_name: jms_chen
+    ulimits:
+      core: 0
+    restart: always
+    tty: true
+    environment:
+      - CORE_HOST: http://core:8080
+      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      - LOG_LEVEL: $LOG_LEVEL
+    volumes:
+      - ${VOLUME_DIR}/chen/data:/opt/chen/data
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -f 127.0.0.1:8082/chen"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - net
+
+  kael:
+    build:
+      context: .
+      dockerfile: kael/Dockerfile
+      args:
+        VERSION: ${VERSION}
+        TARGETARCH: ${TARGETARCH}
+    image: jumpserver/kael:${VERSION}
+    container_name: jms_kael
+    ulimits:
+      core: 0
+    restart: always
+    tty: true
+    environment:
+      - CORE_HOST: http://core:8080
+      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      - LOG_LEVEL: $LOG_LEVEL
+    volumes:
+      - ${VOLUME_DIR}/kael/data:/opt/kael/data
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -fsL http://localhost:8083/kael/health/ > /dev/null"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - net
+
   web:
     build:
       context: .

@@ -1,24 +1,28 @@
 FROM debian:buster-slim
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8
 
 ARG DEPENDENCIES="                    \
-        ca-certificates               \
         curl                          \
-        locales                       \
-        telnet                        \
+        git                           \
+        net-tools                     \
+        unzip                         \
         vim                           \
+        locales                       \
         wget"
 
-RUN set -ex \
+ARG APT_MIRROR=http://mirrors.ustc.edu.cn
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=kael \
+    sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
+    && apt-get update \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
-    && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
@@ -31,22 +35,19 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/wisp \
     && rm -f /opt/*.tar.gz
 
-WORKDIR /opt/magnus
-
-ARG VERSION=v3.7.0
-ENV VERSION=${VERSION}
+WORKDIR /opt/kael
 
 RUN set -ex \
     && cd /opt \
-    && wget https://github.com/jumpserver/magnus-release/releases/download/${VERSION}/magnus-${VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf magnus-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
-    && chmod 755 /opt/magnus/magnus \
-    && chown -R root:root /opt/magnus \
+    && wget https://github.com/jumpserver/kael/releases/download/${VERSION}/kael-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf kael-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/kael --strip-components=1 \
+    && chmod 755 /opt/kael/magnus \
+    && chown -R root:root /opt/kael \
     && rm -f /opt/*.tar.gz
 
-COPY magnus/entrypoint.sh .
+COPY kael/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-EXPOSE 33061 33062 63790
+EXPOSE 8083
 
 CMD [ "./entrypoint.sh" ]

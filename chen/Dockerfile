@@ -1,3 +1,17 @@
+FROM openjdk:17-slim-buster as jre-build
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends binutils git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN jlink \
+         --add-modules ALL-MODULE-PATH \
+         --strip-debug \
+         --no-man-pages \
+         --no-header-files \
+         --compress=2 \
+         --output /javaruntime
+
 FROM debian:buster-slim
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -21,6 +35,10 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH "${JAVA_HOME}/bin:${PATH}"
+COPY --from=jre-build /javaruntime $JAVA_HOME
+
 WORKDIR /opt
 
 ARG WISP_VERSION=v0.1.15
@@ -31,22 +49,20 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/wisp \
     && rm -f /opt/*.tar.gz
 
-WORKDIR /opt/magnus
+WORKDIR /opt/chen
 
 ARG VERSION=v3.7.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \
     && cd /opt \
-    && wget https://github.com/jumpserver/magnus-release/releases/download/${VERSION}/magnus-${VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf magnus-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
-    && chmod 755 /opt/magnus/magnus \
-    && chown -R root:root /opt/magnus \
+    && wget https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION/v/}.tar.gz \
+    && tar -xf chen-${VERSION/v/}.tar.gz -C /opt/chen --strip-components=1 \
     && rm -f /opt/*.tar.gz
 
-COPY magnus/entrypoint.sh .
+COPY chen/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-EXPOSE 33061 33062 63790
+EXPOSE 8082
 
 CMD [ "./entrypoint.sh" ]
