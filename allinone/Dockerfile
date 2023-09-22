@@ -300,6 +300,8 @@ RUN --mount=type=cache,target=/root/.cache \
 ARG VERSION=v3.7.0
 ENV VERSION=${VERSION}
 
+WORKDIR /opt
+
 RUN set -ex \
     && mkdir -p /opt/koko \
     && wget -q https://github.com/jumpserver/koko/releases/download/${VERSION}/koko-${VERSION}-linux-${TARGETARCH}.tar.gz \
