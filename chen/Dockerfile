@@ -1,4 +1,4 @@
-FROM jumpserver/guacd:1.5.2
+FROM debian:buster-slim
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
@@ -6,12 +6,10 @@ ARG DEPENDENCIES="                    \
         ca-certificates               \
         curl                          \
         locales                       \
-        supervisor                    \
+        openjdk-17-jdk-headless       \
         telnet                        \
         vim                           \
         wget"
-
-USER root
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -24,22 +22,30 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /opt/lion
+WORKDIR /opt
+
+ARG WISP_VERSION=v0.1.15
+RUN set -ex \
+    && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
+    && chown root:root /usr/local/bin/wisp \
+    && chmod 755 /usr/local/bin/wisp \
+    && rm -f /opt/*.tar.gz
+
+WORKDIR /opt/chen
 
 ARG VERSION=v3.7.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \
-    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
-    && chown -R root:root /opt/lion \
+    && cd /opt \
+    && wget https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
+    && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && rm -f /opt/*.tar.gz
 
-COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
-
-COPY lion/entrypoint.sh .
+COPY chen/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-EXPOSE 8081
+EXPOSE 8082
 
-CMD ["./entrypoint.sh"]
+CMD [ "./entrypoint.sh" ]

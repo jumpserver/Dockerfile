@@ -3,6 +3,8 @@ services:
   core:
     image: jumpserver/core:${VERSION}
     container_name: jms_core
+    ulimits:
+      core: 0
     restart: always
     tty: true
     command: start web
@@ -11,6 +13,7 @@ services:
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
+      DOMAINS: $DOMAINS
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
       DB_USER: $DB_USER
@@ -34,6 +37,8 @@ services:
   celery:
     image: jumpserver/core:${VERSION}
     container_name: jms_celery
+    ulimits:
+      core: 0
     restart: always
     tty: true
     command: start task
@@ -68,6 +73,8 @@ services:
   koko:
     image: jumpserver/koko:${VERSION}
     container_name: jms_koko
+    ulimits:
+      core: 0
     restart: always
     privileged: true
     tty: true
@@ -95,6 +102,8 @@ services:
   lion:
     image: jumpserver/lion:${VERSION}
     container_name: jms_lion
+    ulimits:
+      core: 0
     restart: always
     tty: true
     environment:
@@ -118,6 +127,8 @@ services:
   magnus:
     image: jumpserver/magnus:${VERSION}
     container_name: jms_magnus
+    ulimits:
+      core: 0
     restart: always
     tty: true
     environment:
@@ -142,6 +153,56 @@ services:
       - ${MAGNUS_MYSQL_PORT:-33061}:33061
       - ${MAGNUS_MARIADB_PORT:-33062}:33062
       - ${MAGNUS_REDIS_PORT:-63790}:63790
+    networks:
+      - net
+
+  chen:
+    image: jumpserver/chen:${VERSION}
+    container_name: jms_chen
+    ulimits:
+      core: 0
+    restart: always
+    tty: true
+    environment:
+      - CORE_HOST: http://core:8080
+      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      - LOG_LEVEL: $LOG_LEVEL
+    volumes:
+      - ${VOLUME_DIR}/chen/data:/opt/chen/data
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -f 127.0.0.1:8082/chen"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    networks:
+      - net
+
+  kael:
+    image: jumpserver/kael:${VERSION}
+    container_name: jms_kael
+    ulimits:
+      core: 0
+    restart: always
+    tty: true
+    environment:
+      - CORE_HOST: http://core:8080
+      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      - LOG_LEVEL: $LOG_LEVEL
+    volumes:
+      - ${VOLUME_DIR}/kael/data:/opt/kael/data
+    depends_on:
+      core:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -fsL http://localhost:8083/kael/health/ > /dev/null"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     networks:
       - net
 

@@ -1,9 +1,8 @@
-FROM jumpserver/redis:6.2 as redis
+FROM jumpserver/redis:7.0 as redis
 FROM jumpserver/guacd:1.5.2 as guacd
 
-FROM jumpserver/python:3.9-slim-buster
+FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8
 
 ARG BUILD_DEPENDENCIES="              \
         g++                           \
@@ -26,16 +25,92 @@ ARG DEPENDENCIES="                    \
 
 ARG TOOLS="                           \
         ca-certificates               \
-        cron                          \
         curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
         git                           \
         git-lfs                       \
-        iputils-ping                  \
+        unzip                         \
+        xz-utils                      \
+        wget"
+
+RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+
+ARG RUST_VERSION=1.71.1
+RUN set -ex \
+    && \
+    if [ "${TARGETARCH}" == "s390x" ] || [ "${TARGETARCH}" == "ppc64le" ] || [ "${TARGETARCH}" == "loong64" ]; then \
+        rustUrl="https://static.rust-lang.org/dist"; \
+        rustArch="${TARGETARCH}"; \
+        mkdir -p /opt/rust-install; \
+        if [ "${TARGETARCH}" == "loong64" ]; then \
+            rustUrl="https://rust-lang.loongnix.cn/dist/${RUST_VERSION}/2023-08-10"; \
+            rustArch="loongarch64"; \
+        fi; \
+        if [ "${TARGETARCH}" == "ppc64le" ]; then \
+            rustArch="powerpc64le"; \
+        fi; \
+        wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
+        tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
+        cd /opt/rust-install && ./install.sh \
+        cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
+    fi
+
+ARG VERSION=v3.7.0
+ENV VERSION=${VERSION}
+
+RUN set -ex \
+    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
+    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
+    && chmod +x /opt/jumpserver/entrypoint.sh \
+    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile.ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
+    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
+
+WORKDIR /opt/jumpserver
+
+RUN set -ex \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ee \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
+    && cd utils \
+    && bash -ixeu build.sh
+
+RUN --mount=type=cache,target=/root/.cache \
+    set -ex \
+    && pip install poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --only=main
+
+FROM jumpserver/python:3.11-slim-buster as stage-build
+ARG TARGETARCH
+ENV LANG=zh_CN.UTF-8
+
+ARG DEPENDENCIES="                    \
+        libxmlsec1-openssl            \
+        openjdk-17-jdk-headless"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
+        default-libmysqlclient-dev    \
+        default-mysql-client          \
+        inetutils-ping                \
         locales                       \
-        logrotate                     \
         netcat                        \
+        logrotate                     \
         openssh-client                \
         procps                        \
         sshpass                       \
@@ -43,27 +118,28 @@ ARG TOOLS="                           \
         telnet                        \
         unzip                         \
         vim                           \
+        nmap                          \
         wget"
 
-RUN set -ex \
+RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
-    && echo "set mouse-=a\nset ts=4\nset expandtab" > ~/.vimrc \
+    && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
-    && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
-ARG MONGOSH_VERSION=1.9.1
+ARG MONGOSH_VERSION=1.10.6
 RUN set -ex \
     && \
     case "${TARGETARCH}" in \
@@ -75,7 +151,7 @@ RUN set -ex \
             && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh_crypt_v1.so /usr/local/lib/ \
             && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
             ;; \
-        arm64) \
+        arm64|s390x|ppc64le) \
             wget -q https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
             && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
             && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* \
@@ -89,10 +165,16 @@ RUN set -ex \
     esac
 
 ARG HELM_VERSION=v3.12.2
+ARG KUBECTL_VERSION=v1.27.4
 RUN set -ex \
-    && wget -q https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz \
-    && tar -xf kubectl-linux-${TARGETARCH}.tar.gz \
-    && mv kubectl /usr/local/bin/rawkubectl \
+    && \
+    if [ "${TARGETARCH}" == "loong64" ]; then \
+        wget -q https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz; \
+        tar -xf kubectl-linux-${TARGETARCH}.tar.gz; \
+        mv kubectl /usr/local/bin/rawkubectl; \
+    else \
+        wget -q -O /usr/local/bin/rawkubectl https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl; \
+    fi \
     && wget -q http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
     && mkdir /opt/kubectl-aliases/ \
     && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
@@ -109,7 +191,7 @@ RUN set -ex \
     && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
     && rm -f /opt/*.tar.gz
 
-ARG WISP_VERSION=v0.1.10
+ARG WISP_VERSION=v0.1.15
 RUN set -ex \
     && wget -q https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -117,7 +199,7 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/wisp \
     && rm -f /opt/*.tar.gz
 
-ARG Client_VERSION=v1.1.8
+ARG Client_VERSION=v2.0.1
 ARG MRD_VERSION=10.6.7
 ARG VIDEO_PLAYER_VERSION=0.1.9
 ARG OPENSSH_VERSION=v9.2.0.0
@@ -125,16 +207,17 @@ RUN set -ex \
     && mkdir -p /opt/download/public \
     && cd /opt/download/public \
     && wget -qO  JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
+    && wget -qO  JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
     && wget -qO  JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
     && wget -qO  JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
-    && wget -qO  JumpServer-Client-Installer-amd64.run https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.run \
-    && wget -qO  JumpServer-Client-Installer-arm64.run https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.run \
+    && wget -qO  JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
+    && wget -qO  JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
     && wget -qO  JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
     && wget -qO  JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
     && wget -qO  OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
-    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
+    && wget -q ${DOWNLOAD_URL}/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
 
-ARG TINKER_VERSION=v0.1.0
+ARG TINKER_VERSION=v0.1.2
 ARG PYTHON_VERSION=3.10.11
 ARG CHROME_VERSION=114.0.5735.134
 ARG DBEAVER_VERSION=22.3.4
@@ -169,27 +252,18 @@ RUN set -ex \
 
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 
-ARG VERSION=v3.4.3
-ENV VERSION=${VERSION}
+COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
+WORKDIR /opt/jumpserver
 
-RUN set -ex \
-    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
-    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
-    && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
-
-RUN set -ex \
-    && cd /opt/jumpserver \
+RUN --mount=type=cache,target=/root/.cache \
+    set -ex \
     && echo > /opt/jumpserver/config.yml \
-    && \
-    if [ "${TARGETARCH}" == "loong64" ]; then \
-        pip install https://download.jumpserver.org/pypi/simple/cryptography/cryptography-38.0.4-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/greenlet/greenlet-1.1.2-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/PyNaCl/PyNaCl-1.5.0-cp39-cp39-linux_loongarch64.whl; \
-        pip install https://download.jumpserver.org/pypi/simple/grpcio/grpcio-1.54.2-cp39-cp39-linux_loongarch64.whl; \
-    fi \
-    && pip install -r requirements/requirements.txt --use-deprecated=legacy-resolver \
-    && rm -rf /root/.cache/pip
+    && pip install poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --only=main
+
+ARG VERSION=v3.7.0
+ENV VERSION=${VERSION}
 
 RUN set -ex \
     && mkdir -p /opt/koko \
@@ -214,6 +288,20 @@ RUN set -ex \
     && tar -xf magnus-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
     && chmod 755 /opt/magnus/magnus \
     && chown -R root:root /opt/magnus \
+    && rm -f /opt/*.tar.gz
+
+RUN set -ex \
+    && mkdir -p /opt/keal \
+    && wget -q https://github.com/jumpserver/keal/releases/download/${VERSION}/keal-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf keal-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/keal --strip-components=1 \
+    && chmod 755 /opt/keal/keal \
+    && chown -R root:root /opt/keal \
+    && rm -f /opt/*.tar.gz
+
+run set -ex \
+    && mkdir -p /opt/chen \
+    && wget -q https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
+    && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \

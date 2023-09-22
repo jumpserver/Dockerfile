@@ -1,4 +1,4 @@
-FROM jumpserver/redis:6.2 as redis
+FROM jumpserver/redis:7.0 as redis
 
 FROM debian:buster-slim
 ARG TARGETARCH
@@ -29,7 +29,7 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG MONGOSH_VERSION=1.9.1
+ARG MONGOSH_VERSION=1.10.6
 RUN set -ex \
     && \
     case "${TARGETARCH}" in \
@@ -78,7 +78,7 @@ RUN set -ex \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.4.3
+ARG VERSION=v3.7.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \
