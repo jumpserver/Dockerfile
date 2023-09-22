@@ -1,5 +1,18 @@
 FROM jumpserver/redis:7.0 as redis
 FROM jumpserver/guacd:1.5.2 as guacd
+FROM openjdk:17-slim-buster as jre-build
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends binutils git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN jlink \
+         --add-modules ALL-MODULE-PATH \
+         --strip-debug \
+         --no-man-pages \
+         --no-header-files \
+         --compress=2 \
+         --output /javaruntime
 
 FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
@@ -34,7 +47,7 @@ ARG TOOLS="                           \
         xz-utils                      \
         wget"
 
-RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -94,13 +107,12 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-FROM jumpserver/python:3.11-slim-buster as stage-build
+FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
 ARG DEPENDENCIES="                    \
-        libxmlsec1-openssl            \
-        openjdk-17-jdk-headless"
+        libxmlsec1-openssl"
 
 ARG TOOLS="                           \
         ca-certificates               \
@@ -121,7 +133,7 @@ ARG TOOLS="                           \
         nmap                          \
         wget"
 
-RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -136,6 +148,10 @@ RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
     && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH "${JAVA_HOME}/bin:${PATH}"
+COPY --from=jre-build /javaruntime $JAVA_HOME
 
 WORKDIR /opt
 
@@ -206,16 +222,16 @@ ARG OPENSSH_VERSION=v9.2.0.0
 RUN set -ex \
     && mkdir -p /opt/download/public \
     && cd /opt/download/public \
-    && wget -qO  JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
-    && wget -qO  JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
-    && wget -qO  JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
-    && wget -qO  JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
-    && wget -qO  JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
-    && wget -qO  JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
-    && wget -qO  JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
-    && wget -qO  JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
-    && wget -qO  OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
-    && wget -q ${DOWNLOAD_URL}/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
+    && wget -qO JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
+    && wget -qO JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
+    && wget -qO JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
+    && wget -qO JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
+    && wget -qO JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
+    && wget -qO JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
+    && wget -qO JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && wget -qO OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
+    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
 
 ARG TINKER_VERSION=v0.1.2
 ARG PYTHON_VERSION=3.10.11
@@ -291,17 +307,17 @@ RUN set -ex \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
-    && mkdir -p /opt/keal \
-    && wget -q https://github.com/jumpserver/keal/releases/download/${VERSION}/keal-${VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf keal-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/keal --strip-components=1 \
-    && chmod 755 /opt/keal/keal \
-    && chown -R root:root /opt/keal \
+    && mkdir -p /opt/kael \
+    && wget -q https://github.com/jumpserver/kael/releases/download/${VERSION}/kael-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf kael-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/kael --strip-components=1 \
+    && chmod 755 /opt/kael/kael \
+    && chown -R root:root /opt/kael \
     && rm -f /opt/*.tar.gz
 
 run set -ex \
     && mkdir -p /opt/chen \
-    && wget -q https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
-    && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
+    && wget -q https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION/v/}.tar.gz \
+    && tar -xf chen-${VERSION/v/}.tar.gz -C /opt/chen --strip-components=1 \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \

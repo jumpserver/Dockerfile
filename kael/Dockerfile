@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:buster-slim
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
