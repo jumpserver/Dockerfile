@@ -78,7 +78,7 @@ RUN set -ex \
         fi; \
         wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
-        cd /opt/rust-install && ./install.sh \
+        cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
