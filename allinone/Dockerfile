@@ -1,6 +1,7 @@
 FROM jumpserver/redis:7.0 as redis
 FROM jumpserver/guacd:1.5.2 as guacd
 FROM openjdk:17-slim-buster as jre-build
+ARG TARGETARCH
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends binutils git \
@@ -147,6 +148,24 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN set -ex \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends gnupg2 \
+    && dpkgArch="$(dpkg --print-architecture)" \
+    && case "$dpkgArch" in \
+        amd64|arm64) \
+            echo "deb https://nginx.org/packages/debian/ buster nginx" > /etc/apt/sources.list.d/nginx.list \
+            && wget -qO - https://nginx.org/keys/nginx_signing.key | apt-key add - \
+            ;; \
+        *) \
+            echo "Unsupported architecture: ${dpkgArch}" \
+            ;; \
+    esac \
+    && apt-get -y install --no-install-recommends nginx \
+    && mkdir -p /var/cache/nginx \
+    && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME=/opt/java/openjdk
@@ -337,24 +356,6 @@ RUN set -ex \
 RUN set -ex \
     && cd /opt/download/applets \
     && wget -q https://github.com/jumpserver/applets/releases/download/${VERSION}/pip_packages.zip
-
-RUN set -ex \
-    && apt-get update \
-    && apt-get -y install --no-install-recommends gnupg1 \
-    && dpkgArch="$(dpkg --print-architecture)" \
-    && case "$dpkgArch" in \
-        amd64|arm64) \
-            echo "deb https://nginx.org/packages/debian/ buster nginx" >> /etc/apt/sources.list.d/nginx.list \
-            && wget -qO - https://nginx.org/keys/nginx_signing.key | apt-key add - \
-            ;; \
-        *) \
-            echo "Unsupported architecture: ${dpkgArch}" \
-            ;; \
-    esac \
-    && apt-get -y install --no-install-recommends nginx \
-    && mkdir -p /var/cache/nginx \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY readme.txt readme.txt
 COPY entrypoint.sh .
