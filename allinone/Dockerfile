@@ -89,7 +89,7 @@ RUN set -ex \
     && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
     && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
     && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile.ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
+    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile-ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
 WORKDIR /opt/jumpserver
