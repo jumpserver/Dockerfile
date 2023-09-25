@@ -9,7 +9,7 @@ fi
 
 echo
 
-if [ ! "${DB_HOST}" ] || [ ! "${DB_PORT}" ] || [ ! "${DB_USER}" ] || [ ! "${DB_PASSWORD}" ] || [ ! "${DB_NAME}" ]; then
+if [ ! "${DB_HOST}" ] || [ ! "${DB_PORT}" ] || [ ! "${REDIS_HOST}" ] || [ ! "${REDIS_PORT}" ]; then
     echo -e "\033[31m Please set database environment \033[0m"
     exit 1
 fi
