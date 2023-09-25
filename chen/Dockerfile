@@ -1,7 +1,7 @@
 FROM openjdk:17-slim-buster as jre-build
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends binutils git \
+    && apt-get install -y --no-install-recommends binutils \
     && rm -rf /var/lib/apt/lists/*
 
 RUN jlink \
@@ -56,8 +56,9 @@ ENV VERSION=${VERSION}
 
 RUN set -ex \
     && cd /opt \
-    && wget https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION/v/}.tar.gz \
-    && tar -xf chen-${VERSION/v/}.tar.gz -C /opt/chen --strip-components=1 \
+    && wget https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
+    && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
+    && chown -R root:root /opt/chen \
     && rm -f /opt/*.tar.gz
 
 COPY chen/entrypoint.sh .

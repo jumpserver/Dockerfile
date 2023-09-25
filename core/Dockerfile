@@ -71,15 +71,28 @@ RUN set -ex \
 ARG VERSION
 ENV VERSION=$VERSION
 
+RUN set -ex \
+    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
+    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
+    && chmod +x /opt/jumpserver/entrypoint.sh \
+    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile-ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
+    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
+
 WORKDIR /opt/jumpserver
-ADD . .
-RUN cd utils && bash -ixeu build.sh
+
+RUN set -ex \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ee \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
+    && cd utils \
+    && bash -ixeu build.sh
 
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && pip install poetry \
     && poetry config virtualenvs.create false \
-    && poetry install
+    && poetry install --only=main
 
 FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
