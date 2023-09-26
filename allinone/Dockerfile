@@ -113,6 +113,7 @@ ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
 ARG DEPENDENCIES="                    \
+        libjpeg-dev                   \
         libxmlsec1-openssl"
 
 ARG TOOLS="                           \
