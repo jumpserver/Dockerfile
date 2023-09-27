@@ -99,8 +99,8 @@ ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
 ARG DEPENDENCIES="                    \
-        libxmlsec1-openssl            \
-        openjdk-17-jdk-headless"
+        libjpeg-dev                   \
+        libxmlsec1-openssl"
 
 ARG TOOLS="                           \
         ca-certificates               \
