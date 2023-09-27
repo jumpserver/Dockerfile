@@ -147,7 +147,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-ARG VERSION=v3.7.0
+ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 WORKDIR /opt/jumpserver
