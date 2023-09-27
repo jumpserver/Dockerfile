@@ -1,17 +1,4 @@
 FROM openjdk:17-slim-buster as jre-build
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends binutils \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN jlink \
-         --add-modules ALL-MODULE-PATH \
-         --strip-debug \
-         --no-man-pages \
-         --no-header-files \
-         --compress=2 \
-         --output /javaruntime
-
 FROM debian:buster-slim
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -20,6 +7,7 @@ ARG DEPENDENCIES="                    \
         ca-certificates               \
         curl                          \
         locales                       \
+        p11-kit                       \
         telnet                        \
         vim                           \
         wget"
@@ -35,9 +23,21 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH "${JAVA_HOME}/bin:${PATH}"
-COPY --from=jre-build /javaruntime $JAVA_HOME
+ENV JAVA_HOME /usr/local/openjdk-17
+ENV PATH $JAVA_HOME/bin:$PATH
+
+COPY --from=jre-build $JAVA_HOME $JAVA_HOME
+COPY --from=jre-build /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
+COPY --from=jre-build /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
+
+RUN set -ex \
+    && chmod +x /etc/ca-certificates/update.d/docker-openjdk \
+    && /etc/ca-certificates/update.d/docker-openjdk \
+    && ldconfig \
+    && java -Xshare:dump \
+    && fileEncoding="$(echo 'System.out.println(System.getProperty("file.encoding"))' | jshell -s -)"; [ "$fileEncoding" = 'UTF-8' ]; rm -rf ~/.java \
+    && javac --version \
+    && java --version
 
 WORKDIR /opt
 

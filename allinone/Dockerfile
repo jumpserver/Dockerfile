@@ -1,20 +1,6 @@
 FROM jumpserver/redis:7.0 as redis
 FROM jumpserver/guacd:1.5.2 as guacd
 FROM openjdk:17-slim-buster as jre-build
-ARG TARGETARCH
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends binutils \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN jlink \
-         --add-modules ALL-MODULE-PATH \
-         --strip-debug \
-         --no-man-pages \
-         --no-header-files \
-         --compress=2 \
-         --output /javaruntime
-
 FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
 
@@ -108,6 +94,38 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
+ARG Client_VERSION=v2.0.1
+ARG MRD_VERSION=10.6.7
+ARG VIDEO_PLAYER_VERSION=0.1.9
+ARG OPENSSH_VERSION=v9.2.0.0
+RUN set -ex \
+    && mkdir -p /opt/download/public \
+    && cd /opt/download/public \
+    && wget -qO JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
+    && wget -qO JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
+    && wget -qO JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
+    && wget -qO JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
+    && wget -qO JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
+    && wget -qO JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
+    && wget -qO JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && wget -qO OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
+    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
+
+ARG TINKER_VERSION=v0.1.2
+ARG PYTHON_VERSION=3.10.11
+ARG CHROME_VERSION=114.0.5735.134
+ARG DBEAVER_VERSION=22.3.4
+RUN set -ex \
+    && mkdir -p /opt/download/applets \
+    && cd /opt/download/applets \
+    && wget -qO Tinker_Installer.exe https://download.jumpserver.org/public/Tinker_Installer_${TINKER_VERSION}.exe \
+    && wget -qO dbeaver-patch.msi https://download.jumpserver.org/public/dbeaver-patch-${DBEAVER_VERSION}-x86_64-setup.msi \
+    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chromedriver_win32.zip \
+    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chrome-win.zip \
+    && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
+    && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
+
 FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -121,11 +139,13 @@ ARG TOOLS="                           \
         curl                          \
         default-libmysqlclient-dev    \
         default-mysql-client          \
+        gnupg2                        \
         inetutils-ping                \
         locales                       \
         netcat                        \
         logrotate                     \
         openssh-client                \
+        p11-kit                       \
         procps                        \
         sshpass                       \
         supervisor                    \
@@ -169,9 +189,21 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/opt/java/openjdk
-ENV PATH "${JAVA_HOME}/bin:${PATH}"
-COPY --from=jre-build /javaruntime $JAVA_HOME
+ENV JAVA_HOME /usr/local/openjdk-17
+ENV PATH $JAVA_HOME/bin:$PATH
+
+COPY --from=jre-build $JAVA_HOME $JAVA_HOME
+COPY --from=jre-build /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
+COPY --from=jre-build /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
+
+RUN set -ex \
+    && chmod +x /etc/ca-certificates/update.d/docker-openjdk \
+    && /etc/ca-certificates/update.d/docker-openjdk \
+    && ldconfig \
+    && java -Xshare:dump \
+    && fileEncoding="$(echo 'System.out.println(System.getProperty("file.encoding"))' | jshell -s -)"; [ "$fileEncoding" = 'UTF-8' ]; rm -rf ~/.java \
+    && javac --version \
+    && java --version
 
 WORKDIR /opt
 
@@ -235,38 +267,6 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/wisp \
     && rm -f /opt/*.tar.gz
 
-ARG Client_VERSION=v2.0.1
-ARG MRD_VERSION=10.6.7
-ARG VIDEO_PLAYER_VERSION=0.1.9
-ARG OPENSSH_VERSION=v9.2.0.0
-RUN set -ex \
-    && mkdir -p /opt/download/public \
-    && cd /opt/download/public \
-    && wget -qO JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
-    && wget -qO JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
-    && wget -qO JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
-    && wget -qO JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
-    && wget -qO JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
-    && wget -qO JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
-    && wget -qO JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
-    && wget -qO JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
-    && wget -qO OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
-    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
-
-ARG TINKER_VERSION=v0.1.2
-ARG PYTHON_VERSION=3.10.11
-ARG CHROME_VERSION=114.0.5735.134
-ARG DBEAVER_VERSION=22.3.4
-RUN set -ex \
-    && mkdir -p /opt/download/applets \
-    && cd /opt/download/applets \
-    && wget -qO Tinker_Installer.exe https://download.jumpserver.org/public/Tinker_Installer_${TINKER_VERSION}.exe \
-    && wget -qO dbeaver-patch.msi https://download.jumpserver.org/public/dbeaver-patch-${DBEAVER_VERSION}-x86_64-setup.msi \
-    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chromedriver_win32.zip \
-    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chrome-win.zip \
-    && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
-    && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
-
 ARG PREFIX_DIR=/opt/guacamole
 ENV LD_LIBRARY_PATH=${PREFIX_DIR}/lib
 ARG RUNTIME_DEPENDENCIES="            \
@@ -287,10 +287,10 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
-
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
-WORKDIR /opt/jumpserver
+COPY --from=stage-build /opt/download /opt/download
 
+WORKDIR /opt/jumpserver
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && echo > /opt/jumpserver/config.yml \
