@@ -40,6 +40,8 @@ COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
 COPY lion/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
+VOLUME /opt/lion/data
+
 EXPOSE 8081
 
 CMD ["./entrypoint.sh"]

@@ -64,6 +64,8 @@ RUN set -ex \
 COPY chen/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
+VOLUME /opt/chen/data
+
 EXPOSE 8082
 
 CMD [ "./entrypoint.sh" ]

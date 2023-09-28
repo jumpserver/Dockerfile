@@ -94,6 +94,8 @@ RUN set -ex \
 COPY koko/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
+VOLUME /opt/koko/data
+
 EXPOSE 2222 5000
 
 CMD [ "./entrypoint.sh" ]

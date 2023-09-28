@@ -51,6 +51,8 @@ RUN set -ex \
 COPY kael/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
+VOLUME /opt/kael/data
+
 EXPOSE 8083
 
 CMD [ "./entrypoint.sh" ]

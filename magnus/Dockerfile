@@ -47,6 +47,8 @@ RUN set -ex \
 COPY magnus/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
+VOLUME /opt/magnus/data
+
 EXPOSE 33061 33062 63790
 
 CMD [ "./entrypoint.sh" ]

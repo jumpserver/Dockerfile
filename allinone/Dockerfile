@@ -371,6 +371,8 @@ VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /opt/lion/data
 VOLUME /opt/magnus/data
+VOLUME /opt/kael/data
+VOLUME /opt/chen/data
 
 EXPOSE 80 2222
 ENTRYPOINT ["./entrypoint.sh"]

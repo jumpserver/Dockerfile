@@ -151,8 +151,8 @@ ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 WORKDIR /opt/jumpserver
+
 VOLUME /opt/jumpserver/data
-VOLUME /opt/jumpserver/logs
 
 EXPOSE 8080
 
