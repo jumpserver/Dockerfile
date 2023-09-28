@@ -78,7 +78,7 @@ RUN set -ex \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.7.0
+ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -93,6 +93,8 @@ RUN set -ex \
 
 COPY koko/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+VOLUME /opt/koko/data
 
 EXPOSE 2222 5000
 

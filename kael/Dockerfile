@@ -37,6 +37,9 @@ RUN set -ex \
 
 WORKDIR /opt/kael
 
+ARG VERSION=v3.7.1
+ENV VERSION=${VERSION}
+
 RUN set -ex \
     && cd /opt \
     && wget https://github.com/jumpserver/kael/releases/download/${VERSION}/kael-${VERSION}-linux-${TARGETARCH}.tar.gz \
@@ -47,6 +50,8 @@ RUN set -ex \
 
 COPY kael/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+VOLUME /opt/kael/data
 
 EXPOSE 8083
 

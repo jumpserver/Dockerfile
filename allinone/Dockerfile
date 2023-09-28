@@ -68,7 +68,7 @@ RUN set -ex \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
-ARG VERSION=v3.7.0
+ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -201,7 +201,7 @@ RUN set -ex \
     && /etc/ca-certificates/update.d/docker-openjdk \
     && ldconfig \
     && java -Xshare:dump \
-    && fileEncoding="$(echo 'System.out.println(System.getProperty("file.encoding"))' | jshell -s -)"; [ "$fileEncoding" = 'UTF-8' ]; rm -rf ~/.java \
+    && rm -rf ~/.java \
     && javac --version \
     && java --version
 
@@ -298,7 +298,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-ARG VERSION=v3.7.0
+ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 WORKDIR /opt
@@ -371,6 +371,8 @@ VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /opt/lion/data
 VOLUME /opt/magnus/data
+VOLUME /opt/kael/data
+VOLUME /opt/chen/data
 
 EXPOSE 80 2222
 ENTRYPOINT ["./entrypoint.sh"]

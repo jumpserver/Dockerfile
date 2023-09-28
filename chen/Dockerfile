@@ -35,7 +35,7 @@ RUN set -ex \
     && /etc/ca-certificates/update.d/docker-openjdk \
     && ldconfig \
     && java -Xshare:dump \
-    && fileEncoding="$(echo 'System.out.println(System.getProperty("file.encoding"))' | jshell -s -)"; [ "$fileEncoding" = 'UTF-8' ]; rm -rf ~/.java \
+    && rm -rf ~/.java \
     && javac --version \
     && java --version
 
@@ -51,7 +51,7 @@ RUN set -ex \
 
 WORKDIR /opt/chen
 
-ARG VERSION=v3.7.0
+ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -63,6 +63,8 @@ RUN set -ex \
 
 COPY chen/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+VOLUME /opt/chen/data
 
 EXPOSE 8082
 

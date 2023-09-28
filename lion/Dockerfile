@@ -26,7 +26,7 @@ RUN set -ex \
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.7.0
+ARG VERSION=v3.7.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -39,6 +39,8 @@ COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
 
 COPY lion/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
+
+VOLUME /opt/lion/data
 
 EXPOSE 8081
 
