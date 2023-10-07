@@ -34,7 +34,7 @@ ARG TOOLS="                           \
         xz-utils                      \
         wget"
 
-RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -68,7 +68,7 @@ RUN set -ex \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
-ARG VERSION
+ARG VERSION=v3.7.1
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -94,7 +94,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-FROM jumpserver/python:3.11-slim-buster as stage-build
+FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
@@ -121,7 +121,7 @@ ARG TOOLS="                           \
         nmap                          \
         wget"
 
-RUN RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \

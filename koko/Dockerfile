@@ -1,4 +1,4 @@
-FROM jumpserver/redis:7.0 as redis
+FROM jumpserver/redis:7.0-buster as redis
 
 FROM debian:buster-slim
 ARG TARGETARCH
