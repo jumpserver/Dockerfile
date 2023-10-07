@@ -1,4 +1,4 @@
-FROM openjdk:17-slim-buster as jre-build
+FROM jumpserver/openjdk:17-slim-buster as jre-build
 FROM debian:buster-slim
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8

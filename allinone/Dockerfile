@@ -1,6 +1,6 @@
 FROM jumpserver/redis:7.0 as redis
 FROM jumpserver/guacd:1.5.2 as guacd
-FROM openjdk:17-slim-buster as jre-build
+FROM jumpserver/openjdk:17-slim-buster as jre-build
 FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
 
