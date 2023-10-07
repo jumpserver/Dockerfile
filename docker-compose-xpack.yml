@@ -36,9 +36,9 @@ services:
     restart: always
     tty: true
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     ports:
       - ${RDP_PORT}:3389
     volumes:
@@ -65,9 +65,9 @@ services:
     restart: always
     tty: true
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     ports:
       - ${XRDP_PORT:-3390}:3390
     volumes:
@@ -95,9 +95,9 @@ services:
     restart: always
     tty: true
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/video/data:/opt/video-worker/data
     healthcheck:

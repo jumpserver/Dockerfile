@@ -164,9 +164,9 @@ services:
     restart: always
     tty: true
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/chen/data:/opt/chen/data
     depends_on:
@@ -189,9 +189,9 @@ services:
     restart: always
     tty: true
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/kael/data:/opt/kael/data
     depends_on:
