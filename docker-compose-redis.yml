@@ -2,7 +2,7 @@ version: '2.4'
 services:
   core:
     depends_on:
-      mysql:
+      redis:
         condition: service_healthy
 
   redis:
