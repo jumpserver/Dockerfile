@@ -48,7 +48,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 
 WORKDIR /opt
 
-ARG RUST_VERSION=1.65.0
+ARG RUST_VERSION=1.71.1
 RUN set -ex \
     && \
     if [ "${TARGETARCH}" == "s390x" ] || [ "${TARGETARCH}" == "ppc64le" ] || [ "${TARGETARCH}" == "loong64" ]; then \
@@ -56,7 +56,7 @@ RUN set -ex \
         rustArch="${TARGETARCH}"; \
         mkdir -p /opt/rust-install; \
         if [ "${TARGETARCH}" == "loong64" ]; then \
-            rustUrl="https://rust-lang.loongnix.cn/dist/2022-11-03"; \
+            rustUrl="https://rust-lang.loongnix.cn/dist/${RUST_VERSION}/2023-08-10"; \
             rustArch="loongarch64"; \
         fi; \
         if [ "${TARGETARCH}" == "ppc64le" ]; then \
@@ -64,11 +64,11 @@ RUN set -ex \
         fi; \
         wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
-        cd /opt/rust-install && ./install.sh \
+        cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
-ARG VERSION=v3.7.1
+ARG VERSION=v3.7.2
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -86,7 +86,7 @@ RUN set -ex \
     && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
     && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
     && cd utils \
-    && bash -ixeu build.sh
+    && bash -ex build.sh
 
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
@@ -147,7 +147,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-ARG VERSION=v3.7.1
+ARG VERSION=v3.7.2
 ENV VERSION=${VERSION}
 
 WORKDIR /opt/jumpserver

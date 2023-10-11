@@ -68,7 +68,7 @@ RUN set -ex \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
-ARG VERSION=v3.7.1
+ARG VERSION=v3.7.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -298,7 +298,7 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-ARG VERSION=v3.7.1
+ARG VERSION=v3.7.2
 ENV VERSION=${VERSION}
 
 WORKDIR /opt
