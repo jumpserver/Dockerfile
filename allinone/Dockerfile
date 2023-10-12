@@ -1,6 +1,58 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.2 as guacd
 FROM jumpserver/openjdk:17-slim-buster as jre-build
+FROM jumpserver/python:3.11-slim-buster as tinker-build
+ARG TARGETARCH
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        wget"
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash
+
+WORKDIR /opt
+
+ARG Client_VERSION=v2.0.1
+ARG MRD_VERSION=10.6.7
+ARG VIDEO_PLAYER_VERSION=0.1.9
+ARG OPENSSH_VERSION=v9.2.0.0
+RUN set -ex \
+    && mkdir -p /opt/download/public \
+    && cd /opt/download/public \
+    && wget -qO JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
+    && wget -qO JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
+    && wget -qO JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
+    && wget -qO JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
+    && wget -qO JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
+    && wget -qO JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
+    && wget -qO JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
+    && wget -qO JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
+    && wget -qO OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
+    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
+
+ARG TINKER_VERSION=v0.1.2
+ARG PYTHON_VERSION=3.10.11
+ARG CHROME_VERSION=114.0.5735.134
+ARG DBEAVER_VERSION=22.3.4
+RUN set -ex \
+    && mkdir -p /opt/download/applets \
+    && cd /opt/download/applets \
+    && wget -qO Tinker_Installer.exe https://download.jumpserver.org/public/Tinker_Installer_${TINKER_VERSION}.exe \
+    && wget -qO dbeaver-patch.msi https://download.jumpserver.org/public/dbeaver-patch-${DBEAVER_VERSION}-x86_64-setup.msi \
+    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chromedriver_win32.zip \
+    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chrome-win.zip \
+    && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
+    && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
+
 FROM jumpserver/python:3.11-slim-buster as stage-build
 ARG TARGETARCH
 
@@ -34,7 +86,8 @@ ARG TOOLS="                           \
         xz-utils                      \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -42,9 +95,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt
 
@@ -94,38 +145,6 @@ RUN --mount=type=cache,target=/root/.cache \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
 
-ARG Client_VERSION=v2.0.1
-ARG MRD_VERSION=10.6.7
-ARG VIDEO_PLAYER_VERSION=0.1.9
-ARG OPENSSH_VERSION=v9.2.0.0
-RUN set -ex \
-    && mkdir -p /opt/download/public \
-    && cd /opt/download/public \
-    && wget -qO JumpServer-Client-Installer-x86_64.msi https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.msi \
-    && wget -qO JumpServer-Client-Installer-x86_64.exe https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-x86_64.exe \
-    && wget -qO JumpServer-Client-Installer-amd64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.dmg \
-    && wget -qO JumpServer-Client-Installer-arm64.dmg https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.dmg \
-    && wget -qO JumpServer-Client-Installer-amd64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-amd64.deb \
-    && wget -qO JumpServer-Client-Installer-arm64.deb https://github.com/jumpserver/clients/releases/download/${Client_VERSION}/JumpServer-Client-Installer-${Client_VERSION}-arm64.deb \
-    && wget -qO JumpServer-Video-Player.dmg https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player-${VIDEO_PLAYER_VERSION}.dmg \
-    && wget -qO JumpServer-Video-Player.exe https://github.com/jumpserver/VideoPlayer/releases/download/v0.1.9/JumpServer.Video.Player.Setup.${VIDEO_PLAYER_VERSION}.exe \
-    && wget -qO OpenSSH-Win64.msi https://github.com/PowerShell/Win32-OpenSSH/releases/download/${OPENSSH_VERSION}p1-Beta/OpenSSH-Win64-${OPENSSH_VERSION}.msi \
-    && wget -q https://download.jumpserver.org/public/Microsoft_Remote_Desktop_${MRD_VERSION}_installer.pkg
-
-ARG TINKER_VERSION=v0.1.2
-ARG PYTHON_VERSION=3.10.11
-ARG CHROME_VERSION=114.0.5735.134
-ARG DBEAVER_VERSION=22.3.4
-RUN set -ex \
-    && mkdir -p /opt/download/applets \
-    && cd /opt/download/applets \
-    && wget -qO Tinker_Installer.exe https://download.jumpserver.org/public/Tinker_Installer_${TINKER_VERSION}.exe \
-    && wget -qO dbeaver-patch.msi https://download.jumpserver.org/public/dbeaver-patch-${DBEAVER_VERSION}-x86_64-setup.msi \
-    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chromedriver_win32.zip \
-    && wget -q https://github.com/wojiushixiaobai/Chrome-Portable-Win64/releases/download/${CHROME_VERSION}/chrome-win.zip \
-    && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
-    && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
-
 FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -155,7 +174,8 @@ ARG TOOLS="                           \
         nmap                          \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -171,7 +191,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -ex \
     && apt-get update \
     && apt-get -y install --no-install-recommends gnupg2 \
     && dpkgArch="$(dpkg --print-architecture)" \
@@ -185,9 +207,7 @@ RUN set -ex \
             ;; \
     esac \
     && apt-get -y install --no-install-recommends nginx \
-    && mkdir -p /var/cache/nginx \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && mkdir -p /var/cache/nginx
 
 ENV JAVA_HOME /usr/local/openjdk-17
 ENV PATH $JAVA_HOME/bin:$PATH
@@ -199,11 +219,7 @@ COPY --from=jre-build /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certi
 RUN set -ex \
     && chmod +x /etc/ca-certificates/update.d/docker-openjdk \
     && /etc/ca-certificates/update.d/docker-openjdk \
-    && ldconfig \
-    && java -Xshare:dump \
-    && rm -rf ~/.java \
-    && javac --version \
-    && java --version
+    && ldconfig
 
 WORKDIR /opt
 
@@ -288,7 +304,7 @@ RUN set -ex \
 
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
-COPY --from=stage-build /opt/download /opt/download
+COPY --from=tinker-build /opt/download /opt/download
 
 WORKDIR /opt/jumpserver
 RUN --mount=type=cache,target=/root/.cache \
