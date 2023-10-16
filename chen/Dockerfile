@@ -1,4 +1,4 @@
-FROM jumpserver/openjdk:17-slim-buster as jre-build
+FROM jumpserver/openjdk:17-slim-buster as openjdk
 FROM debian:buster-slim
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -26,9 +26,9 @@ RUN set -ex \
 ENV JAVA_HOME /usr/local/openjdk-17
 ENV PATH $JAVA_HOME/bin:$PATH
 
-COPY --from=jre-build $JAVA_HOME $JAVA_HOME
-COPY --from=jre-build /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
-COPY --from=jre-build /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
+COPY --from=openjdk $JAVA_HOME $JAVA_HOME
+COPY --from=openjdk /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
+COPY --from=openjdk /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
 
 RUN set -ex \
     && chmod +x /etc/ca-certificates/update.d/docker-openjdk \

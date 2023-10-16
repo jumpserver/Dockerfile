@@ -1,7 +1,47 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.2 as guacd
-FROM jumpserver/openjdk:17-slim-buster as jre-build
-FROM jumpserver/python:3.11-slim-buster as tinker-build
+FROM jumpserver/openjdk:17-slim-buster as openjdk
+FROM jumpserver/python:3.11-slim-buster as get-core
+ARG TARGETARCH
+
+ARG DEPENDENCIES="                    \
+        ca-certificates               \
+        git                           \
+        git-lfs                       \
+        wget"
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash
+
+WORKDIR /opt
+
+ARG VERSION=v3.7.2
+ENV VERSION=$VERSION
+
+RUN set -ex \
+    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
+    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
+    && chmod +x /opt/jumpserver/entrypoint.sh \
+    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile-ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
+    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
+
+WORKDIR /opt/jumpserver
+
+RUN set -ex \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ee \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
+    && cd utils \
+    && bash -ixeu build.sh
+
+FROM jumpserver/python:3.11-slim-buster as build-tinker
 ARG TARGETARCH
 
 ARG TOOLS="                           \
@@ -53,7 +93,7 @@ RUN set -ex \
     && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
     && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
 
-FROM jumpserver/python:3.11-slim-buster as stage-build
+FROM jumpserver/python:3.11-slim-buster as build-core
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -119,28 +159,17 @@ RUN set -ex \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
-ARG VERSION=v3.7.2
-ENV VERSION=${VERSION}
-
-RUN set -ex \
-    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
-    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
-    && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile-ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
-    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
+COPY --from=get-core /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
 
 WORKDIR /opt/jumpserver
 
-RUN set -ex \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ee \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
-    && cd utils \
-    && bash -ixeu build.sh
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
+    && python3 -m venv /opt/py3 \
+    && . /opt/py3/bin/activate \
     && pip install poetry \
     && poetry config virtualenvs.create false \
     && poetry install --only=main
@@ -188,8 +217,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc \
-    && rm -rf /var/lib/apt/lists/*
+    && sed -i "s@# alias @alias @g" ~/.bashrc
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -212,9 +240,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 ENV JAVA_HOME /usr/local/openjdk-17
 ENV PATH $JAVA_HOME/bin:$PATH
 
-COPY --from=jre-build $JAVA_HOME $JAVA_HOME
-COPY --from=jre-build /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
-COPY --from=jre-build /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
+COPY --from=openjdk $JAVA_HOME $JAVA_HOME
+COPY --from=openjdk /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
+COPY --from=openjdk /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
 
 RUN set -ex \
     && chmod +x /etc/ca-certificates/update.d/docker-openjdk \
@@ -303,19 +331,13 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
-COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
-COPY --from=tinker-build /opt/download /opt/download
-
-WORKDIR /opt/jumpserver
-RUN --mount=type=cache,target=/root/.cache \
-    set -ex \
-    && echo > /opt/jumpserver/config.yml \
-    && pip install poetry \
-    && poetry config virtualenvs.create false \
-    && poetry install --only=main
+COPY --from=build-core /opt/py3 /opt/py3
+COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
+COPY --from=build-tinker /opt/download /opt/download
 
 ARG VERSION=v3.7.2
 ENV VERSION=${VERSION}
+ENV PATH=/opt/py3/bin:$PATH
 
 WORKDIR /opt
 
