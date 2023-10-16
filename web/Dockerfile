@@ -57,7 +57,7 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG VERSION=v3.7.1
+ARG VERSION=v3.7.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \

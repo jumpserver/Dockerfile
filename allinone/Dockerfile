@@ -1,75 +1,28 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.2 as guacd
-FROM jumpserver/openjdk:17-slim-buster as jre-build
-FROM jumpserver/python:3.11-slim-buster as stage-build
+FROM jumpserver/openjdk:17-slim-buster as openjdk
+FROM jumpserver/python:3.11-slim-buster as get-core
 ARG TARGETARCH
 
-ARG BUILD_DEPENDENCIES="              \
-        g++                           \
-        make                          \
-        pkg-config"
-
 ARG DEPENDENCIES="                    \
-        freetds-dev                   \
-        libpq-dev                     \
-        libffi-dev                    \
-        libjpeg-dev                   \
-        libldap2-dev                  \
-        libsasl2-dev                  \
-        libssl-dev                    \
-        libxml2-dev                   \
-        libxmlsec1-dev                \
-        libxmlsec1-openssl            \
-        freerdp2-dev                  \
-        libaio-dev"
-
-ARG TOOLS="                           \
         ca-certificates               \
-        curl                          \
-        default-libmysqlclient-dev    \
-        default-mysql-client          \
         git                           \
         git-lfs                       \
-        unzip                         \
-        xz-utils                      \
         wget"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt
 
-ARG RUST_VERSION=1.71.1
-RUN set -ex \
-    && \
-    if [ "${TARGETARCH}" == "s390x" ] || [ "${TARGETARCH}" == "ppc64le" ] || [ "${TARGETARCH}" == "loong64" ]; then \
-        rustUrl="https://static.rust-lang.org/dist"; \
-        rustArch="${TARGETARCH}"; \
-        mkdir -p /opt/rust-install; \
-        if [ "${TARGETARCH}" == "loong64" ]; then \
-            rustUrl="https://rust-lang.loongnix.cn/dist/${RUST_VERSION}/2023-08-10"; \
-            rustArch="loongarch64"; \
-        fi; \
-        if [ "${TARGETARCH}" == "ppc64le" ]; then \
-            rustArch="powerpc64le"; \
-        fi; \
-        wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
-        tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
-        cd /opt/rust-install && ./install.sh; \
-        cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
-    fi
-
-ARG VERSION=v3.7.1
-ENV VERSION=${VERSION}
+ARG VERSION=v3.7.2
+ENV VERSION=$VERSION
 
 RUN set -ex \
     && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
@@ -88,11 +41,25 @@ RUN set -ex \
     && cd utils \
     && bash -ixeu build.sh
 
-RUN --mount=type=cache,target=/root/.cache \
+FROM jumpserver/python:3.11-slim-buster as build-tinker
+ARG TARGETARCH
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        wget"
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     set -ex \
-    && pip install poetry \
-    && poetry config virtualenvs.create false \
-    && poetry install --only=main
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash
+
+WORKDIR /opt
 
 ARG Client_VERSION=v2.0.1
 ARG MRD_VERSION=10.6.7
@@ -126,6 +93,87 @@ RUN set -ex \
     && wget -q https://download.jumpserver.org/public/dbeaver-ce-${DBEAVER_VERSION}-x86_64-setup.exe \
     && wget -q https://download.jumpserver.org/public/python-${PYTHON_VERSION}-amd64.exe
 
+FROM jumpserver/python:3.11-slim-buster as build-core
+ARG TARGETARCH
+
+ARG BUILD_DEPENDENCIES="              \
+        g++                           \
+        make                          \
+        pkg-config"
+
+ARG DEPENDENCIES="                    \
+        freetds-dev                   \
+        libpq-dev                     \
+        libffi-dev                    \
+        libjpeg-dev                   \
+        libldap2-dev                  \
+        libsasl2-dev                  \
+        libssl-dev                    \
+        libxml2-dev                   \
+        libxmlsec1-dev                \
+        libxmlsec1-openssl            \
+        freerdp2-dev                  \
+        libaio-dev"
+
+ARG TOOLS="                           \
+        ca-certificates               \
+        curl                          \
+        default-libmysqlclient-dev    \
+        default-mysql-client          \
+        git                           \
+        git-lfs                       \
+        unzip                         \
+        xz-utils                      \
+        wget"
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -ex \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash
+
+WORKDIR /opt
+
+ARG RUST_VERSION=1.71.1
+RUN set -ex \
+    && \
+    if [ "${TARGETARCH}" == "s390x" ] || [ "${TARGETARCH}" == "ppc64le" ] || [ "${TARGETARCH}" == "loong64" ]; then \
+        rustUrl="https://static.rust-lang.org/dist"; \
+        rustArch="${TARGETARCH}"; \
+        mkdir -p /opt/rust-install; \
+        if [ "${TARGETARCH}" == "loong64" ]; then \
+            rustUrl="https://rust-lang.loongnix.cn/dist/${RUST_VERSION}/2023-08-10"; \
+            rustArch="loongarch64"; \
+        fi; \
+        if [ "${TARGETARCH}" == "ppc64le" ]; then \
+            rustArch="powerpc64le"; \
+        fi; \
+        wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
+        tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
+        cd /opt/rust-install && ./install.sh; \
+        cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
+    fi
+
+COPY --from=get-core /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
+
+WORKDIR /opt/jumpserver
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+RUN --mount=type=cache,target=/root/.cache \
+    set -ex \
+    && python3 -m venv /opt/py3 \
+    && . /opt/py3/bin/activate \
+    && pip install poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --only=main
+
 FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -155,7 +203,8 @@ ARG TOOLS="                           \
         nmap                          \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -168,10 +217,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
     && echo "no" | dpkg-reconfigure dash \
     && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc \
-    && rm -rf /var/lib/apt/lists/*
+    && sed -i "s@# alias @alias @g" ~/.bashrc
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -ex \
     && apt-get update \
     && apt-get -y install --no-install-recommends gnupg2 \
     && dpkgArch="$(dpkg --print-architecture)" \
@@ -185,25 +235,19 @@ RUN set -ex \
             ;; \
     esac \
     && apt-get -y install --no-install-recommends nginx \
-    && mkdir -p /var/cache/nginx \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && mkdir -p /var/cache/nginx
 
 ENV JAVA_HOME /usr/local/openjdk-17
 ENV PATH $JAVA_HOME/bin:$PATH
 
-COPY --from=jre-build $JAVA_HOME $JAVA_HOME
-COPY --from=jre-build /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
-COPY --from=jre-build /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
+COPY --from=openjdk $JAVA_HOME $JAVA_HOME
+COPY --from=openjdk /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
+COPY --from=openjdk /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
 
 RUN set -ex \
     && chmod +x /etc/ca-certificates/update.d/docker-openjdk \
     && /etc/ca-certificates/update.d/docker-openjdk \
-    && ldconfig \
-    && java -Xshare:dump \
-    && rm -rf ~/.java \
-    && javac --version \
-    && java --version
+    && ldconfig
 
 WORKDIR /opt
 
@@ -287,19 +331,13 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
-COPY --from=stage-build /opt/jumpserver/release/jumpserver /opt/jumpserver
-COPY --from=stage-build /opt/download /opt/download
+COPY --from=build-core /opt/py3 /opt/py3
+COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
+COPY --from=build-tinker /opt/download /opt/download
 
-WORKDIR /opt/jumpserver
-RUN --mount=type=cache,target=/root/.cache \
-    set -ex \
-    && echo > /opt/jumpserver/config.yml \
-    && pip install poetry \
-    && poetry config virtualenvs.create false \
-    && poetry install --only=main
-
-ARG VERSION=v3.7.1
+ARG VERSION=v3.7.2
 ENV VERSION=${VERSION}
+ENV PATH=/opt/py3/bin:$PATH
 
 WORKDIR /opt
 
