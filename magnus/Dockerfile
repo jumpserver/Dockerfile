@@ -8,6 +8,7 @@ ARG DEPENDENCIES="                    \
         locales                       \
         telnet                        \
         vim                           \
+        netcat                        \
         wget"
 
 RUN set -ex \
