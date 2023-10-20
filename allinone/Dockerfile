@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 
 WORKDIR /opt
 
-ARG VERSION=v3.7.2
+ARG VERSION=v3.8.0
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -335,7 +335,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=build-tinker /opt/download /opt/download
 
-ARG VERSION=v3.7.2
+ARG VERSION=v3.8.0
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 

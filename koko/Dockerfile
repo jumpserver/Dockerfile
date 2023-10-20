@@ -78,7 +78,7 @@ RUN set -ex \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.7.2
+ARG VERSION=v3.8.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \

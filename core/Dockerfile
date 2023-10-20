@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 
 WORKDIR /opt
 
-ARG VERSION=v3.7.2
+ARG VERSION=v3.8.0
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -163,7 +163,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
 COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 
-ARG VERSION=v3.7.2
+ARG VERSION=v3.8.0
 ENV VERSION=${VERSION}
 
 WORKDIR /opt/jumpserver
