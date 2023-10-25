@@ -10,8 +10,8 @@ ARG DEPENDENCIES="                    \
         git-lfs                       \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=core \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=core \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
     set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -61,7 +61,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG Client_VERSION=v2.0.1
+ARG Client_VERSION=v2.0.2
 ARG MRD_VERSION=10.6.7
 ARG VIDEO_PLAYER_VERSION=0.1.9
 ARG OPENSSH_VERSION=v9.2.0.0
@@ -203,9 +203,7 @@ ARG TOOLS="                           \
         nmap                          \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
+RUN set -ex \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
@@ -219,9 +217,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
+RUN set -ex \
     && apt-get update \
     && apt-get -y install --no-install-recommends gnupg2 \
     && dpkgArch="$(dpkg --print-architecture)" \
