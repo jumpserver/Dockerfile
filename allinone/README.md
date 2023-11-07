@@ -68,29 +68,11 @@ flush privileges;
     - VOLUME /opt/koko/data             # Koko 持久化目录
     - VOLUME /opt/lion/data             # Lion 持久化目录
     - VOLUME /opt/magnus/data           # Magnus 持久化目录
+    - VOLUME /opt/kael/data             # Kael 持久化目录
+    - VOLUME /opt/chen/data             # Chen 持久化目录
     - VOLUME /var/log/nginx             # Nginx 日志持久化目录
 
 注意：自己上面设置的这些信息一定要记录下来。升级需要重新输入使用
-
-**初始化数据库**
-```bash
-docker run --name jms_all --rm \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -e SECRET_KEY=xxxxxx \
-  -e BOOTSTRAP_TOKEN=xxxxxx \
-  -e LOG_LEVEL=ERROR \
-  -e DB_HOST=192.168.x.x \
-  -e DB_PORT=3306 \
-  -e DB_USER=jumpserver \
-  -e DB_PASSWORD=weakPassword \
-  -e DB_NAME=jumpserver \
-  -e REDIS_HOST=192.168.x.x \
-  -e REDIS_PORT=6379 \
-  -e REDIS_PASSWORD=weakPassword \
-  jumpserver/jms_all:v3.8.0 init_db   # 确定无报错
-```
 
 **启动 JumpServer**
 ```bash
@@ -113,7 +95,14 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  jumpserver/jms_all:v3.8.0
+  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
+  -v /opt/jumpserver/koko/data:/opt/koko/data \
+  -v /opt/jumpserver/lion/data:/opt/lion/data \
+  -v /opt/jumpserver/magnus/data:/opt/magnus/data \
+  -v /opt/jumpserver/kael/data:/opt/kael/data \
+  -v /opt/jumpserver/chen/data:/opt/chen/data \
+  -v /opt/jumpserver/web/log:/var/log/nginx \
+  jumpserver/jms_all:v3.8.1
 ```
 
 **升级**
@@ -129,34 +118,13 @@ mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpse
 # 例: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
 
 # 拉取新版本镜像
-docker pull jumpserver/jms_all:v3.8.0
+docker pull jumpserver/jms_all:v3.8.1
 
 # 删掉旧版本容器
 docker rm jms_all
 
-# 处理数据库合并
-docker run --name jms_all --rm \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -e SECRET_KEY=****** \                 # 自行修改成你的旧版本 SECRET_KEY, 丢失此 key 会导致数据无法解密
-  -e BOOTSTRAP_TOKEN=****** \            # 自行修改成你的旧版本 BOOTSTRAP_TOKEN
-  -e LOG_LEVEL=ERROR \
-  -e DB_HOST=192.168.x.x \               # 自行修改成你的旧版本 MySQL 服务器, 设置不对数据丢失
-  -e DB_PORT=3306 \
-  -e DB_USER=jumpserver \
-  -e DB_PASSWORD=****** \
-  -e DB_NAME=jumpserver \
-  -e REDIS_HOST=192.168.x.x \            # 自行修改成你的旧版本 Redis 服务器
-  -e REDIS_PORT=6379 \
-  -e REDIS_PASSWORD=****** \
-  jumpserver/jms_all:v3.8.0 upgrade     # 确定无报错
-
 # 启动新版本
 docker run --name jms_all -d \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
   -p 80:80 \
   -p 2222:2222 \
   -p 30000-30100:30000-30100 \
@@ -172,4 +140,11 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=****** \
   --privileged=true \
-  jumpserver/jms_all:v3.8.0
+  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
+  -v /opt/jumpserver/koko/data:/opt/koko/data \
+  -v /opt/jumpserver/lion/data:/opt/lion/data \
+  -v /opt/jumpserver/magnus/data:/opt/magnus/data \
+  -v /opt/jumpserver/kael/data:/opt/kael/data \
+  -v /opt/jumpserver/chen/data:/opt/chen/data \
+  -v /opt/jumpserver/web/log:/var/log/nginx \
+  jumpserver/jms_all:v3.8.1

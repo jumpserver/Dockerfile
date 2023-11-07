@@ -3,3 +3,5 @@
 .env
 .history/
 .vscode/
+allinone/.env
+allinone/data/

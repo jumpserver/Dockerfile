@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.8.0
+ARG VERSION=v3.8.1
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -299,7 +299,7 @@ RUN set -ex \
     && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
     && rm -f /opt/*.tar.gz
 
-ARG WISP_VERSION=v0.1.15
+ARG WISP_VERSION=v0.1.16
 RUN set -ex \
     && wget -q https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -331,7 +331,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=build-tinker /opt/download /opt/download
 
-ARG VERSION=v3.8.0
+ARG VERSION=v3.8.1
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 

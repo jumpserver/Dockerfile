@@ -24,7 +24,7 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG WISP_VERSION=v0.1.15
+ARG WISP_VERSION=v0.1.16
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -34,7 +34,7 @@ RUN set -ex \
 
 WORKDIR /opt/magnus
 
-ARG VERSION=v3.8.0
+ARG VERSION=v3.8.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
