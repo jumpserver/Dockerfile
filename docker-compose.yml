@@ -23,6 +23,7 @@ services:
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
       MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
+      DOMAINS: ${DOMAINS:-}
     healthcheck:
       test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
       interval: 10s

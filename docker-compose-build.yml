@@ -28,6 +28,7 @@ services:
       MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
       MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
       MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
+      DOMAIN: ${DOMAIN:-}
     healthcheck:
       test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
       interval: 10s
