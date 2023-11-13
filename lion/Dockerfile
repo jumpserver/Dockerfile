@@ -1,4 +1,4 @@
-FROM jumpserver/guacd:1.5.2
+FROM jumpserver/guacd:1.5.3-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
 
@@ -26,7 +26,7 @@ RUN set -ex \
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.8.1
+ARG VERSION=v3.8.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
