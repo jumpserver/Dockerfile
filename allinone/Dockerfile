@@ -1,5 +1,5 @@
 FROM jumpserver/redis:7.0-buster as redis
-FROM jumpserver/guacd:1.5.2 as guacd
+FROM jumpserver/guacd:1.5.3-buster as guacd
 FROM jumpserver/openjdk:17-slim-buster as openjdk
 FROM jumpserver/python:3.11-slim-buster as get-core
 ARG TARGETARCH
@@ -21,7 +21,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.8.1
+ARG VERSION=v3.8.2
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -163,7 +163,7 @@ COPY --from=get-core /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml 
 
 WORKDIR /opt/jumpserver
 
-ENV PYTHONUNBUFFERED=1 \
+ARG PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 RUN --mount=type=cache,target=/root/.cache \
@@ -225,6 +225,12 @@ RUN set -ex \
         amd64|arm64) \
             echo "deb https://nginx.org/packages/debian/ buster nginx" > /etc/apt/sources.list.d/nginx.list \
             && wget -qO - https://nginx.org/keys/nginx_signing.key | apt-key add - \
+            && apt-get update \
+            ;; \
+        loongarch64) \
+            echo "deb https://download.jumpserver.org/nginx/packages/debian buster nginx" > /etc/apt/sources.list.d/nginx.list \
+            && wget -qO - https://download.jumpserver.org/nginx/packages/keys/nginx_signing.key | apt-key add - \
+            && apt-get update \
             ;; \
         *) \
             echo "Unsupported architecture: ${dpkgArch}" \
@@ -331,7 +337,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=build-tinker /opt/download /opt/download
 
-ARG VERSION=v3.8.1
+ARG VERSION=v3.8.2
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 

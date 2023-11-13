@@ -38,7 +38,7 @@ RUN set -ex \
 
 WORKDIR /opt/kael
 
-ARG VERSION=v3.8.1
+ARG VERSION=v3.8.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
