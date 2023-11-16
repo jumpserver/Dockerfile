@@ -1,4 +1,4 @@
-FROM registry.fit2cloud.com/jumpserver/web-static:v1.0.1 as static
+FROM jumpserver/web-static:v1.0.1 as static
 FROM nginx:1.24-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8

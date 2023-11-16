@@ -1,6 +1,6 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.3-buster as guacd
-FROM umpserver/web-static:v1.0.1 as static
+FROM jumpserver/web-static:v1.0.1 as static
 FROM jumpserver/openjdk:17-slim-buster as openjdk
 FROM jumpserver/python:3.11-slim-buster as get-core
 ARG TARGETARCH
@@ -326,7 +326,7 @@ RUN set -ex \
     && chown -R root:root /opt/kael \
     && rm -f /opt/*.tar.gz
 
-run set -ex \
+RUN set -ex \
     && mkdir -p /opt/chen \
     && wget -q https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
     && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
