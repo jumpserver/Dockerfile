@@ -1,4 +1,4 @@
-FROM jumpserver/python:3.11-slim-buster as get-core
+FROM jumpserver/python:3.11-slim-buster as stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.8.2
+ARG VERSION=v3.9.0
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -38,7 +38,7 @@ RUN set -ex \
     && cd utils \
     && bash -ixeu build.sh
 
-FROM jumpserver/python:3.11-slim-buster as build-core
+FROM jumpserver/python:3.11-slim-buster as stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -104,7 +104,7 @@ RUN set -ex \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
     fi
 
-COPY --from=get-core /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
+COPY --from=stage-1 /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
 
 WORKDIR /opt/jumpserver
 
@@ -112,10 +112,11 @@ ARG PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 RUN --mount=type=cache,target=/root/.cache \
+    set -ex \
     && python3 -m venv /opt/py3 \
-    && . /opt/py3/bin/activate \
     && pip install poetry \
     && poetry config virtualenvs.create false \
+    && . /opt/py3/bin/activate \
     && poetry install --only=main
 
 FROM jumpserver/python:3.11-slim-buster
@@ -125,6 +126,7 @@ ENV LANG=zh_CN.UTF-8 \
 
 ARG DEPENDENCIES="                    \
         libjpeg-dev                   \
+        libx11-dev                    \
         libxmlsec1-openssl"
 
 ARG TOOLS="                           \
@@ -156,13 +158,13 @@ RUN set -ex \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc
 
-COPY --from=build-core /opt/py3 /opt/py3
-COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
-
-ARG VERSION=v3.8.2
-ENV VERSION=${VERSION}
+COPY --from=stage-2 /opt/py3 /opt/py3
+COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
+
+ARG VERSION=v3.9.0
+ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data
 

@@ -34,7 +34,7 @@ RUN set -ex \
 
 WORKDIR /opt/magnus
 
-ARG VERSION=v3.8.2
+ARG VERSION=v3.9.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \
