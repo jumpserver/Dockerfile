@@ -92,7 +92,7 @@ RUN set -ex \
         rustArch="${TARGETARCH}"; \
         mkdir -p /opt/rust-install; \
         if [ "${TARGETARCH}" == "loong64" ]; then \
-            rustUrl="https://rust-lang.loongnix.cn/dist/${RUST_VERSION}/2023-08-10"; \
+            rustUrl="download.jumpserver.org/rust/dist"; \
             rustArch="loongarch64"; \
         fi; \
         if [ "${TARGETARCH}" == "ppc64le" ]; then \
@@ -102,6 +102,8 @@ RUN set -ex \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
         cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
+        mkdir -p ${CARGO_HOME:-$HOME/.cargo}; \
+        echo -e '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"' > ${CARGO_HOME:-$HOME/.cargo}/config; \
     fi
 
 COPY --from=stage-1 /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/

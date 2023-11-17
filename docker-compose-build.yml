@@ -7,7 +7,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: jumpserver/core:${VERSION}
+    image: jumpserver/core-ce:${VERSION}
     container_name: jms_core
     restart: always
     tty: true
