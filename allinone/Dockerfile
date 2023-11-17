@@ -96,7 +96,7 @@ RUN set -ex \
         rustArch="${TARGETARCH}"; \
         mkdir -p /opt/rust-install; \
         if [ "${TARGETARCH}" == "loong64" ]; then \
-            rustUrl="https://rust-lang.loongnix.cn/dist/${RUST_VERSION}/2023-08-10"; \
+            rustUrl="download.jumpserver.org/rust/dist"; \
             rustArch="loongarch64"; \
         fi; \
         if [ "${TARGETARCH}" == "ppc64le" ]; then \
