@@ -106,6 +106,8 @@ RUN set -ex \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
         cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
+        mkdir -p ${CARGO_HOME:-$HOME/.cargo}; \
+        echo -e '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"' > ${CARGO_HOME:-$HOME/.cargo}/config; \
     fi
 
 COPY --from=get-core /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
