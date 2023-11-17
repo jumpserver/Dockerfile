@@ -114,6 +114,7 @@ ARG PYTHONUNBUFFERED=1 \
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
     && python3 -m venv /opt/py3 \
+    && pip install $(grep cryptography pyproject.toml | sed 's/ = /==/g' | sed 's/"//g') \
     && pip install poetry \
     && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
