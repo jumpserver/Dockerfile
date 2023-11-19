@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.0
+ARG VERSION=v3.9.1
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -166,7 +166,7 @@ COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v3.9.0
+ARG VERSION=v3.9.1
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data

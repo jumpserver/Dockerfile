@@ -3,7 +3,7 @@
 action="${1}"
 
 if [[ "$action" == "bash" || "$action" == "sh" ]]; then
-    bash "${@}"
+    bash
     exit 0
 fi
 

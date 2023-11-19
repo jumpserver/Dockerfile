@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.0
+ARG VERSION=v3.9.1
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -290,7 +290,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=static /opt/download /opt/download
 
-ARG VERSION=v3.9.0
+ARG VERSION=v3.9.1
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 

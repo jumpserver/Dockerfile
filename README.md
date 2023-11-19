@@ -56,7 +56,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-VERSION=v3.9.0
+VERSION=v3.9.1
 
 # 构建参数, 支持 amd64/arm64/loong64
 TARGETARCH=amd64
