@@ -56,6 +56,10 @@ if [ -f "/etc/init.d/cron" ]; then
   /etc/init.d/cron start
 fi
 
+if [ "$(uname -m)" = "loongarch64" ]; then
+    export SECURITY_LOGIN_CAPTCHA_ENABLED=False
+fi
+
 cd /opt/jumpserver || exit 1
 ./jms upgrade_db || {
     echo -e "\033[31m Failed to change the table structure. \033[0m"

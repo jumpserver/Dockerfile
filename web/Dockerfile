@@ -27,7 +27,7 @@ COPY --from=static /opt/download /opt/download
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.1
+ARG VERSION=v3.9.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
