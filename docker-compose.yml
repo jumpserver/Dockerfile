@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   core:
-    image: jumpserver/core:${VERSION}
+    image: jumpserver/core-ce:${VERSION}
     container_name: jms_core
     ulimits:
       core: 0
@@ -36,7 +36,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/core:${VERSION}
+    image: jumpserver/core-ce:${VERSION}
     container_name: jms_celery
     ulimits:
       core: 0

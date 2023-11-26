@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.1
+ARG VERSION=v3.9.2
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -71,7 +71,6 @@ ARG TOOLS="                           \
         default-mysql-client          \
         git                           \
         git-lfs                       \
-        unzip                         \
         xz-utils                      \
         wget"
 
@@ -141,17 +140,15 @@ ARG TOOLS="                           \
         default-libmysqlclient-dev    \
         default-mysql-client          \
         gnupg2                        \
-        inetutils-ping                \
+        iputils-ping                  \
         locales                       \
         netcat                        \
         logrotate                     \
         openssh-client                \
         p11-kit                       \
-        procps                        \
         sshpass                       \
         supervisor                    \
         telnet                        \
-        unzip                         \
         vim                           \
         nmap                          \
         wget"
@@ -290,7 +287,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=static /opt/download /opt/download
 
-ARG VERSION=v3.9.1
+ARG VERSION=v3.9.2
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 
