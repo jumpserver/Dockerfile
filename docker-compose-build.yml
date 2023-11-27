@@ -10,7 +10,6 @@ services:
     image: jumpserver/core-ce:${VERSION}
     container_name: jms_core
     restart: always
-    tty: true
     command: start web
     environment:
       SECRET_KEY: $SECRET_KEY
@@ -45,7 +44,6 @@ services:
     image: jumpserver/core:${VERSION}
     container_name: jms_celery
     restart: always
-    tty: true
     command: start task
     environment:
       SECRET_KEY: $SECRET_KEY
@@ -89,7 +87,6 @@ services:
     container_name: jms_koko
     restart: always
     privileged: true
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -121,7 +118,6 @@ services:
     image: jumpserver/lion:${VERSION}
     container_name: jms_lion
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -150,7 +146,6 @@ services:
     image: jumpserver/magnus:${VERSION}
     container_name: jms_magnus
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -188,7 +183,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       - CORE_HOST: http://core:8080
       - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -219,7 +213,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       - CORE_HOST: http://core:8080
       - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -248,7 +241,6 @@ services:
     image: jumpserver/web:${VERSION}
     container_name: jms_web
     restart: always
-    tty: true
     depends_on:
       core:
         condition: service_healthy
