@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.2
+ARG VERSION=v3.9.3
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -106,7 +106,7 @@ RUN set -ex \
         cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
         mkdir -p ${CARGO_HOME:-$HOME/.cargo}; \
-        echo -e '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"' > ${CARGO_HOME:-$HOME/.cargo}/config; \
+        echo -e '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"' > ${CARGO_HOME:-$HOME/.cargo}/config; \
     fi
 
 COPY --from=get-core /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
@@ -115,6 +115,8 @@ WORKDIR /opt/jumpserver
 
 ARG PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
+
+ENV GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
 
 RUN --mount=type=cache,target=/root/.cache \
     set -ex \
@@ -287,7 +289,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=static /opt/download /opt/download
 
-ARG VERSION=v3.9.2
+ARG VERSION=v3.9.3
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 
