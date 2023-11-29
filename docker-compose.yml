@@ -6,7 +6,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     command: start web
     environment:
       SECRET_KEY: $SECRET_KEY
@@ -40,7 +39,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     command: start task
     environment:
       SECRET_KEY: $SECRET_KEY
@@ -78,7 +76,6 @@ services:
       core: 0
     restart: always
     privileged: true
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -106,7 +103,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -131,7 +127,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -163,7 +158,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -188,7 +182,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -211,7 +204,6 @@ services:
     image: jumpserver/web:${VERSION}
     container_name: jms_web
     restart: always
-    tty: true
     depends_on:
       core:
         condition: service_healthy

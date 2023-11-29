@@ -35,7 +35,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -64,7 +63,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
@@ -94,7 +92,6 @@ services:
     ulimits:
       core: 0
     restart: always
-    tty: true
     environment:
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN

@@ -51,7 +51,7 @@ RUN set -ex \
 
 WORKDIR /opt/chen
 
-ARG VERSION=v3.9.2
+ARG VERSION=v3.9.3
 ENV VERSION=${VERSION}
 
 RUN set -ex \

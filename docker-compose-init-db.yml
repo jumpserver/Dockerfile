@@ -4,7 +4,6 @@ services:
   core:
     image: jumpserver/core-ce:${VERSION}
     container_name: jms_core
-    tty: true
     command: sleep
     environment:
       SECRET_KEY: $SECRET_KEY
