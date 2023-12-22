@@ -26,7 +26,7 @@ RUN set -ex \
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \

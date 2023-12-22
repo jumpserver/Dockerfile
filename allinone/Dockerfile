@@ -1,6 +1,6 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.3-buster as guacd
-FROM jumpserver/web-static:v1.0.1 as static
+FROM jumpserver/web-static:v1.0.4 as static
 FROM jumpserver/openjdk:17-slim-buster as openjdk
 FROM jumpserver/python:3.11-slim-buster as get-core
 ARG TARGETARCH
@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -289,7 +289,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=static /opt/download /opt/download
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 
