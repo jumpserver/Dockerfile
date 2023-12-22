@@ -1,4 +1,4 @@
-FROM jumpserver/web-static:v1.0.1 as static
+FROM jumpserver/web-static:v1.0.4 as static
 FROM nginx:1.24-buster
 ARG TARGETARCH
 ENV LANG=zh_CN.UTF-8
@@ -27,7 +27,7 @@ COPY --from=static /opt/download /opt/download
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=${VERSION}
 
 RUN set -ex \

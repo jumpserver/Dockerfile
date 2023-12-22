@@ -1,6 +1,6 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.3-buster as guacd
-FROM jumpserver/web-static:v1.0.1 as static
+FROM jumpserver/web-static:v1.0.4 as static
 FROM jumpserver/openjdk:17-slim-buster as openjdk
 FROM jumpserver/python:3.11-slim-buster as get-core
 ARG TARGETARCH
@@ -22,23 +22,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=$VERSION
 
 RUN set -ex \
     && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
     && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
     && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile-ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
+    && rm -f /opt/jumpserver/Dockerfile \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
 WORKDIR /opt/jumpserver
 
 RUN set -ex \
     && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ee \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
     && cd utils \
     && bash -ixeu build.sh
 
@@ -289,7 +286,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=static /opt/download /opt/download
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 

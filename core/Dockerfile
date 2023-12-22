@@ -18,23 +18,20 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=$VERSION
 
 RUN set -ex \
     && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
     && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
     && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -f /opt/jumpserver/Dockerfile /opt/jumpserver/Dockerfile-ee /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml \
+    && rm -f /opt/jumpserver/Dockerfile \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
 WORKDIR /opt/jumpserver
 
 RUN set -ex \
     && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ee \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/poetry.lock \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/pyproject.toml \
     && cd utils \
     && bash -ixeu build.sh
 
@@ -168,7 +165,7 @@ COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v3.9.3
+ARG VERSION=v3.10.0
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data
