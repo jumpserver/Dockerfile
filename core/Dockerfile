@@ -31,7 +31,7 @@ RUN set -ex \
 WORKDIR /opt/jumpserver
 
 RUN set -ex \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/${VERSION}/core/Dockerfile-ce \
+    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/master/core/Dockerfile-ce \
     && cd utils \
     && bash -ixeu build.sh
 
