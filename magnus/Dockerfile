@@ -1,13 +1,10 @@
 FROM debian:buster-slim
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8
+ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         curl                          \
-        locales                       \
-        telnet                        \
-        vim                           \
         netcat                        \
         wget"
 
@@ -16,7 +13,6 @@ RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
     && apt-get clean all \
@@ -34,7 +30,7 @@ RUN set -ex \
 
 WORKDIR /opt/magnus
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
