@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -123,10 +123,11 @@ RUN --mount=type=cache,target=/root/.cache \
 
 FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8 \
+ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
+        freerdp2-dev                  \
         libjpeg-dev                   \
         libx11-dev                    \
         libxmlsec1-openssl"
@@ -135,15 +136,8 @@ ARG TOOLS="                           \
         ca-certificates               \
         curl                          \
         default-libmysqlclient-dev    \
-        default-mysql-client          \
-        iputils-ping                  \
-        locales                       \
-        nmap                          \
         openssh-client                \
-        patch                         \
         sshpass                       \
-        telnet                        \
-        vim                           \
         wget"
 
 RUN set -ex \
@@ -154,18 +148,18 @@ RUN set -ex \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
-    && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data

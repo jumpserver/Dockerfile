@@ -1,14 +1,10 @@
 FROM debian:buster-slim
 ARG TARGETARCH
+ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         curl                          \
-        git                           \
-        net-tools                     \
-        unzip                         \
-        vim                           \
-        locales                       \
         wget"
 
 ARG APT_MIRROR=http://mirrors.ustc.edu.cn
@@ -19,9 +15,9 @@ RUN set -ex \
     && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
     && apt-get update \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
+    && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
@@ -36,7 +32,7 @@ RUN set -ex \
 
 WORKDIR /opt/kael
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \

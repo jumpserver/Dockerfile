@@ -1,6 +1,6 @@
 FROM jumpserver/redis:7.0-buster as redis
 FROM jumpserver/guacd:1.5.3-buster as guacd
-FROM jumpserver/web-static:v1.0.4 as static
+FROM jumpserver/web-static:v1.0.5 as static
 FROM jumpserver/openjdk:17-slim-buster as openjdk
 FROM jumpserver/python:3.11-slim-buster as get-core
 ARG TARGETARCH
@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -126,9 +126,10 @@ RUN --mount=type=cache,target=/root/.cache \
 
 FROM jumpserver/python:3.11-slim-buster
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8
+ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
+        freerdp2-dev                  \
         libjpeg-dev                   \
         libx11-dev                    \
         libxmlsec1-openssl"
@@ -139,17 +140,12 @@ ARG TOOLS="                           \
         default-libmysqlclient-dev    \
         default-mysql-client          \
         gnupg2                        \
-        iputils-ping                  \
-        locales                       \
         netcat                        \
         logrotate                     \
         openssh-client                \
         p11-kit                       \
         sshpass                       \
         supervisor                    \
-        telnet                        \
-        vim                           \
-        nmap                          \
         wget"
 
 RUN set -ex \
@@ -160,11 +156,11 @@ RUN set -ex \
     && apt-get -y install --no-install-recommends ${TOOLS} \
     && mkdir -p /root/.ssh/ \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
-    && echo "set mouse-=a" > ~/.vimrc \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc
+    && sed -i "s@# alias @alias @g" ~/.bashrc \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN set -ex \
     && apt-get update \
@@ -186,7 +182,9 @@ RUN set -ex \
             ;; \
     esac \
     && apt-get -y install --no-install-recommends nginx \
-    && mkdir -p /var/cache/nginx
+    && mkdir -p /var/cache/nginx \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME /usr/local/openjdk-17
 ENV PATH $JAVA_HOME/bin:$PATH
@@ -286,7 +284,7 @@ COPY --from=build-core /opt/py3 /opt/py3
 COPY --from=get-core /opt/jumpserver/release/jumpserver /opt/jumpserver
 COPY --from=static /opt/download /opt/download
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=${VERSION}
 ENV PATH=/opt/py3/bin:$PATH
 

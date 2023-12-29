@@ -2,18 +2,15 @@ FROM jumpserver/redis:7.0-buster as redis
 
 FROM debian:buster-slim
 ARG TARGETARCH
-ENV LANG=zh_CN.UTF-8
+ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
-        bash-completion               \
         ca-certificates               \
         curl                          \
         libssl-dev                    \
-        locales                       \
         mariadb-client                \
         openssh-client                \
         postgresql-client             \
-        vim                           \
         wget"
 
 RUN set -ex \
@@ -21,7 +18,6 @@ RUN set -ex \
     && apt-get update \
     && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
     && echo "no" | dpkg-reconfigure dash \
-    && echo "zh_CN.UTF-8" | dpkg-reconfigure locales \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
     && apt-get clean all \
@@ -78,7 +74,7 @@ RUN set -ex \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.10.0
+ARG VERSION=v3.10.1
 ENV VERSION=${VERSION}
 
 RUN set -ex \
