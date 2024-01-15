@@ -29,19 +29,18 @@ services:
       MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
       DOMAIN: ${DOMAIN:-}
     healthcheck:
-      test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
+      test: "check http://localhost:8080/api/health/"
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 60s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
-      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
   celery:
-    image: jumpserver/core:${VERSION}
+    image: jumpserver/core-ce:${VERSION}
     container_name: jms_celery
     restart: always
     command: start task
@@ -72,7 +71,6 @@ services:
       start_period: 30s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
-      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
@@ -96,7 +94,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost:5000/koko/health/ > /dev/null"
+      test: "check http://localhost:5000/koko/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -126,7 +124,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost:8081/lion/health/ > /dev/null"
+      test: "check http://localhost:8081/lion/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -157,7 +155,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "nc -z 127.0.0.1 33061 || exit 1"
+      test: "check tcp://127.0.0.1:$$MAGNUS_MYSQL_PORT"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -184,16 +182,16 @@ services:
       core: 0
     restart: always
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/chen/data:/opt/chen/data
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -f 127.0.0.1:8082/chen"
+      test: "check http://localhost:8082/chen/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -214,16 +212,16 @@ services:
       core: 0
     restart: always
     environment:
-      - CORE_HOST: http://core:8080
-      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      - LOG_LEVEL: $LOG_LEVEL
+      CORE_HOST: http://core:8080
+      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/kael/data:/opt/kael/data
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost:8083/kael/health/ > /dev/null"
+      test: "check http://localhost:8083/kael/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -241,11 +239,13 @@ services:
     image: jumpserver/web:${VERSION}
     container_name: jms_web
     restart: always
+    environment:
+      CORE_HOST: http://core:8080
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost/ > /dev/null"
+      test: "check http://localhost/api/health/ "
       interval: 10s
       timeout: 5s
       retries: 3

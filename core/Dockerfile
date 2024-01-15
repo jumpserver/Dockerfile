@@ -1,4 +1,4 @@
-FROM jumpserver/python:3.11-slim-buster as stage-1
+FROM python:3.11-slim-bullseye as stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
@@ -13,10 +13,18 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && echo "no" | dpkg-reconfigure dash
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES}
 
 WORKDIR /opt
+
+ARG CHECK_VERSION=v1.0.1
+RUN set -ex \
+    && wget https://github.com/wojiushixiaobai/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && mv check /usr/local/bin/ \
+    && chown root:root /usr/local/bin/check \
+    && chmod 755 /usr/local/bin/check \
+    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
 ARG VERSION=v3.10.1
 ENV VERSION=$VERSION
@@ -31,12 +39,12 @@ RUN set -ex \
 WORKDIR /opt/jumpserver
 
 RUN set -ex \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/master/core/Dockerfile-ce \
+    && wget https://github.com/wojiushixiaobai/jumpserver-patch/raw/master/core/Dockerfile-ce \
     && echo > /opt/jumpserver/config.yml \
     && cd utils \
     && bash -ixeu build.sh
 
-FROM jumpserver/python:3.11-slim-buster as stage-2
+FROM python:3.11-slim-bullseye as stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -77,31 +85,31 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash
+    && apt-get -y install --no-install-recommends ${TOOLS}
 
 WORKDIR /opt
 
 ARG RUST_VERSION=1.71.1
 RUN set -ex \
     && \
-    if [ "${TARGETARCH}" == "s390x" ] || [ "${TARGETARCH}" == "ppc64le" ] || [ "${TARGETARCH}" == "loong64" ]; then \
+    if [ "${TARGETARCH}" = "s390x" ] || [ "${TARGETARCH}" = "ppc64le" ] || [ "${TARGETARCH}" = "loong64" ]; then \
         rustUrl="https://static.rust-lang.org/dist"; \
         rustArch="${TARGETARCH}"; \
         mkdir -p /opt/rust-install; \
-        if [ "${TARGETARCH}" == "loong64" ]; then \
+        if [ "${TARGETARCH}" = "loong64" ]; then \
             rustUrl="download.jumpserver.org/rust/dist"; \
             rustArch="loongarch64"; \
         fi; \
-        if [ "${TARGETARCH}" == "ppc64le" ]; then \
+        if [ "${TARGETARCH}" = "ppc64le" ]; then \
             rustArch="powerpc64le"; \
+        fi; \
+        if [ "${TARGETARCH}" = "riscv64" ]; then \
+            rustArch="riscv64gc-unknown-linux-gnu"; \
         fi; \
         wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
         cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
-        mkdir -p ${CARGO_HOME:-$HOME/.cargo}; \
-        echo -e '[source.crates-io]\nreplace-with = "ustc"\n\n[source.ustc]\nregistry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"' > ${CARGO_HOME:-$HOME/.cargo}/config; \
     fi
 
 COPY --from=stage-1 /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
@@ -122,27 +130,23 @@ RUN --mount=type=cache,target=/root/.cache \
     && . /opt/py3/bin/activate \
     && poetry install --only=main
 
-FROM jumpserver/python:3.11-slim-buster
-ARG TARGETARCH
+FROM python:3.11-slim-bullseye
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
-        freerdp2-dev                  \
         libjpeg-dev                   \
+        libldap2-dev                  \
         libx11-dev                    \
         libxmlsec1-openssl"
 
 ARG TOOLS="                           \
         ca-certificates               \
-        curl                          \
         default-libmysqlclient-dev    \
         openssh-client                \
-        sshpass                       \
-        wget"
+        sshpass"
 
 RUN set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
@@ -156,6 +160,7 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=stage-2 /opt/py3 /opt/py3
+COPY --from=stage-1 /usr/local/bin /usr/local/bin
 COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver

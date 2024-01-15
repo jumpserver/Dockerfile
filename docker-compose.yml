@@ -23,7 +23,7 @@ services:
       MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
       DOMAINS: ${DOMAINS:-}
     healthcheck:
-      test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
+      test: "check http://localhost:8080/api/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -85,7 +85,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost:5000/koko/health/ > /dev/null"
+      test: "check http://localhost:5000/koko/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -111,7 +111,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost:8081/lion/health/ > /dev/null"
+      test: "check http://localhost:8081/lion/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -138,7 +138,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "nc -z 127.0.0.1 33061 || exit 1"
+      test: "check tcp://localhost:$$MAGNUS_MYSQL_PORT"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -168,7 +168,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -f 127.0.0.1:8082/chen"
+      test: "check http://localhost:8082/chen/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -192,7 +192,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost:8083/kael/health/ > /dev/null"
+      test: "check http://localhost:8083/kael/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -208,7 +208,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "curl -fsL http://localhost/ > /dev/null"
+      test: "check http://localhost:51980/api/health/"
       interval: 10s
       timeout: 5s
       retries: 3
