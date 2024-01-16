@@ -7,7 +7,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_core:${VERSION}
+    image: jumpserver/core-ce:${VERSION}
     container_name: jms_core
     restart: always
     command: start web
@@ -29,18 +29,19 @@ services:
       MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
       DOMAIN: ${DOMAIN:-}
     healthcheck:
-      test: "check http://localhost:8080/api/health/"
+      test: "curl -fsL http://localhost:8080/api/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 60s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
   celery:
-    image: wojiushixiaobai/jms_core:${VERSION}
+    image: jumpserver/core:${VERSION}
     container_name: jms_celery
     restart: always
     command: start task
@@ -71,6 +72,7 @@ services:
       start_period: 30s
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
+      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
 
@@ -81,7 +83,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_koko:${VERSION}
+    image: jumpserver/koko:${VERSION}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -94,7 +96,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check http://localhost:5000/koko/health/"
+      test: "curl -fsL http://localhost:5000/koko/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -113,7 +115,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_lion:${VERSION}
+    image: jumpserver/lion:${VERSION}
     container_name: jms_lion
     restart: always
     environment:
@@ -124,7 +126,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check http://localhost:8081/lion/health/"
+      test: "curl -fsL http://localhost:8081/lion/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -141,7 +143,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_magnus:${VERSION}
+    image: jumpserver/magnus:${VERSION}
     container_name: jms_magnus
     restart: always
     environment:
@@ -155,7 +157,7 @@ services:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check tcp://127.0.0.1:$$MAGNUS_MYSQL_PORT"
+      test: "nc -z 127.0.0.1 33061 || exit 1"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -176,22 +178,22 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_chen:${VERSION}
+    image: jumpserver/chen:${VERSION}
     container_name: jms_chen
     ulimits:
       core: 0
     restart: always
     environment:
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
+      - CORE_HOST: http://core:8080
+      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      - LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/chen/data:/opt/chen/data
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check http://localhost:8082/chen/"
+      test: "curl -f 127.0.0.1:8082/chen"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -206,22 +208,22 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_kael:${VERSION}
+    image: jumpserver/kael:${VERSION}
     container_name: jms_kael
     ulimits:
       core: 0
     restart: always
     environment:
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
+      - CORE_HOST: http://core:8080
+      - BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
+      - LOG_LEVEL: $LOG_LEVEL
     volumes:
       - ${VOLUME_DIR}/kael/data:/opt/kael/data
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check http://localhost:8083/kael/health/"
+      test: "curl -fsL http://localhost:8083/kael/health/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -236,16 +238,14 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_web:${VERSION}
+    image: jumpserver/web:${VERSION}
     container_name: jms_web
     restart: always
-    environment:
-      CORE_HOST: http://core:8080
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check http://localhost/api/health/ "
+      test: "curl -fsL http://localhost/ > /dev/null"
       interval: 10s
       timeout: 5s
       retries: 3

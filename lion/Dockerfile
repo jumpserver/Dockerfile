@@ -1,49 +1,12 @@
-FROM debian:bullseye-slim as stage-1
+FROM jumpserver/guacd:1.5.3-buster
 ARG TARGETARCH
-
-ARG DEPENDENCIES="                    \
-        ca-certificates               \
-        wget"
-
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && apt-get update \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES}
-
-WORKDIR /opt
-
-ARG CHECK_VERSION=v1.0.1
-RUN set -ex \
-    && wget https://github.com/wojiushixiaobai/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && mv check /usr/local/bin/ \
-    && chown root:root /usr/local/bin/check \
-    && chmod 755 /usr/local/bin/check \
-    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
-
-WORKDIR /opt/lion
-
-ARG VERSION=v3.10.1
-ENV VERSION=${VERSION}
-
-RUN set -ex \
-    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
-    && chown -R root:root /opt/lion \
-    && rm -f /opt/*.tar.gz
-
-COPY lion/entrypoint.sh .
-RUN chmod 755 ./entrypoint.sh
-
-FROM jumpserver/guacd:1.5.3-bullseye
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
-        supervisor"
+        curl                          \
+        supervisor                    \
+        wget"
 
 USER root
 
@@ -57,14 +20,21 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=stage-1 /usr/local/bin /usr/local/bin
-COPY --from=stage-1 /opt/lion /opt/lion
-COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
-
 WORKDIR /opt/lion
 
 ARG VERSION=v3.10.1
 ENV VERSION=${VERSION}
+
+RUN set -ex \
+    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
+    && chown -R root:root /opt/lion \
+    && rm -f /opt/*.tar.gz
+
+COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
+
+COPY lion/entrypoint.sh .
+RUN chmod 755 ./entrypoint.sh
 
 VOLUME /opt/lion/data
 

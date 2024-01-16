@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 
-until /usr/local/bin/check ${CORE_HOST}/api/health/; do
+while [ "$(curl -I -m 10 -L -k -o /dev/null -s -w %{http_code} ${CORE_HOST}/api/health/)" != "200" ]
+do
     echo "wait for jms_core ${CORE_HOST} ready"
     sleep 2
 done
@@ -32,10 +33,5 @@ case $LOG_LEVEL in
         export GUACD_LOG_LEVEL=error
         ;;
 esac
-
-if [ ! -d "/opt/lion/data/logs" ]; then
-    mkdir -p /opt/lion/data/logs
-    touch /opt/lion/data/logs/guacd.log
-fi
 
 supervisord
