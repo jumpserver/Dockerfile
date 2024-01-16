@@ -42,4 +42,6 @@ jobs:
                     push: true
                     tags: |
                       wojiushixiaobai/jms_${{ matrix.component }}:${{ env.version }}
+                      wojiushixiaobai/jms_${{ matrix.component }}:latest
                       ghcr.io/wojiushixiaobai/jms_${{ matrix.component }}:${{ env.version }}
+                      ghcr.io/wojiushixiaobai/jms_${{ matrix.component }}:latest
