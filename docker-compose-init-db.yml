@@ -2,7 +2,7 @@ version: '2.4'
 
 services:
   core:
-    image: jumpserver/core-ce:${VERSION}
+    image: jumpserver/jms_core:${VERSION}
     container_name: jms_core
     command: sleep
     environment:
@@ -20,6 +20,5 @@ services:
       REDIS_PASSWORD: $REDIS_PASSWORD
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
-      - ${VOLUME_DIR}/core/logs:/opt/jumpserver/logs
     networks:
       - net
