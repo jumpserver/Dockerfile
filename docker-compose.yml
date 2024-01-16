@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   core:
-    image: jumpserver/core-ce:${VERSION}
+    image: wojiushixiaobai/jms_core:${VERSION}
     container_name: jms_core
     ulimits:
       core: 0
@@ -34,7 +34,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/core-ce:${VERSION}
+    image: wojiushixiaobai/jms_core:${VERSION}
     container_name: jms_celery
     ulimits:
       core: 0
@@ -70,7 +70,7 @@ services:
       - net
 
   koko:
-    image: jumpserver/koko:${VERSION}
+    image: wojiushixiaobai/jms_koko:${VERSION}
     container_name: jms_koko
     ulimits:
       core: 0
@@ -98,7 +98,7 @@ services:
       - net
 
   lion:
-    image: jumpserver/lion:${VERSION}
+    image: wojiushixiaobai/jms_lion:${VERSION}
     container_name: jms_lion
     ulimits:
       core: 0
@@ -122,7 +122,7 @@ services:
       - net
 
   magnus:
-    image: jumpserver/magnus:${VERSION}
+    image: wojiushixiaobai/jms_magnus:${VERSION}
     container_name: jms_magnus
     ulimits:
       core: 0
@@ -153,7 +153,7 @@ services:
       - net
 
   chen:
-    image: jumpserver/chen:${VERSION}
+    image: wojiushixiaobai/jms_chen:${VERSION}
     container_name: jms_chen
     ulimits:
       core: 0
@@ -177,7 +177,7 @@ services:
       - net
 
   kael:
-    image: jumpserver/kael:${VERSION}
+    image: wojiushixiaobai/jms_kael:${VERSION}
     container_name: jms_kael
     ulimits:
       core: 0
@@ -201,7 +201,7 @@ services:
       - net
 
   web:
-    image: jumpserver/web:${VERSION}
+    image: wojiushixiaobai/jms_web:${VERSION}
     container_name: jms_web
     restart: always
     depends_on:

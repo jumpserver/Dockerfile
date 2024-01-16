@@ -48,7 +48,7 @@ RUN set -ex \
 COPY magnus/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
