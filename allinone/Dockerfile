@@ -35,7 +35,7 @@ RUN set -ex \
 WORKDIR /opt/jumpserver
 
 RUN set -ex \
-    && wget -q https://github.com/wojiushixiaobai/jumpserver-patch/raw/master/core/Dockerfile-ce \
+    && wget https://github.com/wojiushixiaobai/jumpserver-patch/raw/master/core/Dockerfile-ce \
     && echo > /opt/jumpserver/config.yml \
     && cd utils \
     && bash -ixeu build.sh
@@ -88,15 +88,15 @@ WORKDIR /opt
 ARG RUST_VERSION=1.71.1
 RUN set -ex \
     && \
-    if [ "${TARGETARCH}" == "s390x" ] || [ "${TARGETARCH}" == "ppc64le" ] || [ "${TARGETARCH}" == "loong64" ]; then \
+    if [ "${TARGETARCH}" = "s390x" ] || [ "${TARGETARCH}" = "ppc64le" ] || [ "${TARGETARCH}" = "loong64" ]; then \
         rustUrl="https://static.rust-lang.org/dist"; \
         rustArch="${TARGETARCH}"; \
         mkdir -p /opt/rust-install; \
-        if [ "${TARGETARCH}" == "loong64" ]; then \
+        if [ "${TARGETARCH}" = "loong64" ]; then \
             rustUrl="download.jumpserver.org/rust/dist"; \
             rustArch="loongarch64"; \
         fi; \
-        if [ "${TARGETARCH}" == "ppc64le" ]; then \
+        if [ "${TARGETARCH}" = "ppc64le" ]; then \
             rustArch="powerpc64le"; \
         fi; \
         wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
@@ -170,12 +170,12 @@ RUN set -ex \
     && case "$dpkgArch" in \
         amd64|arm64) \
             echo "deb https://nginx.org/packages/debian/ buster nginx" > /etc/apt/sources.list.d/nginx.list \
-            && wget -qO - https://nginx.org/keys/nginx_signing.key | apt-key add - \
+            && wget -O - https://nginx.org/keys/nginx_signing.key | apt-key add - \
             && apt-get update \
             ;; \
         loongarch64) \
             echo "deb https://download.jumpserver.org/nginx/packages/debian buster nginx" > /etc/apt/sources.list.d/nginx.list \
-            && wget -qO - https://download.jumpserver.org/nginx/packages/keys/nginx_signing.key | apt-key add - \
+            && wget -O - https://download.jumpserver.org/nginx/packages/keys/nginx_signing.key | apt-key add - \
             && apt-get update \
             ;; \
         *) \
@@ -206,7 +206,7 @@ RUN set -ex \
     && \
     case "${TARGETARCH}" in \
         amd64) \
-            wget -q https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
             && tar -xf mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
             && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/bin/* \
             && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh /usr/local/bin/ \
@@ -214,7 +214,7 @@ RUN set -ex \
             && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
             ;; \
         arm64|s390x|ppc64le) \
-            wget -q https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
             && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
             && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* \
             && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh /usr/local/bin/ \
@@ -230,22 +230,22 @@ ARG HELM_VERSION=v3.12.2
 ARG KUBECTL_VERSION=v1.27.4
 RUN set -ex \
     && \
-    if [ "${TARGETARCH}" == "loong64" ]; then \
-        wget -q https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz; \
+    if [ "${TARGETARCH}" = "loong64" ]; then \
+        wget https://download.jumpserver.org/public/kubectl-linux-${TARGETARCH}.tar.gz; \
         tar -xf kubectl-linux-${TARGETARCH}.tar.gz; \
         mv kubectl /usr/local/bin/rawkubectl; \
     else \
-        wget -q -O /usr/local/bin/rawkubectl https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl; \
+        wget -O /usr/local/bin/rawkubectl https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl; \
     fi \
-    && wget -q http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
+    && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
     && mkdir /opt/kubectl-aliases/ \
     && tar -xf kubectl_aliases.tar.gz -C /opt/kubectl-aliases/ \
     && chown -R root:root /opt/kubectl-aliases/ \
     && \
-    if [ "${TARGETARCH}" == "loong64" ]; then \
-        wget -q https://github.com/wojiushixiaobai/helm-loongarch64/releases/download/${HELM_VERSION}/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
+    if [ "${TARGETARCH}" = "loong64" ]; then \
+        wget https://github.com/wojiushixiaobai/helm-loongarch64/releases/download/${HELM_VERSION}/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
     else \
-        wget -q https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
+        wget https://get.helm.sh/helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz; \
     fi \
     && tar -xf helm-${HELM_VERSION}-linux-${TARGETARCH}.tar.gz -C /opt --strip-components=1 linux-${TARGETARCH}/helm \
     && mv helm /usr/local/bin/rawhelm \
@@ -255,7 +255,7 @@ RUN set -ex \
 
 ARG WISP_VERSION=v0.1.16
 RUN set -ex \
-    && wget -q https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
     && chown root:root /usr/local/bin/wisp \
     && chmod 755 /usr/local/bin/wisp \
@@ -293,7 +293,7 @@ WORKDIR /opt
 
 RUN set -ex \
     && mkdir -p /opt/koko \
-    && wget -q https://github.com/jumpserver/koko/releases/download/${VERSION}/koko-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver/koko/releases/download/${VERSION}/koko-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf koko-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/koko/ --strip-components=1 \
     && mv /opt/koko/kubectl /usr/local/bin/ \
     && mv /opt/koko/helm /usr/local/bin/ \
@@ -303,14 +303,14 @@ RUN set -ex \
 
 RUN set -ex \
     && mkdir -p /opt/lion \
-    && wget -q https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
     && chown -R root:root /opt/lion \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
     && mkdir -p /opt/magnus \
-    && wget -q https://github.com/jumpserver/magnus-release/releases/download/${VERSION}/magnus-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver/magnus-release/releases/download/${VERSION}/magnus-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf magnus-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/magnus --strip-components=1 \
     && chmod 755 /opt/magnus/magnus \
     && chown -R root:root /opt/magnus \
@@ -318,7 +318,7 @@ RUN set -ex \
 
 RUN set -ex \
     && mkdir -p /opt/kael \
-    && wget -q https://github.com/jumpserver/kael/releases/download/${VERSION}/kael-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver/kael/releases/download/${VERSION}/kael-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf kael-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/kael --strip-components=1 \
     && chmod 755 /opt/kael/kael \
     && chown -R root:root /opt/kael \
@@ -326,28 +326,28 @@ RUN set -ex \
 
 RUN set -ex \
     && mkdir -p /opt/chen \
-    && wget -q https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
+    && wget https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
     && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && chown -R root:root /opt/chen \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
     && mkdir -p /opt/lina \
-    && wget -q https://github.com/jumpserver/lina/releases/download/${VERSION}/lina-${VERSION}.tar.gz \
+    && wget https://github.com/jumpserver/lina/releases/download/${VERSION}/lina-${VERSION}.tar.gz \
     && tar -xf lina-${VERSION}.tar.gz -C /opt/lina --strip-components=1 \
     && chown -R root:root /opt/lina \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
     && mkdir -p /opt/luna \
-    && wget -q https://github.com/jumpserver/luna/releases/download/${VERSION}/luna-${VERSION}.tar.gz \
+    && wget https://github.com/jumpserver/luna/releases/download/${VERSION}/luna-${VERSION}.tar.gz \
     && tar -xf luna-${VERSION}.tar.gz -C /opt/luna --strip-components=1 \
     && chown -R root:root /opt/luna \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
     && cd /opt/download/applets \
-    && wget -q https://github.com/jumpserver/applets/releases/download/${VERSION}/pip_packages.zip
+    && wget https://github.com/jumpserver/applets/releases/download/${VERSION}/pip_packages.zip
 
 COPY readme.txt readme.txt
 COPY entrypoint.sh .
