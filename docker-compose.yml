@@ -204,11 +204,13 @@ services:
     image: wojiushixiaobai/jms_web:${VERSION}
     container_name: jms_web
     restart: always
+    environment:
+      CORE_HOST: http://core:8080
     depends_on:
       core:
         condition: service_healthy
     healthcheck:
-      test: "check http://localhost:51980/api/health/"
+      test: "check http://localhost/api/health/"
       interval: 10s
       timeout: 5s
       retries: 3

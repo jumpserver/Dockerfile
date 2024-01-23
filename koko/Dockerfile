@@ -1,4 +1,4 @@
-FROM redis:7.0-bullseye as stage-1
+FROM redis:7.0-bookworm as stage-1
 FROM debian:bookworm-slim as stage-2
 ARG TARGETARCH
 
