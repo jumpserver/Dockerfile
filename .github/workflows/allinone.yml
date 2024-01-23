@@ -37,7 +37,7 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                     context: ./allinone
-                    file: Dockerfile
+                    file: ./allinone/Dockerfile
                     platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
                     push: true
                     tags: |

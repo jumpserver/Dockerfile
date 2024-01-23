@@ -37,7 +37,7 @@ RUN set -ex \
 COPY lion/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-FROM jumpserver/guacd:1.5.3-bullseye
+FROM jumpserver/guacd:1.5.3-bookworm
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \

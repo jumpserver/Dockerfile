@@ -40,7 +40,7 @@ RUN set -ex \
 COPY web/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-FROM nginx:1.24-bookworm
+FROM nginx:1.25-bookworm
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
