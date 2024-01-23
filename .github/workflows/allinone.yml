@@ -1,4 +1,4 @@
-name: Build
+name: Build Allinone
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                component: [core, koko, lion, kael, chen, magnus, web]
+                component: [all]
         steps:
             - uses: actions/checkout@v4
             - uses: docker/setup-qemu-action@v3
@@ -36,8 +36,8 @@ jobs:
             - name: Build and Push Image
               uses: docker/build-push-action@v5
               with:
-                    context: .
-                    file: ${{ matrix.component }}/Dockerfile
+                    context: ./allinone
+                    file: Dockerfile
                     platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/s390x
                     push: true
                     tags: |

@@ -1,24 +1,23 @@
 FROM redis:7.0-bullseye as stage-1
-FROM debian:bullseye-slim as stage-2
+FROM debian:bookworm-slim as stage-2
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES}
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
-ARG CHECK_VERSION=v1.0.1
+ARG CHECK_VERSION=v1.0.2
 RUN set -ex \
-    && wget https://github.com/wojiushixiaobai/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && mv check /usr/local/bin/ \
     && chown root:root /usr/local/bin/check \
@@ -80,7 +79,7 @@ RUN set -ex \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -96,7 +95,7 @@ RUN set -ex \
 COPY koko/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
@@ -123,7 +122,7 @@ COPY --from=stage-2 /opt/kubectl-aliases /opt/kubectl-aliases
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 VOLUME /opt/koko/data

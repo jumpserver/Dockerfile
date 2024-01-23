@@ -57,16 +57,10 @@ services:
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_PASSWORD: ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
-      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
-      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
-      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
       DOMAINS: ${DOMAINS:-}
     ports:
       - ${HTTP_PORT:-80}:80/tcp
       - ${SSH_PORT:-2222}:2222/tcp
-      - ${MAGNUS_MYSQL_PORT:-33061}:33061/tcp
-      - ${MAGNUS_MARIADB_PORT:-33062}:33062/tcp
-      - ${MAGNUS_REDIS_PORT:-63790}:63790/tcp
     depends_on:
       mysql:
         condition: service_healthy
@@ -82,7 +76,6 @@ services:
       - ${VOLUME_DIR:-./data}/core/data:/opt/jumpserver/core/data
       - ${VOLUME_DIR:-./data}/koko/data:/opt/jumpserver/koko/data
       - ${VOLUME_DIR:-./data}/lion/data:/opt/jumpserver/lion/data
-      - ${VOLUME_DIR:-./data}/magnus/data:/opt/jumpserver/magnus/data
       - ${VOLUME_DIR:-./data}/chen/data:/opt/jumpserver/chen/data
       - ${VOLUME_DIR:-./data}/kael/data:/opt/jumpserver/kael/data
       - ${VOLUME_DIR:-./data}/nginx/data:/var/log/nginx
