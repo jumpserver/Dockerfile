@@ -37,7 +37,7 @@ services:
       - net
 
   jumpserver:
-    image: wojiushixiaobai/jms_all:${VERSION:-latest}
+    image: jumpserver/jms_all:${VERSION:-latest}
     build:
       context: .
       dockerfile: Dockerfile

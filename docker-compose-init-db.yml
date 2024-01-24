@@ -2,7 +2,7 @@ version: '2.4'
 
 services:
   core:
-    image: wojiushixiaobai/jms_core:${VERSION}
+    image: jumpserver/jms_core:${VERSION}
     container_name: jms_core
     command: sleep
     environment:

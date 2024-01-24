@@ -7,7 +7,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_core:${VERSION}
+    image: jumpserver/jms_core:${VERSION}
     container_name: jms_core
     restart: always
     command: start web
@@ -40,7 +40,7 @@ services:
       - net
 
   celery:
-    image: wojiushixiaobai/jms_core:${VERSION}
+    image: jumpserver/jms_core:${VERSION}
     container_name: jms_celery
     restart: always
     command: start task
@@ -81,7 +81,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_koko:${VERSION}
+    image: jumpserver/jms_koko:${VERSION}
     container_name: jms_koko
     restart: always
     privileged: true
@@ -113,7 +113,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_lion:${VERSION}
+    image: jumpserver/jms_lion:${VERSION}
     container_name: jms_lion
     restart: always
     environment:
@@ -141,7 +141,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_magnus:${VERSION}
+    image: jumpserver/jms_magnus:${VERSION}
     container_name: jms_magnus
     restart: always
     environment:
@@ -176,7 +176,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_chen:${VERSION}
+    image: jumpserver/jms_chen:${VERSION}
     container_name: jms_chen
     ulimits:
       core: 0
@@ -206,7 +206,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_kael:${VERSION}
+    image: jumpserver/jms_kael:${VERSION}
     container_name: jms_kael
     ulimits:
       core: 0
@@ -236,7 +236,7 @@ services:
       args:
         VERSION: ${VERSION}
         TARGETARCH: ${TARGETARCH}
-    image: wojiushixiaobai/jms_web:${VERSION}
+    image: jumpserver/jms_web:${VERSION}
     container_name: jms_web
     restart: always
     environment:
