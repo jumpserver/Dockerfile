@@ -2,11 +2,11 @@ version: '2.4'
 services:
   core:
     depends_on:
-      redis:
+      mysql:
         condition: service_healthy
 
   redis:
-    image: jumpserver/redis:7.0
+    image: redis:7.0
     container_name: jms_redis
     restart: always
     command: redis-server --requirepass $REDIS_PASSWORD --loglevel warning --maxmemory-policy allkeys-lru

@@ -14,6 +14,9 @@ This project is Docker image build.
 
 仅在测试环境中快速部署验证功能使用, 生产环境请使用 [标准部署](https://github.com/jumpserver/Dockerfile)
 
+**注意: 为了控制镜像的大小, 该部署方式不支持 Client 相关功能, 纯 B/S 架构 Web 端使用**
+
+
 ```sh
 docker-compose up -d
 ```
@@ -67,7 +70,6 @@ flush privileges;
     - VOLUME /opt/jumpserver/data       # Core 持久化目录, 存储录像日志
     - VOLUME /opt/koko/data             # Koko 持久化目录
     - VOLUME /opt/lion/data             # Lion 持久化目录
-    - VOLUME /opt/magnus/data           # Magnus 持久化目录
     - VOLUME /opt/kael/data             # Kael 持久化目录
     - VOLUME /opt/chen/data             # Chen 持久化目录
     - VOLUME /var/log/nginx             # Nginx 日志持久化目录
@@ -98,11 +100,10 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -v /opt/jumpserver/magnus/data:/opt/magnus/data \
   -v /opt/jumpserver/kael/data:/opt/kael/data \
   -v /opt/jumpserver/chen/data:/opt/chen/data \
   -v /opt/jumpserver/web/log:/var/log/nginx \
-  jumpserver/jms_all:v3.10.1
+  jumpserver/jms_all:v3.10.2
 ```
 
 **升级**
@@ -118,7 +119,7 @@ mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpse
 # 例: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
 
 # 拉取新版本镜像
-docker pull jumpserver/jms_all:v3.10.1
+docker pull jumpserver/jms_all:v3.10.2
 
 # 删掉旧版本容器
 docker rm jms_all
@@ -143,8 +144,7 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -v /opt/jumpserver/magnus/data:/opt/magnus/data \
   -v /opt/jumpserver/kael/data:/opt/kael/data \
   -v /opt/jumpserver/chen/data:/opt/chen/data \
   -v /opt/jumpserver/web/log:/var/log/nginx \
-  jumpserver/jms_all:v3.10.1
+  jumpserver/jms_all:v3.10.2

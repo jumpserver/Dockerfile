@@ -1,24 +1,22 @@
-FROM jumpserver/openjdk:17-slim-bullseye as stage-1
-FROM debian:bullseye-slim as stage-2
+FROM debian:bookworm-slim as stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES}
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
-ARG CHECK_VERSION=v1.0.1
+ARG CHECK_VERSION=v1.0.2
 RUN set -ex \
-    && wget https://github.com/jumpserver-dev/healthch/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && mv check /usr/local/bin/ \
     && chown root:root /usr/local/bin/check \
@@ -35,7 +33,7 @@ RUN set -ex \
 
 WORKDIR /opt/chen
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -48,12 +46,12 @@ RUN set -ex \
 COPY chen/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
-        p11-kit"
+        openjdk-17-jre-headless"
 
 RUN set -ex \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
@@ -62,31 +60,16 @@ RUN set -ex \
     && echo "no" | dpkg-reconfigure dash \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc \
+    && sed -i "s@jdk.tls.disabledAlgorithms=SSLv3, TLSv1, TLSv1.1@jdk.tls.disabledAlgorithms=SSLv3@" /etc/java-17-openjdk/security/java.security \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME /usr/local/openjdk-17
-ENV PATH $JAVA_HOME/bin:$PATH
-
-COPY --from=stage-1 $JAVA_HOME $JAVA_HOME
-COPY --from=stage-1 /etc/ld.so.conf.d/docker-openjdk.conf /etc/ld.so.conf.d/docker-openjdk.conf
-COPY --from=stage-1 /etc/ca-certificates/update.d/docker-openjdk /etc/ca-certificates/update.d/docker-openjdk
-
-RUN set -ex \
-    && chmod +x /etc/ca-certificates/update.d/docker-openjdk \
-    && /etc/ca-certificates/update.d/docker-openjdk \
-    && ldconfig \
-    && java -Xshare:dump \
-    && rm -rf ~/.java \
-    && javac --version \
-    && java --version
-
-COPY --from=stage-2 /usr/local/bin /usr/local/bin
-COPY --from=stage-2 /opt/chen /opt/chen
+COPY --from=stage-1 /usr/local/bin /usr/local/bin
+COPY --from=stage-1 /opt/chen /opt/chen
 
 WORKDIR /opt/chen
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 VOLUME /opt/chen/data
