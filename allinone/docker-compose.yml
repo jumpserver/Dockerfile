@@ -19,7 +19,7 @@ services:
       - net
 
   redis:
-    image: redis:6.2
+    image: redis:7.0
     container_name: jms_redis
     restart: always
     command: redis-server --requirepass ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
@@ -37,7 +37,7 @@ services:
       - net
 
   jumpserver:
-    image: jumpserver/jms_all:${VERSION:-latest}
+    image: wojiushixiaobai/jms_all:${VERSION:-latest}
     build:
       context: .
       dockerfile: Dockerfile
