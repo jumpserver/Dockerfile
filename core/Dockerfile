@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bullseye as stage-1
+FROM python:3.11-slim-bookworm as stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
@@ -7,26 +7,25 @@ ARG DEPENDENCIES="                    \
         git-lfs                       \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES}
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
-ARG CHECK_VERSION=v1.0.1
+ARG CHECK_VERSION=v1.0.2
 RUN set -ex \
-    && wget https://github.com/jumpserver-dev/healthch/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && mv check /usr/local/bin/ \
     && chown root:root /usr/local/bin/check \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -39,12 +38,11 @@ RUN set -ex \
 WORKDIR /opt/jumpserver
 
 RUN set -ex \
-    && wget https://github.com/jumpserver-dev/jumpserver-patch/raw/master/core/Dockerfile-ce \
     && echo > /opt/jumpserver/config.yml \
     && cd utils \
     && bash -ixeu build.sh
 
-FROM python:3.11-slim-bullseye as stage-2
+FROM python:3.11-slim-bookworm as stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -77,36 +75,44 @@ ARG TOOLS="                           \
         xz-utils                      \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+RUN set -ex \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${TOOLS}
+    && apt-get -y install --no-install-recommends ${TOOLS} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
 ARG RUST_VERSION=1.71.1
 RUN set -ex \
+    && mkdir -p /opt/rust-install \
+    && rustUrl="https://static.rust-lang.org/dist" \
     && \
-    if [ "${TARGETARCH}" = "s390x" ] || [ "${TARGETARCH}" = "ppc64le" ] || [ "${TARGETARCH}" = "loong64" ]; then \
-        rustUrl="https://static.rust-lang.org/dist"; \
-        rustArch="${TARGETARCH}"; \
-        mkdir -p /opt/rust-install; \
-        if [ "${TARGETARCH}" = "loong64" ]; then \
-            rustUrl="download.jumpserver.org/rust/dist"; \
-            rustArch="loongarch64"; \
-        fi; \
-        if [ "${TARGETARCH}" = "ppc64le" ]; then \
-            rustArch="powerpc64le"; \
-        fi; \
-        if [ "${TARGETARCH}" = "riscv64" ]; then \
-            rustArch="riscv64gc-unknown-linux-gnu"; \
-        fi; \
-        wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}-unknown-linux-gnu.tar.xz"; \
+    case "${TARGETARCH}" in \
+        amd64) rustArch='x86_64-unknown-linux-gnu'; \
+            ;; \
+        arm64) rustArch='aarch64-unknown-linux-gnu'; \
+            ;; \
+        mips64le) rustArch='mips64el-unknown-linux-gnuabi64'; \
+            ;; \
+        ppc64le) rustArch='powerpc64le-unknown-linux-gnu'; \
+            ;; \
+        riscv64) rustArch='riscv64gc-unknown-linux-gnu'; \
+            ;; \
+        s390x) rustArch='s390x-unknown-linux-gnu'; \
+            ;; \
+        loong64) rustArch='loongarch64-unknown-linux-gnu'; \
+            rustUrl="https://download.jumpserver.org/rust/dist"; \
+            ;; \
+        *) echo >&2 "error: unsupported architecture: ${TARGETARCH}"; \
+            ;; \
+    esac \
+    && \
+    if [ -n "${rustArch}" ]; then \
+        wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}.tar.xz"; \
         tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
         cd /opt/rust-install && ./install.sh; \
         cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
@@ -122,7 +128,7 @@ ARG PYTHONUNBUFFERED=1 \
 ENV GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
 
 RUN --mount=type=cache,target=/root/.cache \
-    set -ex \
+set -ex \
     && python3 -m venv /opt/py3 \
     && pip install $(grep cryptography pyproject.toml | sed 's/ = /==/g' | sed 's/"//g') \
     && pip install poetry \
@@ -130,12 +136,12 @@ RUN --mount=type=cache,target=/root/.cache \
     && . /opt/py3/bin/activate \
     && poetry install --only=main
 
-FROM python:3.11-slim-bullseye
+FROM python:3.11-slim-bookworm
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
-        libjpeg-dev                   \
+        freerdp2-dev                  \
         libldap2-dev                  \
         libx11-dev                    \
         libxmlsec1-openssl"
@@ -165,7 +171,7 @@ COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data

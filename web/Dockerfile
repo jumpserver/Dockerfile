@@ -1,31 +1,30 @@
-FROM jumpserver/web-static:v1.0.5 as stage-1
-FROM debian:bullseye-slim as stage-2
+FROM jumpserver/web-static:v1.0.6-bookworm as stage-1
+FROM debian:bookworm-slim as stage-2
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget"
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    set -ex \
-    && rm -f /etc/apt/apt.conf.d/docker-clean \
-    && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+RUN set -ex \
     && apt-get update \
-    && apt-get -y install --no-install-recommends ${DEPENDENCIES}
+    && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
+    && echo "no" | dpkg-reconfigure dash \
+    && apt-get clean all \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
 
-ARG CHECK_VERSION=v1.0.1
+ARG CHECK_VERSION=v1.0.2
 RUN set -ex \
-    && wget https://github.com/jumpserver-dev/healthch/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && mv check /usr/local/bin/ \
     && chown root:root /usr/local/bin/check \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -41,7 +40,7 @@ RUN set -ex \
 COPY web/entrypoint.sh .
 RUN chmod 755 ./entrypoint.sh
 
-FROM nginx:1.24-bullseye
+FROM nginx:1.25-bookworm
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
@@ -65,7 +64,7 @@ COPY web/nginx.conf /etc/nginx/
 
 WORKDIR /opt
 
-ARG VERSION=v3.10.1
+ARG VERSION=v3.10.2
 ENV VERSION=${VERSION}
 
 VOLUME /var/log/nginx

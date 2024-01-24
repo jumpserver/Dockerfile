@@ -6,7 +6,7 @@ services:
         condition: service_healthy
 
   mysql:
-    image: jumpserver/mariadb:10.6
+    image: mariadb:10.6
     container_name: jms_mysql
     restart: always
     command: --character-set-server=utf8 --collation-server=utf8_general_ci
