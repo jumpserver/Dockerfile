@@ -47,7 +47,6 @@ services:
     environment:
       SECRET_KEY: ${SECRET_KEY:-vYneAbsXUhe4BghEeedNL7nfWLwaTTmhnwQMvjYOIG25Ofzghk}
       BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:-K1ffDfLSIK8SV2PZj6VaxOiv8KuawlJK}
-      DEBUG: ${DEBUG:-FALSE}
       LOG_LEVEL: ${LOG_LEVEL:-ERROR}
       DB_HOST: ${DB_HOST:-mysql}
       DB_PORT: ${DB_PORT:-3306}
