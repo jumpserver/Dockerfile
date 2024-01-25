@@ -89,3 +89,14 @@ jobs:
             ghcr.io/${{ github.repository_owner }}/jms_${{ matrix.component }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.version }}
+          release_name: Release ${{ env.version }}
+          draft: false
+          prerelease: false
