@@ -86,38 +86,6 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG RUST_VERSION=1.71.1
-RUN set -ex \
-    && mkdir -p /opt/rust-install \
-    && rustUrl="https://static.rust-lang.org/dist" \
-    && \
-    case "${TARGETARCH}" in \
-        amd64) rustArch='x86_64-unknown-linux-gnu'; \
-            ;; \
-        arm64) rustArch='aarch64-unknown-linux-gnu'; \
-            ;; \
-        mips64le) rustArch='mips64el-unknown-linux-gnuabi64'; \
-            ;; \
-        ppc64le) rustArch='powerpc64le-unknown-linux-gnu'; \
-            ;; \
-        riscv64) rustArch='riscv64gc-unknown-linux-gnu'; \
-            ;; \
-        s390x) rustArch='s390x-unknown-linux-gnu'; \
-            ;; \
-        loong64) rustArch='loongarch64-unknown-linux-gnu'; \
-            rustUrl="https://download.jumpserver.org/rust/dist"; \
-            ;; \
-        *) echo >&2 "error: unsupported architecture: ${TARGETARCH}"; \
-            ;; \
-    esac \
-    && \
-    if [ -n "${rustArch}" ]; then \
-        wget -O /opt/rust.tar.gz "${rustUrl}/rust-${RUST_VERSION}-${rustArch}.tar.xz"; \
-        tar -xf /opt/rust.tar.gz -C /opt/rust-install --strip-components=1; \
-        cd /opt/rust-install && ./install.sh; \
-        cd /opt && rm -rf /opt/rust-install /opt/rust.tar.gz; \
-    fi
-
 COPY --from=stage-1 /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
 
 WORKDIR /opt/jumpserver
@@ -141,7 +109,6 @@ ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
 
 ARG DEPENDENCIES="                    \
-        freerdp2-dev                  \
         libldap2-dev                  \
         libx11-dev                    \
         libxmlsec1-openssl"
