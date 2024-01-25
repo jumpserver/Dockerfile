@@ -1,37 +1,25 @@
 # Dockerfile
 
-Jumpserver all in one Dockerfile
-
-This project is Docker image build.
-
-该项目是 Jumpserver 项目的 Docker 镜像生成代码
+JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方式的 Docker 镜像生成代码。
 
 ## How to start
 
-环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密
+环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密。
 
 ### Quick start
 
-仅在测试环境中快速部署验证功能使用, 生产环境请使用 [标准部署](https://github.com/jumpserver/Dockerfile)
-
-**注意: 为了控制镜像的大小, 该部署方式不支持 Client 相关功能, 纯 B/S 架构 Web 端使用**
-
+**注意: all-in-one 部署方式不支持 Client 相关功能, 仅支持在 纯 B/S 架构 Web 端使用。**
 
 ```sh
 docker-compose up -d
-```
-
-```sh
-# 测试完毕后清理环境
-docker-compose down -v
 ```
 
 ### Standard start
 
 使用外置 MySQL 数据库和 Redis:
 
-    - 外置数据库要求 MariaDB 版本大于等于 10.6
-    - 外置 Redis 要求 Redis 版本大于等于 6.2
+    - 外置数据库要求 MariaDB 版本大于等于 10.6；
+    - 外置 Redis 要求 Redis 版本大于等于 6.2。
 
 ```sh
 # 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
@@ -74,7 +62,7 @@ flush privileges;
     - VOLUME /opt/chen/data             # Chen 持久化目录
     - VOLUME /var/log/nginx             # Nginx 日志持久化目录
 
-注意：自己上面设置的这些信息一定要记录下来。升级需要重新输入使用
+注意：自己上面设置的这些信息一定要记录下来，升级需要重新输入使用。
 
 **启动 JumpServer**
 ```bash
