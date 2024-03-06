@@ -1,4 +1,4 @@
-FROM jumpserver/web-static:v1.0.6-bookworm as stage-1
+FROM jumpserver/web-static:v1.0.7-bookworm as stage-1
 FROM debian:bookworm-slim as stage-2
 ARG TARGETARCH
 
