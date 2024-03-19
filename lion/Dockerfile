@@ -25,7 +25,7 @@ RUN set -ex \
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.10.5
+ARG VERSION=v3.10.6
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -62,7 +62,7 @@ COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.10.5
+ARG VERSION=v3.10.6
 ENV VERSION=${VERSION}
 
 VOLUME /opt/lion/data

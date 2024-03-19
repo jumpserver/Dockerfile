@@ -1,7 +1,7 @@
 FROM redis:7.0-bookworm as redis
 FROM jumpserver/guacd:1.5.3-bookworm as guacd
 FROM jumpserver/web-static:v1.0.7-bookworm as static
-FROM jumpserver/jms_core:v3.10.5
+FROM jumpserver/jms_core:v3.10.6
 ARG TARGETARCH
 
 ARG TOOLS="                           \
