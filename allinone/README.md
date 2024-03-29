@@ -11,15 +11,15 @@ JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方�
 **注意: all-in-one 部署方式不支持 Client 相关功能, 仅支持在 纯 B/S 架构 Web 端使用。**
 
 ```sh
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Standard start
 
 使用外置 MySQL 数据库和 Redis:
 
-    - 外置数据库要求 MariaDB 版本大于等于 10.6；
-    - 外置 Redis 要求 Redis 版本大于等于 6.2。
+  - 外置数据库要求 MariaDB 版本大于等于 10.6；
+  - 外置 Redis 要求 Redis 版本大于等于 6.2。
 
 ```sh
 # 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
