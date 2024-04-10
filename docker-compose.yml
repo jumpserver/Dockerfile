@@ -9,7 +9,6 @@ services:
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
@@ -42,7 +41,6 @@ services:
     environment:
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      DEBUG: $DEBUG
       LOG_LEVEL: $LOG_LEVEL
       DB_HOST: $DB_HOST
       DB_PORT: $DB_PORT
