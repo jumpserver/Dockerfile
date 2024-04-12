@@ -71,7 +71,7 @@ services:
       retries: 3
       start_period: 90s
     volumes:
-      - ${VOLUME_DIR:-./data}/core/data:/opt/core/data
+      - ${VOLUME_DIR:-./data}/core/data:/opt/jumpserver/data
       - ${VOLUME_DIR:-./data}/koko/data:/opt/koko/data
       - ${VOLUME_DIR:-./data}/lion/data:/opt/lion/data
       - ${VOLUME_DIR:-./data}/chen/data:/opt/chen/data
