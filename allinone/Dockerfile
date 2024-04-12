@@ -135,10 +135,6 @@ RUN set -ex \
     && chown -R root:root /opt/luna \
     && rm -f /opt/*.tar.gz
 
-RUN set -ex \
-    && cd /opt/download/applets \
-    && wget https://github.com/jumpserver/applets/releases/download/${VERSION}/pip_packages.zip
-
 COPY readme.txt readme.txt
 COPY entrypoint.sh .
 COPY nginx.conf /etc/nginx/nginx.conf
