@@ -71,11 +71,11 @@ services:
       retries: 3
       start_period: 90s
     volumes:
-      - ${VOLUME_DIR:-./data}/core/data:/opt/jumpserver/core/data
-      - ${VOLUME_DIR:-./data}/koko/data:/opt/jumpserver/koko/data
-      - ${VOLUME_DIR:-./data}/lion/data:/opt/jumpserver/lion/data
-      - ${VOLUME_DIR:-./data}/chen/data:/opt/jumpserver/chen/data
-      - ${VOLUME_DIR:-./data}/kael/data:/opt/jumpserver/kael/data
+      - ${VOLUME_DIR:-./data}/core/data:/opt/core/data
+      - ${VOLUME_DIR:-./data}/koko/data:/opt/koko/data
+      - ${VOLUME_DIR:-./data}/lion/data:/opt/lion/data
+      - ${VOLUME_DIR:-./data}/chen/data:/opt/chen/data
+      - ${VOLUME_DIR:-./data}/kael/data:/opt/kael/data
       - ${VOLUME_DIR:-./data}/nginx/data:/var/log/nginx
     networks:
       - net
