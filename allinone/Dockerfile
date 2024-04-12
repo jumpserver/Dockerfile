@@ -1,6 +1,5 @@
 FROM redis:7.0-bookworm as redis
 FROM jumpserver/guacd:1.5.3-bookworm as guacd
-FROM jumpserver/web-static:v1.0.7-bookworm as static
 FROM jumpserver/jms_core:v3.10.7
 ARG TARGETARCH
 
@@ -89,7 +88,6 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
-COPY --from=static /opt/download/applets /opt/download/applets
 
 RUN set -ex \
     && mkdir -p /opt/koko \
