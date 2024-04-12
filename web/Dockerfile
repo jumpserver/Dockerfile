@@ -1,5 +1,4 @@
-FROM jumpserver/web-static:v1.0.7-bookworm as stage-1
-FROM debian:bookworm-slim as stage-2
+FROM debian:bookworm-slim as stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
@@ -57,9 +56,8 @@ RUN set -ex \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=stage-1 /opt/download /opt/download
-COPY --from=stage-2 /usr/local/bin /usr/local/bin
-COPY --from=stage-2 /opt /opt
+COPY --from=stage-1 /usr/local/bin /usr/local/bin
+COPY --from=stage-1 /opt /opt
 COPY web/nginx.conf /etc/nginx/
 
 WORKDIR /opt
