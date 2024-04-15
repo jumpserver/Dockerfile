@@ -44,6 +44,7 @@ services:
     privileged: true
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       SECRET_KEY: ${SECRET_KEY:-vYneAbsXUhe4BghEeedNL7nfWLwaTTmhnwQMvjYOIG25Ofzghk}
       BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:-K1ffDfLSIK8SV2PZj6VaxOiv8KuawlJK}
       LOG_LEVEL: ${LOG_LEVEL:-ERROR}

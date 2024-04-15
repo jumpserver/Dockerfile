@@ -7,6 +7,7 @@ services:
     restart: always
     command: start web
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -39,6 +40,7 @@ services:
     restart: always
     command: start task
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -74,6 +76,7 @@ services:
     restart: always
     privileged: true
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -101,6 +104,7 @@ services:
       core: 0
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -125,6 +129,7 @@ services:
       core: 0
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -156,6 +161,7 @@ services:
       core: 0
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -180,6 +186,7 @@ services:
       core: 0
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
@@ -202,6 +209,7 @@ services:
     container_name: jms_web
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
     depends_on:
       core:

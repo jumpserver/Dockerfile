@@ -10,6 +10,7 @@ services:
     restart: always
     command: redis-server --requirepass $REDIS_PASSWORD --loglevel warning --maxmemory-policy allkeys-lru
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       REDIS_PORT: $REDIS_PORT
       REDIS_PASSWORD: $REDIS_PASSWORD
     healthcheck:
