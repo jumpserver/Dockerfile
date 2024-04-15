@@ -4,6 +4,7 @@ services:
     container_name: jms_core
     command: sleep
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       SECRET_KEY: $SECRET_KEY
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
