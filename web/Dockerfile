@@ -23,7 +23,7 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-ARG VERSION=v3.10.7
+ARG VERSION=v3.10.8
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -60,7 +60,7 @@ COPY web/nginx.conf /etc/nginx/
 
 WORKDIR /opt
 
-ARG VERSION=v3.10.7
+ARG VERSION=v3.10.8
 ENV VERSION=${VERSION}
 
 VOLUME /var/log/nginx
