@@ -147,7 +147,7 @@ COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v3.10.7
+ARG VERSION=v3.10.8
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data
