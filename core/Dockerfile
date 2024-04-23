@@ -33,7 +33,7 @@ RUN set -ex \
     && chmod 755 /usr/local/bin/receptor \
     && rm -f /opt/receptor.tar.gz
 
-ARG VERSION=v3.10.8
+ARG VERSION=v3.10.9
 ENV VERSION=$VERSION
 
 RUN set -ex \
@@ -147,7 +147,7 @@ COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v3.10.8
+ARG VERSION=v3.10.9
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data
