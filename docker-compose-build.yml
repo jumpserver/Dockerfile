@@ -76,29 +76,6 @@ services:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
     networks:
       - net
-  
-  receptor:
-    image: jumpserver/jms_core:${VERSION}
-    container_name: jms_receptor
-    ulimits:
-      core: 0
-    restart: always
-    command: start receptor
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-    depends_on:
-      core:
-        condition: service_healthy
-    healthcheck:
-      test: "test -S /opt/jumpserver/data/share/control.sock || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    volumes:
-      - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
-    networks:
-      - net
 
   koko:
     build:
