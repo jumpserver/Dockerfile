@@ -74,7 +74,7 @@ RUN set -ex \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.10.8
+ARG VERSION=v3.10.9
 ENV VERSION=${VERSION}
 
 RUN set -ex \
@@ -94,6 +94,7 @@ FROM debian:bookworm-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
+        bash-completion               \
         ca-certificates               \
         libssl-dev                    \
         mariadb-client                \
@@ -117,7 +118,7 @@ COPY --from=stage-2 /opt/kubectl-aliases /opt/kubectl-aliases
 
 WORKDIR /opt/koko
 
-ARG VERSION=v3.10.8
+ARG VERSION=v3.10.9
 ENV VERSION=${VERSION}
 
 VOLUME /opt/koko/data
