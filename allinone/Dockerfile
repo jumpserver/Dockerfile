@@ -142,6 +142,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/
 RUN chmod +x ./entrypoint.sh
 
+ENV TERMINAL_MAGNUS_ENABLED=False \
+    TERMINAL_KOKO_SSH_ENABLED=False
+
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /opt/lion/data
