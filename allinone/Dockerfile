@@ -4,6 +4,7 @@ FROM jumpserver/jms_core:v3.10.9
 ARG TARGETARCH
 
 ARG TOOLS="                           \
+        bash-completion               \
         curl                          \
         default-mysql-client          \
         nginx                         \

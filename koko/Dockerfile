@@ -94,6 +94,7 @@ FROM debian:bookworm-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
+        bash-completion               \
         ca-certificates               \
         libssl-dev                    \
         mariadb-client                \
