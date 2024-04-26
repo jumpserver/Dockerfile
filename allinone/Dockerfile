@@ -145,11 +145,20 @@ RUN chmod +x ./entrypoint.sh
 ENV TERMINAL_MAGNUS_ENABLED=False \
     TERMINAL_KOKO_SSH_ENABLED=False
 
+RUN set -ex \
+    && STATIC_VERSION=$(curl -s https://raw.githubusercontent.com/jumpserver/web-static/master/VERSION) \
+    && wget -O /opt/prepare.sh https://github.com/jumpserver/web-static/raw/${STATIC_VERSION}/prepare.sh \
+    && chown root:root /opt/prepare.sh \
+    && chmod 755 /opt/prepare.sh \
+    && sed -i "s@https://gitea.com/jumpserver/web-static/raw/tag/.*/download/@https://gitea.com/jumpserver/web-static/raw/tag/${STATIC_VERSION}/download/@g" /etc/nginx/nginx.conf
+
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /opt/lion/data
 VOLUME /opt/kael/data
 VOLUME /opt/chen/data
+VOLUME /opt/download
+VOLUME /var/log/nginx
 
 EXPOSE 80 2222
 ENTRYPOINT ["./entrypoint.sh"]

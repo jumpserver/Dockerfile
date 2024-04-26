@@ -61,6 +61,7 @@ flush privileges;
     - VOLUME /opt/kael/data             # Kael 持久化目录
     - VOLUME /opt/chen/data             # Chen 持久化目录
     - VOLUME /var/log/nginx             # Nginx 日志持久化目录
+    - VOLUME /opt/download              # APPLETS 文件持久化目录 (应用发布机所需文件)
 
 注意：自己上面设置的这些信息一定要记录下来，升级需要重新输入使用。
 
@@ -90,7 +91,8 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
   -v /opt/jumpserver/kael/data:/opt/kael/data \
   -v /opt/jumpserver/chen/data:/opt/chen/data \
-  -v /opt/jumpserver/web/log:/var/log/nginx \
+  -v /opt/jumpserver/web/data/logs:/var/log/nginx \
+  -v /opt/jumpserver/web/data/download:/opt/download \
   jumpserver/jms_all:v3.10.9
 ```
 
@@ -134,5 +136,6 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
   -v /opt/jumpserver/kael/data:/opt/kael/data \
   -v /opt/jumpserver/chen/data:/opt/chen/data \
-  -v /opt/jumpserver/web/log:/var/log/nginx \
+  -v /opt/jumpserver/web/data/logs:/var/log/nginx \
+  -v /opt/jumpserver/web/data/download:/opt/download \
   jumpserver/jms_all:v3.10.9
