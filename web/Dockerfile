@@ -62,11 +62,10 @@ COPY web/nginx.conf /etc/nginx/
 WORKDIR /opt
 
 RUN set -ex \
-    && STATIC_VERSION=$(curl -s https://raw.githubusercontent.com/jumpserver/web-static/master/VERSION) \
+    && STATIC_VERSION=$(curl -sSL https://github.com/jumpserver/web-static/raw/v3/VERSION) \
     && wget -O /opt/prepare.sh https://github.com/jumpserver/web-static/raw/${STATIC_VERSION}/prepare.sh \
     && chown root:root /opt/prepare.sh \
-    && chmod 755 /opt/prepare.sh \
-    && sed -i 's@https://gitea.com/jumpserver/web-static/raw/tag/.*/download/@https://gitea.com/jumpserver/web-static/raw/tag/${STATIC_VERSION}/download/@g' /etc/nginx/nginx.conf
+    && chmod 755 /opt/prepare.sh
 
 ARG VERSION=v3.10.9
 ENV VERSION=${VERSION}
