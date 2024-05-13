@@ -1,10 +1,12 @@
 #!/bin/bash
 #
 
-until /usr/local/bin/check ${CORE_HOST}/api/health/; do
-    echo "wait for jms_core ${CORE_HOST} ready"
-    sleep 2
-done
+if [ -n "$CORE_HOST" ]; then
+    until check ${CORE_HOST}/api/health/; do
+        echo "wait for jms_core ${CORE_HOST} ready"
+        sleep 2
+    done
+fi
 
 export GIN_MODE=release
 export WORK_DIR=/opt/chen
@@ -18,5 +20,4 @@ fi
 
 sed -i "s@root: INFO@root: ${LOG_LEVEL}@g" /opt/chen/config/application.yml
 
-cd /opt/chen
-wisp
+exec "$@"

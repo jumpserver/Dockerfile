@@ -8,8 +8,6 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_core:${VERSION}
     container_name: jms_core
-    ulimits:
-      core: 0
     restart: always
     command: start web
     environment:
@@ -43,8 +41,6 @@ services:
   celery:
     image: jumpserver/jms_core:${VERSION}
     container_name: jms_celery
-    ulimits:
-      core: 0
     restart: always
     command: start task
     environment:
@@ -86,8 +82,6 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_koko:${VERSION}
     container_name: jms_koko
-    ulimits:
-      core: 0
     restart: always
     privileged: true
     environment:
@@ -112,6 +106,19 @@ services:
     networks:
       - net
 
+  guacd:
+    image: jumpserver/guacd:1.5.5-bookworm
+    container_name: jms_guacd
+    user: root
+    restart: always
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      GUACD_LOG_LEVEL: ${GUACD_LOG_LEVEL:-error}
+    volumes:
+      - ${VOLUME_DIR}/lion/data:/opt/lion/data
+    networks:
+      - net
+
   lion:
     build:
       context: .
@@ -121,14 +128,14 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_lion:${VERSION}
     container_name: jms_lion
-    ulimits:
-      core: 0
     restart: always
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       CORE_HOST: http://core:8080
       BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
       LOG_LEVEL: $LOG_LEVEL
+      GUA_HOST: ${GUA_HOST:-guacd}
+      GUA_PORT: ${GUA_PORT:-4822}
     depends_on:
       core:
         condition: service_healthy
@@ -152,8 +159,6 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_magnus:${VERSION}
     container_name: jms_magnus
-    ulimits:
-      core: 0
     restart: always
     environment:
       TZ: ${TZ:-Asia/Shanghai}
@@ -190,8 +195,6 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_chen:${VERSION}
     container_name: jms_chen
-    ulimits:
-      core: 0
     restart: always
     environment:
       TZ: ${TZ:-Asia/Shanghai}
@@ -221,8 +224,6 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_kael:${VERSION}
     container_name: jms_kael
-    ulimits:
-      core: 0
     restart: always
     environment:
       TZ: ${TZ:-Asia/Shanghai}
@@ -252,8 +253,6 @@ services:
         TARGETARCH: ${TARGETARCH}
     image: jumpserver/jms_web:${VERSION}
     container_name: jms_web
-    ulimits:
-      core: 0
     restart: always
     environment:
       TZ: ${TZ:-Asia/Shanghai}

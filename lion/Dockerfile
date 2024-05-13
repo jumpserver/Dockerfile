@@ -5,60 +5,68 @@ ARG DEPENDENCIES="                    \
         ca-certificates               \
         wget"
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -e \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && echo "no" | dpkg-reconfigure dash \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt
 
 ARG CHECK_VERSION=v1.0.2
-RUN set -ex \
-    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+RUN set -e \
+    && wget --quiet https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && mv check /usr/local/bin/ \
     && chown root:root /usr/local/bin/check \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
+ARG WISP_VERSION=v0.1.20
+RUN set -e \
+    && wget --quiet https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
+    && chown root:root /usr/local/bin/wisp \
+    && chmod 755 /usr/local/bin/wisp \
+    && rm -f /opt/*.tar.gz
+
 WORKDIR /opt/lion
 
 ARG VERSION=v3.10.9
 ENV VERSION=${VERSION}
 
-RUN set -ex \
-    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
+RUN set -e \
+    && cd /opt \
+    && wget --quiet https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
     && chown -R root:root /opt/lion \
     && rm -f /opt/*.tar.gz
 
-COPY lion/entrypoint.sh .
-RUN chmod 755 ./entrypoint.sh
-
-FROM jumpserver/guacd:1.5.5-bookworm
+FROM debian:bookworm-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
-        ca-certificates               \
-        supervisor"
+        ca-certificates"
 
 USER root
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -e \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get install -y --no-install-recommends ${DEPENDENCIES} \
     && echo "no" | dpkg-reconfigure dash \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && sed -i "s@# alias @alias @g" ~/.bashrc
 
 COPY --from=stage-1 /usr/local/bin /usr/local/bin
 COPY --from=stage-1 /opt/lion /opt/lion
-COPY lion/supervisord.conf /etc/supervisor/conf.d/lion.conf
 
 WORKDIR /opt/lion
 
@@ -67,6 +75,11 @@ ENV VERSION=${VERSION}
 
 VOLUME /opt/lion/data
 
+COPY lion/entrypoint.sh /opt/entrypoint.sh
+ENTRYPOINT ["/opt/entrypoint.sh"]
+
 EXPOSE 8081
 
-CMD ["./entrypoint.sh"]
+STOPSIGNAL SIGQUIT
+
+CMD ["wisp"]
