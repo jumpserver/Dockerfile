@@ -7,45 +7,38 @@ ARG DEPENDENCIES="                    \
         git-lfs                       \
         wget"
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -e \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && echo "no" | dpkg-reconfigure dash \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt
 
 ARG CHECK_VERSION=v1.0.2
-RUN set -ex \
-    && wget https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
+RUN set -e \
+    && wget --quiet https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && mv check /usr/local/bin/ \
     && chown root:root /usr/local/bin/check \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-ARG RECEPTOR_VERSION=1.4.5
-RUN set -ex \
-    && wget -O /opt/receptor.tar.gz https://github.com/ansible/receptor/releases/download/v${RECEPTOR_VERSION}/receptor_${RECEPTOR_VERSION}_linux_${TARGETARCH}.tar.gz \
-    && tar -xf /opt/receptor.tar.gz -C /usr/local/bin/ \
-    && chown root:root /usr/local/bin/receptor \
-    && chmod 755 /usr/local/bin/receptor \
-    && rm -f /opt/receptor.tar.gz
-
 ARG VERSION=v3.10.9
 ENV VERSION=$VERSION
 
-RUN set -ex \
+RUN set -e \
     && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
     && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
     && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -f /opt/jumpserver/Dockerfile-ce \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
 WORKDIR /opt/jumpserver
 
-RUN set -ex \
+RUN set -e \
     && echo > /opt/jumpserver/config.yml \
     && cd utils \
     && bash -ixeu build.sh
@@ -83,32 +76,34 @@ ARG TOOLS="                           \
         xz-utils                      \
         wget"
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -e \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${TOOLS} \
-    && echo "no" | dpkg-reconfigure dash \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt
 
-COPY --from=stage-1 /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
+
+RUN --mount=type=cache,target=/root/.cache,sharing=locked \
+    set -e \
+    && pip install poetry
 
 WORKDIR /opt/jumpserver
 
-ARG PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+COPY --from=stage-1 /opt/jumpserver/poetry.lock /opt/jumpserver/pyproject.toml /opt/jumpserver/
 
-ENV GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
-
-RUN --mount=type=cache,target=/root/.cache \
-set -ex \
+RUN --mount=type=cache,target=/root/.cache,sharing=locked \
+    set -e \
     && python3 -m venv /opt/py3 \
-    && pip install $(grep cryptography pyproject.toml | sed 's/ = /==/g' | sed 's/"//g') \
-    && pip install poetry \
-    && poetry config virtualenvs.create false \
     && . /opt/py3/bin/activate \
     && poetry install --only=main
 
@@ -128,7 +123,11 @@ ARG TOOLS="                           \
         openssh-client                \
         sshpass"
 
-RUN set -ex \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    set -e \
+    && rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' >/etc/apt/apt.conf.d/keep-cache \
     && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
@@ -137,9 +136,7 @@ RUN set -ex \
     && echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n\tCiphers +aes128-cbc\n\tKexAlgorithms +diffie-hellman-group1-sha1\n\tHostKeyAlgorithms +ssh-rsa" > /root/.ssh/config \
     && echo "no" | dpkg-reconfigure dash \
     && sed -i "s@# export @export @g" ~/.bashrc \
-    && sed -i "s@# alias @alias @g" ~/.bashrc \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*
+    && sed -i "s@# alias @alias @g" ~/.bashrc
 
 COPY --from=stage-2 /opt/py3 /opt/py3
 COPY --from=stage-1 /usr/local/bin /usr/local/bin
@@ -150,10 +147,13 @@ WORKDIR /opt/jumpserver
 ARG VERSION=v3.10.9
 ENV VERSION=${VERSION}
 
-ENV RECEPTOR_ENABLED=0
-
 VOLUME /opt/jumpserver/data
+
+COPY core/entrypoint.sh /opt/entrypoint.sh
+ENTRYPOINT ["/opt/entrypoint.sh"]
 
 EXPOSE 8080
 
-ENTRYPOINT ["./entrypoint.sh"]
+STOPSIGNAL SIGQUIT
+
+CMD ["start", "all"]

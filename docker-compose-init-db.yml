@@ -2,7 +2,7 @@ services:
   core:
     image: jumpserver/jms_core:${VERSION}
     container_name: jms_core
-    command: sleep
+    command: "tail -f /dev/null"
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       SECRET_KEY: $SECRET_KEY
