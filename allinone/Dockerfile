@@ -72,18 +72,11 @@ RUN set -ex \
 
 ARG PREFIX_DIR=/opt/guacamole
 ENV LD_LIBRARY_PATH=${PREFIX_DIR}/lib
-ARG RUNTIME_DEPENDENCIES="            \
-        fonts-dejavu                  \
-        fonts-liberation              \
-        ghostscript                   \
-        netcat-openbsd                \
-        xfonts-terminus"
 
 COPY --from=guacd ${PREFIX_DIR} ${PREFIX_DIR}
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install -y --no-install-recommends $RUNTIME_DEPENDENCIES \
     && apt-get install -y --no-install-recommends $(cat "${PREFIX_DIR}"/DEPENDENCIES) \
     && apt-get clean all \
     && rm -rf /var/lib/apt/lists/*
@@ -136,6 +129,12 @@ RUN set -ex \
     && chown -R root:root /opt/luna \
     && rm -f /opt/*.tar.gz
 
+RUN set -ex \
+    && STATIC_VERSION=$(curl -sSL https://github.com/jumpserver/web-static/raw/v3/VERSION) \
+    && wget -O /opt/prepare.sh https://github.com/jumpserver/web-static/raw/${STATIC_VERSION}/prepare.sh \
+    && chown root:root /opt/prepare.sh \
+    && chmod 755 /opt/prepare.sh
+
 COPY readme.txt readme.txt
 COPY entrypoint.sh .
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -144,12 +143,6 @@ RUN chmod +x ./entrypoint.sh
 
 ENV TERMINAL_MAGNUS_ENABLED=False \
     TERMINAL_KOKO_SSH_ENABLED=False
-
-RUN set -ex \
-    && STATIC_VERSION=$(curl -sSL https://github.com/jumpserver/web-static/raw/v3/VERSION) \
-    && wget -O /opt/prepare.sh https://github.com/jumpserver/web-static/raw/${STATIC_VERSION}/prepare.sh \
-    && chown root:root /opt/prepare.sh \
-    && chmod 755 /opt/prepare.sh
 
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
@@ -160,4 +153,5 @@ VOLUME /opt/download
 VOLUME /var/log/nginx
 
 EXPOSE 80 2222
+
 ENTRYPOINT ["./entrypoint.sh"]
