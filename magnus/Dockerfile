@@ -35,7 +35,7 @@ RUN set -e \
 
 WORKDIR /opt/magnus
 
-ARG VERSION=v3.10.10
+ARG VERSION=v3.10.11
 ENV VERSION=${VERSION}
 
 RUN set -e \
@@ -69,7 +69,7 @@ COPY --from=stage-1 /opt/magnus /opt/magnus
 
 WORKDIR /opt/magnus
 
-ARG VERSION=v3.10.10
+ARG VERSION=v3.10.11
 ENV VERSION=${VERSION}
 
 VOLUME /opt/magnus/data

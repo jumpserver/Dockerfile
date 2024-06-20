@@ -1,6 +1,6 @@
 FROM redis:7.0-bookworm as redis
 FROM jumpserver/guacd:1.5.5-bookworm as guacd
-FROM jumpserver/jms_core:v3.10.10
+FROM jumpserver/jms_core:v3.10.11
 ARG TARGETARCH
 
 ARG TOOLS="                           \
