@@ -17,7 +17,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /opt
 
-ARG CHECK_VERSION=v1.0.2
+ARG CHECK_VERSION=v1.0.3
 RUN set -e \
     && wget --quiet https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
@@ -26,7 +26,7 @@ RUN set -e \
     && chmod 755 /usr/local/bin/check \
     && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
 
-ARG WISP_VERSION=v0.1.20
+ARG WISP_VERSION=v0.1.21
 RUN set -e \
     && wget --quiet https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -34,7 +34,7 @@ RUN set -e \
     && chmod 755 /usr/local/bin/wisp \
     && rm -f /opt/*.tar.gz
 
-ARG MONGOSH_VERSION=2.1.1
+ARG MONGOSH_VERSION=2.2.10
 RUN set -e \
     && \
     case "${TARGETARCH}" in \
@@ -65,8 +65,8 @@ RUN set -e \
         ; \
     fi
 
-ARG HELM_VERSION=v3.14.3
-ARG KUBECTL_VERSION=v1.29.3
+ARG HELM_VERSION=v3.15.2
+ARG KUBECTL_VERSION=v1.30.2
 RUN set -e \
     && wget --quiet -O kubectl.tar.gz https://dl.k8s.io/${KUBECTL_VERSION}/kubernetes-client-linux-${TARGETARCH}.tar.gz \
     && tar -xf kubectl.tar.gz --strip-components=3 -C /opt kubernetes/client/bin/kubectl \

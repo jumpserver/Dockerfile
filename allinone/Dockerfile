@@ -22,7 +22,7 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG MONGOSH_VERSION=1.10.6
+ARG MONGOSH_VERSION=2.2.10
 RUN set -ex \
     && \
     case "${TARGETARCH}" in \
@@ -47,8 +47,8 @@ RUN set -ex \
             ;; \
     esac
 
-ARG HELM_VERSION=v3.12.2
-ARG KUBECTL_VERSION=v1.27.4
+ARG HELM_VERSION=v3.15.2
+ARG KUBECTL_VERSION=v1.30.2
 RUN set -ex \
     && wget -O /usr/local/bin/rawkubectl https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl \
     && wget http://download.jumpserver.org/public/kubectl_aliases.tar.gz \
@@ -62,7 +62,7 @@ RUN set -ex \
     && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
     && rm -f /opt/*.tar.gz
 
-ARG WISP_VERSION=v0.1.20
+ARG WISP_VERSION=v0.1.21
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -76,7 +76,6 @@ ARG RUNTIME_DEPENDENCIES="            \
         fonts-dejavu                  \
         fonts-liberation              \
         ghostscript                   \
-        netcat-openbsd                \
         xfonts-terminus"
 
 COPY --from=guacd ${PREFIX_DIR} ${PREFIX_DIR}
