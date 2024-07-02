@@ -1,6 +1,6 @@
 networks:
   net:
-    driver: bridge
+    driver: ${NETWORK_DRIVER:-bridge}
     ipam:
       driver: default
       config:
