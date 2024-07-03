@@ -40,7 +40,7 @@ ENV VERSION=${VERSION}
 
 RUN set -e \
     && cd /opt \
-    && wget --quiet https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
+    && wget --quiet https://github.com/jumpserver/chen/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
     && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && chown -R root:root /opt/chen \
     && rm -f /opt/*.tar.gz

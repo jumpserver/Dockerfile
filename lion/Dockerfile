@@ -40,7 +40,7 @@ ENV VERSION=${VERSION}
 
 RUN set -e \
     && cd /opt \
-    && wget --quiet https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget --quiet https://github.com/jumpserver/lion/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
     && chown -R root:root /opt/lion \
     && rm -f /opt/*.tar.gz

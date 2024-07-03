@@ -101,7 +101,7 @@ RUN set -ex \
 
 RUN set -ex \
     && mkdir -p /opt/lion \
-    && wget https://github.com/jumpserver/lion-release/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
+    && wget https://github.com/jumpserver/lion/releases/download/${VERSION}/lion-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf lion-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/lion --strip-components=1 \
     && chown -R root:root /opt/lion \
     && rm -f /opt/*.tar.gz
@@ -116,7 +116,7 @@ RUN set -ex \
 
 RUN set -ex \
     && mkdir -p /opt/chen \
-    && wget https://github.com/jumpserver/chen-release/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
+    && wget https://github.com/jumpserver/chen/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
     && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && chown -R root:root /opt/chen \
     && rm -f /opt/*.tar.gz
