@@ -1,21 +1,17 @@
 services:
-  core:
+  init_db:
     image: jumpserver/jms_core:${VERSION}
-    container_name: jms_core
-    command: "tail -f /dev/null"
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      SECRET_KEY: $SECRET_KEY
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-      REDIS_HOST: $REDIS_HOST
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
+    container_name: jms_init_db
+    command: upgrade_db
+    deploy:
+      mode: replicated-job
+      replicas: 1
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     volumes:
       - ${VOLUME_DIR}/core/data:/opt/jumpserver/data
     networks:

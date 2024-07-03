@@ -10,23 +10,7 @@ services:
     container_name: jms_core
     restart: always
     command: start web
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      SECRET_KEY: $SECRET_KEY
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-      REDIS_HOST: $REDIS_HOST
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
-      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
-      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
-      DOMAIN: ${DOMAIN:-}
+    env_file: .env
     healthcheck:
       test: "check http://localhost:8080/api/health/"
       interval: 10s
@@ -43,22 +27,7 @@ services:
     container_name: jms_celery
     restart: always
     command: start task
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      SECRET_KEY: $SECRET_KEY
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-      REDIS_HOST: $REDIS_HOST
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
-      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
-      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
+    env_file: .env
     depends_on:
       core:
         condition: service_healthy
@@ -84,12 +53,7 @@ services:
     container_name: jms_koko
     restart: always
     privileged: true
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      SSHD_PORT: ${SSH_PORT:-2222}
+    env_file: .env
     depends_on:
       core:
         condition: service_healthy
@@ -129,13 +93,7 @@ services:
     image: jumpserver/jms_lion:${VERSION}
     container_name: jms_lion
     restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      GUA_HOST: ${GUA_HOST:-guacd}
-      GUA_PORT: ${GUA_PORT:-4822}
+    env_file: .env
     depends_on:
       core:
         condition: service_healthy
@@ -150,42 +108,6 @@ services:
     networks:
       - net
 
-  magnus:
-    build:
-      context: .
-      dockerfile: magnus/Dockerfile
-      args:
-        VERSION: ${VERSION}
-        TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_magnus:${VERSION}
-    container_name: jms_magnus
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
-      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
-      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
-    depends_on:
-      core:
-        condition: service_healthy
-    healthcheck:
-      test: "check tcp://127.0.0.1:$$MAGNUS_MYSQL_PORT"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    volumes:
-      - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
-    ports:
-      - ${MAGNUS_MYSQL_PORT:-33061}:33061
-      - ${MAGNUS_MARIADB_PORT:-33062}:33062
-      - ${MAGNUS_REDIS_PORT:-63790}:63790
-    networks:
-      - net
-
   chen:
     build:
       context: .
@@ -196,11 +118,7 @@ services:
     image: jumpserver/jms_chen:${VERSION}
     container_name: jms_chen
     restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
+    env_file: .env
     volumes:
       - ${VOLUME_DIR}/chen/data:/opt/chen/data
     depends_on:
@@ -208,35 +126,6 @@ services:
         condition: service_healthy
     healthcheck:
       test: "check http://localhost:8082/chen/"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
-    networks:
-      - net
-
-  kael:
-    build:
-      context: .
-      dockerfile: kael/Dockerfile
-      args:
-        VERSION: ${VERSION}
-        TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_kael:${VERSION}
-    container_name: jms_kael
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-    volumes:
-      - ${VOLUME_DIR}/kael/data:/opt/kael/data
-    depends_on:
-      core:
-        condition: service_healthy
-    healthcheck:
-      test: "check http://localhost:8083/kael/health/"
       interval: 10s
       timeout: 5s
       retries: 3
@@ -254,9 +143,7 @@ services:
     image: jumpserver/jms_web:${VERSION}
     container_name: jms_web
     restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
+    env_file: .env
     depends_on:
       core:
         condition: service_healthy
@@ -274,11 +161,3 @@ services:
       - ${HTTP_PORT:-80}:80
     networks:
       - net
-
-networks:
-  net:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: $DOCKER_SUBNET

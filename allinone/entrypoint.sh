@@ -14,14 +14,12 @@ if [ ! "${DB_HOST}" ] || [ ! "${DB_PORT}" ] || [ ! "${REDIS_HOST}" ] || [ ! "${R
     exit 1
 fi
 
-while ! nc -z "${DB_HOST}" "${DB_PORT}";
-do
+until check tcp://${DB_HOST}:${DB_PORT}; do
     echo "wait for jms_mysql ${DB_HOST} ready"
     sleep 2s
 done
 
-while ! nc -z "${REDIS_HOST}" "${REDIS_PORT}";
-do
+until check tcp://${REDIS_HOST}:${REDIS_PORT}; do
     echo "wait for jms_redis ${REDIS_HOST} ready"
     sleep 2s
 done
@@ -38,10 +36,6 @@ fi
 if [ ! -d "/opt/jumpserver/data/static" ]; then
     mkdir -p /opt/jumpserver/data/static
     chmod 755 -R /opt/jumpserver/data/static
-fi
-
-if [ -f "/opt/readme.txt" ]; then
-  sed -i "s@VERSION:.*@VERSION: ${VERSION}@g" /opt/readme.txt
 fi
 
 rm -f /opt/jumpserver/tmp/*.pid
@@ -71,6 +65,7 @@ cd /opt/jumpserver || exit 1
 echo
 echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
 if [ -f "/opt/readme.txt" ]; then
+  sed -i "s@VERSION:.*@VERSION: ${VERSION}@g" /opt/readme.txt
   cat /opt/readme.txt
   rm -f /opt/readme.txt
 fi

@@ -1,9 +1,4 @@
 services:
-  core:
-    depends_on:
-      mysql:
-        condition: service_healthy
-
   redis:
     image: redis:7.0
     container_name: jms_redis
