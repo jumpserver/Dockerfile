@@ -2,23 +2,20 @@ services:
   core:
     image: jumpserver/jms_core:${VERSION}
     container_name: jms_core
-    restart: always
     command: start web
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      SECRET_KEY: $SECRET_KEY
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-      REDIS_HOST: $REDIS_HOST
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-      MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
-      DOMAINS: ${DOMAINS:-}
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "1"
+          # memory: 1536M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     healthcheck:
       test: "check http://localhost:8080/api/health/"
       interval: 10s
@@ -33,26 +30,20 @@ services:
   celery:
     image: jumpserver/jms_core:${VERSION}
     container_name: jms_celery
-    restart: always
     command: start task
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      SECRET_KEY: $SECRET_KEY
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-      REDIS_HOST: $REDIS_HOST
-      REDIS_PORT: $REDIS_PORT
-      REDIS_PASSWORD: $REDIS_PASSWORD
-      MAGNUS_PORT: ${MAGNUS_PORT:-30000-30020}
-      DOMAINS: ${DOMAINS:-}
-    depends_on:
-      core:
-        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.2"
+          # memory: 1024M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     healthcheck:
       test: "bash /opt/jumpserver/utils/check_celery.sh"
       interval: 10s
@@ -67,17 +58,20 @@ services:
   koko:
     image: jumpserver/jms_koko:${VERSION}
     container_name: jms_koko
-    restart: always
     privileged: true
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      SSHD_PORT: ${SSH_PORT:-2222}
-    depends_on:
-      core:
-        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     healthcheck:
       test: "check http://localhost:5000/koko/health/"
       interval: 10s
@@ -87,7 +81,7 @@ services:
     volumes:
       - ${VOLUME_DIR}/koko/data:/opt/koko/data
     ports:
-      - ${SSH_PORT:-2222}:${SSH_PORT}
+      - ${SSH_PORT:-2222}:${SSH_PORT:-2222}
     networks:
       - net
 
@@ -95,7 +89,18 @@ services:
     image: jumpserver/guacd:1.5.5-bookworm
     container_name: jms_guacd
     user: root
-    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       GUACD_LOG_LEVEL: ${GUACD_LOG_LEVEL:-error}
@@ -107,17 +112,19 @@ services:
   lion:
     image: jumpserver/jms_lion:${VERSION}
     container_name: jms_lion
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      GUA_HOST: ${GUA_HOST:-guacd}
-      GUA_PORT: ${GUA_PORT:-4822}
-    depends_on:
-      core:
-        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     healthcheck:
       test: "check http://localhost:8081/lion/health/"
       interval: 10s
@@ -132,18 +139,19 @@ services:
   magnus:
     image: jumpserver/jms_magnus:${VERSION}
     container_name: jms_magnus
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
-      MAGNUS_MYSQL_PORT: ${MAGNUS_MYSQL_PORT:-33061}
-      MAGNUS_MARIADB_PORT: ${MAGNUS_MARIADB_PORT:-33062}
-      MAGNUS_REDIS_PORT: ${MAGNUS_REDIS_PORT:-63790}
-    depends_on:
-      core:
-        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     healthcheck:
       test: "check http://localhost:8088/health"
       interval: 10s
@@ -162,17 +170,21 @@ services:
   chen:
     image: jumpserver/jms_chen:${VERSION}
     container_name: jms_chen
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     volumes:
       - ${VOLUME_DIR}/chen/data:/opt/chen/data
-    depends_on:
-      core:
-        condition: service_healthy
     healthcheck:
       test: "check http://localhost:8082/chen"
       interval: 10s
@@ -185,17 +197,21 @@ services:
   kael:
     image: jumpserver/jms_kael:${VERSION}
     container_name: jms_kael
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-      BOOTSTRAP_TOKEN: $BOOTSTRAP_TOKEN
-      LOG_LEVEL: $LOG_LEVEL
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     volumes:
       - ${VOLUME_DIR}/kael/data:/opt/kael/data
-    depends_on:
-      core:
-        condition: service_healthy
     healthcheck:
       test: "check http://localhost:8083/kael/health/"
       interval: 10s
@@ -208,13 +224,19 @@ services:
   web:
     image: jumpserver/jms_web:${VERSION}
     container_name: jms_web
-    restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      CORE_HOST: http://core:8080
-    depends_on:
-      core:
-        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+      # resources:
+        # limits:
+          # cpus: "0.1"
+          # memory: 128M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - "node.role==worker"
+    env_file: .env
     healthcheck:
       test: "check http://localhost/api/health/"
       interval: 10s

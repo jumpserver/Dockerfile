@@ -38,10 +38,6 @@ if [ ! -d "/opt/jumpserver/data/static" ]; then
     chmod 755 -R /opt/jumpserver/data/static
 fi
 
-if [ -f "/opt/readme.txt" ]; then
-  sed -i "s@VERSION:.*@VERSION: ${VERSION}@g" /opt/readme.txt
-fi
-
 rm -f /opt/jumpserver/tmp/*.pid
 
 if [ ! "${LOG_LEVEL}" ]; then
@@ -69,6 +65,7 @@ cd /opt/jumpserver || exit 1
 echo
 echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
 if [ -f "/opt/readme.txt" ]; then
+  sed -i "s@VERSION:.*@VERSION: ${VERSION}@g" /opt/readme.txt
   cat /opt/readme.txt
   rm -f /opt/readme.txt
 fi
