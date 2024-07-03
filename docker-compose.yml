@@ -136,37 +136,6 @@ services:
     networks:
       - net
 
-  magnus:
-    image: jumpserver/jms_magnus:${VERSION}
-    container_name: jms_magnus
-    deploy:
-      mode: replicated
-      replicas: 1
-      # resources:
-        # limits:
-          # cpus: "0.1"
-          # memory: 128M
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - "node.role==worker"
-    env_file: .env
-    healthcheck:
-      test: "check http://localhost:8088/health"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    volumes:
-      - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
-    ports:
-      - ${MAGNUS_MYSQL_PORT:-33061}:33061
-      - ${MAGNUS_MARIADB_PORT:-33062}:33062
-      - ${MAGNUS_REDIS_PORT:-63790}:63790
-    networks:
-      - net
-
   chen:
     image: jumpserver/jms_chen:${VERSION}
     container_name: jms_chen
@@ -187,33 +156,6 @@ services:
       - ${VOLUME_DIR}/chen/data:/opt/chen/data
     healthcheck:
       test: "check http://localhost:8082/chen"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
-    networks:
-      - net
-
-  kael:
-    image: jumpserver/jms_kael:${VERSION}
-    container_name: jms_kael
-    deploy:
-      mode: replicated
-      replicas: 1
-      # resources:
-        # limits:
-          # cpus: "0.1"
-          # memory: 128M
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - "node.role==worker"
-    env_file: .env
-    volumes:
-      - ${VOLUME_DIR}/kael/data:/opt/kael/data
-    healthcheck:
-      test: "check http://localhost:8083/kael/health/"
       interval: 10s
       timeout: 5s
       retries: 3

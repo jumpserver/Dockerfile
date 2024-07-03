@@ -100,9 +100,6 @@ GUA_PORT=4822
 # Web
 HTTP_PORT=80
 SSH_PORT=2222
-MAGNUS_MYSQL_PORT=33061
-MAGNUS_MARIADB_PORT=33062
-MAGNUS_REDIS_PORT=63790
 
 ##
 # SECRET_KEY is the key to protect signed data. Please be sure to modify and remember it for the first installation. It cannot be changed during subsequent upgrades and migrations, otherwise the encrypted data will not be decrypted.
@@ -185,9 +182,6 @@ GUA_PORT=4822
 # Web
 HTTP_PORT=80
 SSH_PORT=2222
-MAGNUS_MYSQL_PORT=33061
-MAGNUS_MARIADB_PORT=33062
-MAGNUS_REDIS_PORT=63790
 
 ##
 # SECRET_KEY is the key to protect signed data. Please be sure to modify and remember it for the first installation. It cannot be changed during subsequent upgrades and migrations, otherwise the encrypted data will not be decrypted.

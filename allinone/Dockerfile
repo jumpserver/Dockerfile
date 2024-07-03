@@ -22,31 +22,6 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG MONGOSH_VERSION=2.2.10
-RUN set -ex \
-    && \
-    case "${TARGETARCH}" in \
-        amd64) \
-            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
-            && tar -xf mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
-            && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/bin/* \
-            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh /usr/local/bin/ \
-            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh_crypt_v1.so /usr/local/lib/ \
-            && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
-            ;; \
-        arm64|s390x|ppc64le) \
-            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
-            && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
-            && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* \
-            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh /usr/local/bin/ \
-            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh_crypt_v1.so /usr/local/lib/ \
-            && rm -rf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}* \
-            ;; \
-        *) \
-            echo "Unsupported architecture: ${TARGETARCH}" \
-            ;; \
-    esac
-
 ARG HELM_VERSION=v3.15.2
 ARG KUBECTL_VERSION=v1.30.2
 RUN set -ex \
@@ -89,6 +64,20 @@ RUN set -ex \
 COPY --from=redis /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 
 RUN set -ex \
+    && mkdir -p /opt/lina \
+    && wget https://github.com/jumpserver/lina/releases/download/${VERSION}/lina-${VERSION}.tar.gz \
+    && tar -xf lina-${VERSION}.tar.gz -C /opt/lina --strip-components=1 \
+    && chown -R root:root /opt/lina \
+    && rm -f /opt/*.tar.gz
+
+RUN set -ex \
+    && mkdir -p /opt/luna \
+    && wget https://github.com/jumpserver/luna/releases/download/${VERSION}/luna-${VERSION}.tar.gz \
+    && tar -xf luna-${VERSION}.tar.gz -C /opt/luna --strip-components=1 \
+    && chown -R root:root /opt/luna \
+    && rm -f /opt/*.tar.gz
+
+RUN set -ex \
     && mkdir -p /opt/koko \
     && wget https://github.com/jumpserver/koko/releases/download/${VERSION}/koko-${VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf koko-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/koko/ --strip-components=1 \
@@ -106,32 +95,10 @@ RUN set -ex \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
-    && mkdir -p /opt/kael \
-    && wget https://github.com/jumpserver/kael/releases/download/${VERSION}/kael-${VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf kael-${VERSION}-linux-${TARGETARCH}.tar.gz -C /opt/kael --strip-components=1 \
-    && chmod 755 /opt/kael/kael \
-    && chown -R root:root /opt/kael \
-    && rm -f /opt/*.tar.gz
-
-RUN set -ex \
     && mkdir -p /opt/chen \
     && wget https://github.com/jumpserver/chen/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
     && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && chown -R root:root /opt/chen \
-    && rm -f /opt/*.tar.gz
-
-RUN set -ex \
-    && mkdir -p /opt/lina \
-    && wget https://github.com/jumpserver/lina/releases/download/${VERSION}/lina-${VERSION}.tar.gz \
-    && tar -xf lina-${VERSION}.tar.gz -C /opt/lina --strip-components=1 \
-    && chown -R root:root /opt/lina \
-    && rm -f /opt/*.tar.gz
-
-RUN set -ex \
-    && mkdir -p /opt/luna \
-    && wget https://github.com/jumpserver/luna/releases/download/${VERSION}/luna-${VERSION}.tar.gz \
-    && tar -xf luna-${VERSION}.tar.gz -C /opt/luna --strip-components=1 \
-    && chown -R root:root /opt/luna \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
@@ -145,9 +112,6 @@ COPY entrypoint.sh .
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/
 RUN chmod +x ./entrypoint.sh
-
-ENV TERMINAL_MAGNUS_ENABLED=False \
-    TERMINAL_KOKO_SSH_ENABLED=False
 
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data

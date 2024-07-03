@@ -4,7 +4,6 @@ ARG TARGETARCH
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         git                           \
-        git-lfs                       \
         wget"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -21,27 +20,27 @@ WORKDIR /opt
 ARG CHECK_VERSION=v1.0.3
 RUN set -e \
     && wget --quiet https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && mv check /usr/local/bin/ \
+    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ check \
     && chown root:root /usr/local/bin/check \
     && chmod 755 /usr/local/bin/check \
-    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
+    && rm -f /opt/*.tar.gz
 
 ARG VERSION=v3.10.11
 ENV VERSION=$VERSION
 
 RUN set -e \
-    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver \
-    && sed -i "s@VERSION = .*@VERSION = \"${VERSION}\"@g" /opt/jumpserver/apps/jumpserver/const.py \
-    && chmod +x /opt/jumpserver/entrypoint.sh \
-    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
+    && git clone -b ${VERSION} --depth=1 https://github.com/jumpserver/jumpserver /opt/jumpserver
 
 WORKDIR /opt/jumpserver
 
 RUN set -e \
     && echo > /opt/jumpserver/config.yml \
-    && cd utils \
-    && bash -ixeu build.sh
+    && \
+    if [ -n "${VERSION}" ]; then \
+        sed -i "s@VERSION = .*@VERSION = '${VERSION}'@g" apps/jumpserver/const.py; \
+    fi \
+    && chmod +x /opt/jumpserver/entrypoint.sh \
+    && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
 FROM python:3.11-slim-bookworm as stage-2
 ARG TARGETARCH
@@ -107,6 +106,14 @@ RUN --mount=type=cache,target=/root/.cache,sharing=locked \
     && . /opt/py3/bin/activate \
     && poetry install --only=main
 
+COPY --from=stage-1 /opt/jumpserver /opt/jumpserver
+
+RUN set -e \
+    && export SECRET_KEY=$(head -c100 < /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 48) \
+    && . /opt/py3/bin/activate \
+    && cd apps \
+    && python manage.py compilemessages
+
 FROM python:3.11-slim-bookworm
 ENV LANG=en_US.UTF-8 \
     PATH=/opt/py3/bin:$PATH
@@ -139,9 +146,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && sed -i "s@# export @export @g" ~/.bashrc \
     && sed -i "s@# alias @alias @g" ~/.bashrc
 
-COPY --from=stage-2 /opt/py3 /opt/py3
+COPY --from=stage-2 /opt /opt
 COPY --from=stage-1 /usr/local/bin /usr/local/bin
-COPY --from=stage-1 /opt/jumpserver/release/jumpserver /opt/jumpserver
+COPY --from=stage-1 /opt/jumpserver/apps/libs/ansible/ansible.cfg /etc/ansible/
 
 WORKDIR /opt/jumpserver
 

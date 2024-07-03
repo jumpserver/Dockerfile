@@ -19,11 +19,10 @@ WORKDIR /opt
 ARG CHECK_VERSION=v1.0.3
 RUN set -e \
     && wget --quiet https://github.com/jumpserver-dev/healthcheck/releases/download/${CHECK_VERSION}/check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && mv check /usr/local/bin/ \
+    && tar -xf check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ check \
     && chown root:root /usr/local/bin/check \
     && chmod 755 /usr/local/bin/check \
-    && rm -f check-${CHECK_VERSION}-linux-${TARGETARCH}.tar.gz
+    && rm -f /opt/*.tar.gz
 
 ARG WISP_VERSION=v0.1.21
 RUN set -e \

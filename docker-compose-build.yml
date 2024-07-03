@@ -108,35 +108,6 @@ services:
     networks:
       - net
 
-  magnus:
-    build:
-      context: .
-      dockerfile: magnus/Dockerfile
-      args:
-        VERSION: ${VERSION}
-        TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_magnus:${VERSION}
-    container_name: jms_magnus
-    restart: always
-    env_file: .env
-    depends_on:
-      core:
-        condition: service_healthy
-    healthcheck:
-      test: "check tcp://127.0.0.1:$$MAGNUS_MYSQL_PORT"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    volumes:
-      - ${VOLUME_DIR}/magnus/data:/opt/magnus/data
-    ports:
-      - ${MAGNUS_MYSQL_PORT:-33061}:33061
-      - ${MAGNUS_MARIADB_PORT:-33062}:33062
-      - ${MAGNUS_REDIS_PORT:-63790}:63790
-    networks:
-      - net
-
   chen:
     build:
       context: .
@@ -155,31 +126,6 @@ services:
         condition: service_healthy
     healthcheck:
       test: "check http://localhost:8082/chen/"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
-    networks:
-      - net
-
-  kael:
-    build:
-      context: .
-      dockerfile: kael/Dockerfile
-      args:
-        VERSION: ${VERSION}
-        TARGETARCH: ${TARGETARCH}
-    image: jumpserver/jms_kael:${VERSION}
-    container_name: jms_kael
-    restart: always
-    env_file: .env
-    volumes:
-      - ${VOLUME_DIR}/kael/data:/opt/kael/data
-    depends_on:
-      core:
-        condition: service_healthy
-    healthcheck:
-      test: "check http://localhost:8083/kael/health/"
       interval: 10s
       timeout: 5s
       retries: 3
