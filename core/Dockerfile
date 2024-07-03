@@ -118,6 +118,7 @@ ARG DEPENDENCIES="                    \
         libxmlsec1-openssl"
 
 ARG TOOLS="                           \
+        bubblewrap                    \
         ca-certificates               \
         default-libmysqlclient-dev    \
         openssh-client                \
