@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        component: [core, koko, lion, kael, chen, magnus, web]
+        component: [core, koko, lion, chen, web]
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-qemu-action@v3
