@@ -42,7 +42,7 @@ RUN set -e \
     && chmod +x /opt/jumpserver/entrypoint.sh \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
-FROM python:3.11-slim-bookworm AS stage-2
+FROM python:3.11-slim-bullseye as stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -51,29 +51,12 @@ ARG BUILD_DEPENDENCIES="              \
         pkg-config"
 
 ARG DEPENDENCIES="                    \
-        freetds-dev                   \
-        libpq-dev                     \
-        libffi-dev                    \
-        libjpeg-dev                   \
-        libldap2-dev                  \
-        libsasl2-dev                  \
-        libssl-dev                    \
-        libxml2-dev                   \
-        libxmlsec1-dev                \
-        libxmlsec1-openssl            \
-        freerdp2-dev                  \
-        libaio-dev"
-
-ARG TOOLS="                           \
-        ca-certificates               \
-        curl                          \
         default-libmysqlclient-dev    \
-        default-mysql-client          \
-        git                           \
-        git-lfs                       \
-        unzip                         \
-        xz-utils                      \
-        wget"
+        freetds-dev                   \
+        gettext                       \
+        libkrb5-dev                   \
+        libldap2-dev                  \
+        libsasl2-dev"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -120,9 +103,7 @@ ENV LANG=en_US.UTF-8 \
 
 ARG DEPENDENCIES="                    \
         libldap2-dev                  \
-        libpq-dev                     \
-        libx11-dev                    \
-        libxmlsec1-openssl"
+        libx11-dev"
 
 ARG TOOLS="                           \
         bubblewrap                    \
