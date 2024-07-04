@@ -57,7 +57,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-VERSION=v3.10.11
+VERSION=v4.0.0
 
 # 构建参数, 支持 amd64, arm64, ppc64le, s390x
 TARGETARCH=amd64
@@ -139,7 +139,7 @@ vi .env
 ```
 ```vim
 # 版本号可以自己根据项目的版本修改
-VERSION=v3.10.10
+VERSION=v4.0.0
 
 # 构建参数, 支持 amd64, arm64, ppc64le, s390x
 TARGETARCH=amd64
