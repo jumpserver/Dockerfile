@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim as stage-1
+FROM debian:bookworm-slim AS stage-1
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \

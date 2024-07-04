@@ -1,5 +1,5 @@
-FROM redis:7.0-bookworm as stage-1
-FROM debian:bookworm-slim as stage-2
+FROM redis:7.0-bookworm AS stage-1
+FROM debian:bookworm-slim AS stage-2
 ARG TARGETARCH
 
 ARG DEPENDENCIES="                    \
