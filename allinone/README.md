@@ -58,7 +58,6 @@ flush privileges;
     - VOLUME /opt/jumpserver/data       # Core 持久化目录, 存储录像日志
     - VOLUME /opt/koko/data             # Koko 持久化目录
     - VOLUME /opt/lion/data             # Lion 持久化目录
-    - VOLUME /opt/kael/data             # Kael 持久化目录
     - VOLUME /opt/chen/data             # Chen 持久化目录
     - VOLUME /var/log/nginx             # Nginx 日志持久化目录
     - VOLUME /opt/download              # APPLETS 文件持久化目录 (应用发布机所需文件)
@@ -89,7 +88,6 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -v /opt/jumpserver/kael/data:/opt/kael/data \
   -v /opt/jumpserver/chen/data:/opt/chen/data \
   -v /opt/jumpserver/web/data/logs:/var/log/nginx \
   -v /opt/jumpserver/web/data/download:/opt/download \
@@ -134,8 +132,14 @@ docker run --name jms_all -d \
   -v /opt/jumpserver/core/data:/opt/jumpserver/data \
   -v /opt/jumpserver/koko/data:/opt/koko/data \
   -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -v /opt/jumpserver/kael/data:/opt/kael/data \
   -v /opt/jumpserver/chen/data:/opt/chen/data \
   -v /opt/jumpserver/web/data/logs:/var/log/nginx \
   -v /opt/jumpserver/web/data/download:/opt/download \
   jumpserver/jms_all:v4.0.0
+```
+
+**初始账号**
+```bash
+默认账号: admin
+默认密码: ChangeMe
+```

@@ -76,7 +76,6 @@ services:
       - ${VOLUME_DIR:-./data}/koko/data:/opt/koko/data
       - ${VOLUME_DIR:-./data}/lion/data:/opt/lion/data
       - ${VOLUME_DIR:-./data}/chen/data:/opt/chen/data
-      - ${VOLUME_DIR:-./data}/kael/data:/opt/kael/data
       - ${VOLUME_DIR:-./data}/web/data/logs:/var/log/nginx
       - ${VOLUME_DIR:-./data}/web/data/download:/opt/download
     networks:

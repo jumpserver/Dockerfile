@@ -22,7 +22,7 @@
 git clone --depth=1 https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
-docker compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up -d
+docker compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up
 docker compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up -d
 
 docker rm jms_init_db
@@ -93,6 +93,8 @@ BOOTSTRAP_TOKEN=7Q11Vz6R2J6BLAdO
 LOG_LEVEL=ERROR
 DOMAINS=
 
+CORE_HOST=http://core:8080
+
 # Lion
 GUA_HOST=guacd
 GUA_PORT=4822
@@ -106,7 +108,7 @@ SSH_PORT=2222
 # BOOTSTRAP_TOKEN is the key used for component authentication, only used when the component is registered. The components refer to koko, lion, magnus, kael, chen ...
 ```
 ```sh
-docker compose -f docker-compose-network.yml -f docker-compose-init-db.yml up -d
+docker compose -f docker-compose-network.yml -f docker-compose-init-db.yml up
 docker compose -f docker-compose-network.yml -f docker-compose.yml up -d
 
 docker rm jms_init_db
@@ -124,10 +126,8 @@ docker rm jms_init_db
 mkdir -p /data/jumpserver/core/data
 mkdir -p /data/jumpserver/chen/data
 mkdir -p /data/jumpserver/lion/data
-mkdir -p /data/jumpserver/kael/data
 mkdir -p /data/jumpserver/koko/data
 mkdir -p /data/jumpserver/lion/data
-mkdir -p /data/jumpserver/magnus/data
 mkdir -p /data/jumpserver/web/data/logs
 mkdir -p /data/jumpserver/web/download
 ```
@@ -175,6 +175,8 @@ BOOTSTRAP_TOKEN=7Q11Vz6R2J6BLAdO
 LOG_LEVEL=ERROR
 DOMAINS=
 
+CORE_HOST=http://core:8080
+
 # Lion
 GUA_HOST=guacd
 GUA_PORT=4822
@@ -220,3 +222,7 @@ TARGETARCH=amd64
 ```sh
 docker compose -f docker-compose-build.yml up
 ```
+
+## Initial Account
+- Default username: `admin`
+- Default password: `ChangeMe`

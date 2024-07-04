@@ -22,7 +22,7 @@
 git clone --depth=1 https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile
 cp config_example.conf .env
-docker compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up -d
+docker compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose-init-db.yml up
 docker compose -f docker-compose-network.yml -f docker-compose-redis.yml -f docker-compose-mariadb.yml -f docker-compose.yml up -d
 
 docker rm jms_init_db
@@ -93,6 +93,9 @@ BOOTSTRAP_TOKEN=7Q11Vz6R2J6BLAdO
 LOG_LEVEL=ERROR
 DOMAINS=
 
+# 组件通信
+CORE_HOST=http://core:8080
+
 # Lion
 GUA_HOST=guacd
 GUA_PORT=4822
@@ -106,7 +109,7 @@ SSH_PORT=2222
 # BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko, lion, magnus, kael, chen ...
 ```
 ```sh
-docker compose -f docker-compose-network.yml -f docker-compose-init-db.yml up -d
+docker compose -f docker-compose-network.yml -f docker-compose-init-db.yml up
 docker compose -f docker-compose-network.yml -f docker-compose.yml up -d
 
 docker rm jms_init_db
@@ -124,10 +127,8 @@ docker rm jms_init_db
 mkdir -p /data/jumpserver/core/data
 mkdir -p /data/jumpserver/chen/data
 mkdir -p /data/jumpserver/lion/data
-mkdir -p /data/jumpserver/kael/data
 mkdir -p /data/jumpserver/koko/data
 mkdir -p /data/jumpserver/lion/data
-mkdir -p /data/jumpserver/magnus/data
 mkdir -p /data/jumpserver/web/data/logs
 mkdir -p /data/jumpserver/web/download
 ```
@@ -174,6 +175,9 @@ SECRET_KEY=B3f2w8P2PfxIAS7s4URrD9YmSbtqX4vXdPUL217kL9XPUOWrmy
 BOOTSTRAP_TOKEN=7Q11Vz6R2J6BLAdO
 LOG_LEVEL=ERROR
 DOMAINS=
+
+# 组件通信
+CORE_HOST=http://core:8080
 
 # Lion
 GUA_HOST=guacd
@@ -226,3 +230,7 @@ TARGETARCH=amd64
 ```bash
 docker compose -f docker-compose-build.yml up
 ```
+
+## 初始账号
+- 默认账号: `admin`
+- 默认密码: `ChangeMe`

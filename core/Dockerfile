@@ -4,6 +4,7 @@ ARG TARGETARCH
 ARG DEPENDENCIES="                    \
         ca-certificates               \
         git                           \
+        git-lfs                       \
         wget"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -42,7 +43,7 @@ RUN set -e \
     && chmod +x /opt/jumpserver/entrypoint.sh \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
-FROM python:3.11-slim-bullseye as stage-2
+FROM python:3.11-slim-bookworm as stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
@@ -66,7 +67,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get update \
     && apt-get -y install --no-install-recommends ${BUILD_DEPENDENCIES} \
     && apt-get -y install --no-install-recommends ${DEPENDENCIES} \
-    && apt-get -y install --no-install-recommends ${TOOLS} \
     && echo "no" | dpkg-reconfigure dash
 
 WORKDIR /opt
@@ -77,7 +77,8 @@ ENV PYTHONUNBUFFERED=1 \
 
 RUN --mount=type=cache,target=/root/.cache,sharing=locked \
     set -e \
-    && pip install poetry
+    && pip install poetry \
+    && poetry config virtualenvs.create false
 
 WORKDIR /opt/jumpserver
 

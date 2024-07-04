@@ -116,7 +116,6 @@ RUN chmod +x ./entrypoint.sh
 VOLUME /opt/jumpserver/data
 VOLUME /opt/koko/data
 VOLUME /opt/lion/data
-VOLUME /opt/kael/data
 VOLUME /opt/chen/data
 VOLUME /opt/download
 VOLUME /var/log/nginx
