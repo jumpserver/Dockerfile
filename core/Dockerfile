@@ -43,7 +43,7 @@ RUN set -e \
     && chmod +x /opt/jumpserver/entrypoint.sh \
     && rm -rf /opt/jumpserver/.git /opt/jumpserver/.github
 
-FROM python:3.11-slim-bookworm as stage-2
+FROM python:3.11-slim-bookworm AS stage-2
 ARG TARGETARCH
 
 ARG BUILD_DEPENDENCIES="              \
