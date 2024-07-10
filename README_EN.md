@@ -96,6 +96,7 @@ DOMAINS=
 CORE_HOST=http://core:8080
 
 # Lion
+GUACD_LOG_LEVEL=error
 GUA_HOST=guacd
 GUA_PORT=4822
 
@@ -178,6 +179,7 @@ DOMAINS=
 CORE_HOST=http://core:8080
 
 # Lion
+GUACD_LOG_LEVEL=error
 GUA_HOST=guacd
 GUA_PORT=4822
 

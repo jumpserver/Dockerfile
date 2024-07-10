@@ -75,9 +75,7 @@ services:
     container_name: jms_guacd
     user: root
     restart: always
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      GUACD_LOG_LEVEL: ${GUACD_LOG_LEVEL:-error}
+    env_file: .env
     volumes:
       - ${VOLUME_DIR}/lion/data:/opt/lion/data
     networks:

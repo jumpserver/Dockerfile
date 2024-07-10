@@ -4,6 +4,7 @@ services:
     container_name: jms_mysql
     restart: always
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       MARIADB_ROOT_PASSWORD: ${DB_PASSWORD:-Np2qgqtiUayA857GpuVI0Wtg}
       MARIADB_DATABASE: ${DB_NAME:-jumpserver}
     healthcheck:
@@ -23,6 +24,7 @@ services:
     restart: always
     command: redis-server --requirepass ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       REDIS_PASSWORD: ${REDIS_PASSWORD:-KoJqlTDu1d5HwfXgJ4QTbZQt}
     healthcheck:
       test: "redis-cli -h 127.0.0.1 -a $$REDIS_PASSWORD info Replication"

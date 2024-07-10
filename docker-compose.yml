@@ -101,9 +101,7 @@ services:
       placement:
         constraints:
           - "node.role==worker"
-    environment:
-      TZ: ${TZ:-Asia/Shanghai}
-      GUACD_LOG_LEVEL: ${GUACD_LOG_LEVEL:-error}
+    env_file: .env
     volumes:
       - ${VOLUME_DIR}/lion/data:/opt/lion/data
     networks:
