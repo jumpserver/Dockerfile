@@ -35,7 +35,7 @@ RUN set -e \
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.10.11
+ARG VERSION=v3.10.12
 ENV VERSION=${VERSION}
 
 RUN set -e \
@@ -70,7 +70,7 @@ COPY --from=stage-1 /opt/lion /opt/lion
 
 WORKDIR /opt/lion
 
-ARG VERSION=v3.10.11
+ARG VERSION=v3.10.12
 ENV VERSION=${VERSION}
 
 VOLUME /opt/lion/data

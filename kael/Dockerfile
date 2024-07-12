@@ -35,7 +35,7 @@ RUN set -e \
 
 WORKDIR /opt/kael
 
-ARG VERSION=v3.10.11
+ARG VERSION=v3.10.12
 ENV VERSION=${VERSION}
 
 RUN set -e \
@@ -72,7 +72,7 @@ COPY --from=stage-1 /opt/kael /opt/kael
 
 WORKDIR /opt/kael
 
-ARG VERSION=v3.10.11
+ARG VERSION=v3.10.12
 ENV VERSION=${VERSION}
 
 VOLUME /opt/kael/data

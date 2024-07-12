@@ -57,7 +57,7 @@ vi .env
 ```
 ```vim
 # You can modify the version number according to the project version
-VERSION=v3.10.11
+VERSION=v3.10.12
 
 # Build parameters, support amd64, arm64, ppc64le, s390x
 TARGETARCH=amd64
@@ -142,7 +142,7 @@ vi .env
 ```
 ```vim
 # The version number can be modified according to the version of the project
-VERSION=v3.10.10
+VERSION=v3.10.12
 
 # Build parameters, support amd64, arm64, ppc64le, s390x
 TARGETARCH=amd64
