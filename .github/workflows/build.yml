@@ -4,7 +4,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - '*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      - v3.*
 
 jobs:
   build:
@@ -90,7 +90,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Create Release
+      - name: Create Draft
         id: create_release
         uses: actions/create-release@v1
         env:
@@ -98,5 +98,11 @@ jobs:
         with:
           tag_name: ${{ env.version }}
           release_name: Release ${{ env.version }}
-          draft: false
+          draft: true
           prerelease: false
+
+      - name: Create Release
+        run: |
+          gh release edit ${{ env.version }} --draft=false --latest=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
