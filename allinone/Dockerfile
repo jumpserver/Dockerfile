@@ -22,6 +22,39 @@ RUN set -ex \
 
 WORKDIR /opt
 
+ARG WISP_VERSION=v0.1.22
+RUN set -ex \
+    && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
+    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
+    && chown root:root /usr/local/bin/wisp \
+    && chmod 755 /usr/local/bin/wisp \
+    && rm -f /opt/*.tar.gz
+
+ARG MONGOSH_VERSION=2.2.12
+RUN set -e \
+    && \
+    case "${TARGETARCH}" in \
+        amd64) \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            && tar -xf mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh /usr/local/bin/ \
+            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh_crypt_v1.so /usr/local/lib/ \
+            && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
+            ;; \
+        arm64|ppc64le|s390x) \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh /usr/local/bin/ \
+            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh_crypt_v1.so /usr/local/lib/ \
+            && rm -rf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}* \
+            ;; \
+        *) \
+            echo "Unsupported architecture: ${TARGETARCH}" \
+            ;; \
+    esac
+
 ARG HELM_VERSION=v3.15.2
 ARG KUBECTL_VERSION=v1.30.2
 RUN set -ex \
@@ -35,14 +68,6 @@ RUN set -ex \
     && mv helm /usr/local/bin/rawhelm \
     && chmod 755 /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
     && chown root:root /usr/local/bin/rawhelm /usr/local/bin/rawkubectl \
-    && rm -f /opt/*.tar.gz
-
-ARG WISP_VERSION=v0.1.21
-RUN set -ex \
-    && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
-    && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
-    && chown root:root /usr/local/bin/wisp \
-    && chmod 755 /usr/local/bin/wisp \
     && rm -f /opt/*.tar.gz
 
 ARG PREFIX_DIR=/opt/guacamole

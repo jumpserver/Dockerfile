@@ -25,7 +25,7 @@ RUN set -e \
     && chmod 755 /usr/local/bin/check \
     && rm -f /opt/*.tar.gz
 
-ARG WISP_VERSION=v0.1.21
+ARG WISP_VERSION=v0.1.22
 RUN set -e \
     && wget --quiet https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -40,6 +40,31 @@ RUN set -e \
     && chown root:root /usr/local/bin/usql \
     && chmod 755 /usr/local/bin/usql \
     && rm -f /opt/*.tar.gz
+
+ARG MONGOSH_VERSION=2.2.12
+RUN set -e \
+    && \
+    case "${TARGETARCH}" in \
+        amd64) \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            && tar -xf mongosh-${MONGOSH_VERSION}-linux-x64.tgz \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-x64/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh /usr/local/bin/ \
+            && mv mongosh-${MONGOSH_VERSION}-linux-x64/bin/mongosh_crypt_v1.so /usr/local/lib/ \
+            && rm -rf mongosh-${MONGOSH_VERSION}-linux-x64* \
+            ;; \
+        arm64|ppc64le|s390x) \
+            wget https://downloads.mongodb.com/compass/mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            && tar -xf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}.tgz \
+            && chown root:root mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/* \
+            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh /usr/local/bin/ \
+            && mv mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}/bin/mongosh_crypt_v1.so /usr/local/lib/ \
+            && rm -rf mongosh-${MONGOSH_VERSION}-linux-${TARGETARCH}* \
+            ;; \
+        *) \
+            echo "Unsupported architecture: ${TARGETARCH}" \
+            ;; \
+    esac
 
 ARG HELM_VERSION=v3.15.2
 ARG KUBECTL_VERSION=v1.30.2
@@ -77,12 +102,7 @@ FROM debian:bookworm-slim
 ENV LANG=en_US.UTF-8
 
 ARG DEPENDENCIES="                    \
-        bash-completion               \
-        ca-certificates               \
-        libssl-dev                    \
-        mariadb-client                \
-        openssh-client                \
-        postgresql-client"
+        ca-certificates"
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -98,6 +118,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 COPY --from=stage-1 /usr/local/bin/redis-cli /usr/local/bin/redis-cli
 COPY --from=stage-2 /usr/local/bin /usr/local/bin
+COPY --from=stage-2 /usr/local/lib /usr/local/lib
 COPY --from=stage-2 /opt/koko /opt/koko
 COPY --from=stage-2 /opt/kubectl-aliases /opt/kubectl-aliases
 

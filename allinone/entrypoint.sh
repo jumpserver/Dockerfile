@@ -44,7 +44,6 @@ if [ ! "${LOG_LEVEL}" ]; then
     export LOG_LEVEL=ERROR
 fi
 sed -i "s@root: INFO@root: ${LOG_LEVEL}@g" /opt/chen/config/application.yml
-sed -i "s@endpoint: .*@endpoint: http://localhost:8080@g" /opt/chen/config/application.yml
 sed -i "s@address: static://127.0.0.1:9090@address: static://127.0.0.1:9092@g" /opt/chen/config/application.yml
 
 if [ -f "/etc/init.d/cron" ]; then
