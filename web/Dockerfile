@@ -25,7 +25,7 @@ RUN set -e \
     && chmod 755 /usr/local/bin/check \
     && rm -f /opt/*.tar.gz
 
-ARG VERSION=v4.0.1
+ARG VERSION=v4.0.2
 ENV VERSION=${VERSION}
 
 RUN set -e \
@@ -70,7 +70,7 @@ COPY web/nginx.conf /etc/nginx/
 
 WORKDIR /opt
 
-ARG VERSION=v4.0.1
+ARG VERSION=v4.0.2
 ENV VERSION=${VERSION}
 
 VOLUME /opt/download

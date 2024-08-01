@@ -85,7 +85,7 @@ RUN set -e \
 
 WORKDIR /opt/koko
 
-ARG VERSION=v4.0.1
+ARG VERSION=v4.0.2
 ENV VERSION=${VERSION}
 
 RUN set -e \
@@ -124,7 +124,7 @@ COPY --from=stage-2 /opt/kubectl-aliases /opt/kubectl-aliases
 
 WORKDIR /opt/koko
 
-ARG VERSION=v4.0.1
+ARG VERSION=v4.0.2
 ENV VERSION=${VERSION}
 
 VOLUME /opt/koko/data

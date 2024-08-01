@@ -26,7 +26,7 @@ RUN set -e \
     && chmod 755 /usr/local/bin/check \
     && rm -f /opt/*.tar.gz
 
-ARG VERSION=v4.0.1
+ARG VERSION=v4.0.2
 ENV VERSION=$VERSION
 
 RUN set -e \
@@ -134,7 +134,7 @@ COPY --from=stage-1 /opt/jumpserver/apps/libs/ansible/ansible.cfg /etc/ansible/
 
 WORKDIR /opt/jumpserver
 
-ARG VERSION=v4.0.1
+ARG VERSION=v4.0.2
 ENV VERSION=${VERSION}
 
 VOLUME /opt/jumpserver/data
