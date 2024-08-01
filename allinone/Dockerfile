@@ -124,6 +124,7 @@ RUN set -ex \
     && wget https://github.com/jumpserver/chen/releases/download/${VERSION}/chen-${VERSION}.tar.gz \
     && tar -xf chen-${VERSION}.tar.gz -C /opt/chen --strip-components=1 \
     && chown -R root:root /opt/chen \
+    && sed -i 's/http:\/\/core/http:\/\/127.0.0.1/g' /opt/chen/config/application.yml
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
