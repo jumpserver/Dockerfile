@@ -40,6 +40,10 @@ fi
 
 rm -f /opt/jumpserver/tmp/*.pid
 
+if [ ! "${CORE_HOST}" ]; then
+    export CORE_HOST=http://localhost:8080
+fi
+
 if [ ! "${LOG_LEVEL}" ]; then
     export LOG_LEVEL=ERROR
 fi
