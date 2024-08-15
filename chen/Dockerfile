@@ -34,7 +34,7 @@ RUN set -e \
 
 WORKDIR /opt/chen
 
-ARG VERSION=v4.0.2
+ARG VERSION=v4.1.0
 ENV VERSION=${VERSION}
 
 RUN set -e \
@@ -69,7 +69,7 @@ COPY --from=stage-1 /opt/chen /opt/chen
 
 WORKDIR /opt/chen
 
-ARG VERSION=v4.0.2
+ARG VERSION=v4.1.0
 ENV VERSION=${VERSION}
 
 VOLUME /opt/chen/data
