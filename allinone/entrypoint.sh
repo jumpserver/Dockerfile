@@ -1,32 +1,25 @@
 #!/bin/bash
 #
+
+cwd=$(dirname "$(realpath "$0")")
 action="${1}"
 
 if [[ "$action" == "bash" || "$action" == "sh" ]]; then
     bash
     exit 0
 fi
-
 echo
 
-if [ ! "${DB_HOST}" ] || [ ! "${DB_PORT}" ] || [ ! "${REDIS_HOST}" ] || [ ! "${REDIS_PORT}" ]; then
-    echo -e "\033[31m Please set database environment \033[0m"
-    exit 1
-fi
-
-until check tcp://${DB_HOST}:${DB_PORT}; do
-    echo "wait for jms_mysql ${DB_HOST} ready"
-    sleep 2s
+envs=("DB_PASSWORD" "REDIS_PASSWORD" "SECRET_KEY" "BOOTSTRAP_TOKEN")
+for var in "${envs[@]}"; do
+    if [[ -z "${!var}" ]];then
+        echo "WARN: No ${var} set use unsafe default val"
+        export "$var=PleaseChangeMe"
+    fi
+    echo "$var: ${!var}"
 done
 
-until check tcp://${REDIS_HOST}:${REDIS_PORT}; do
-    echo "wait for jms_redis ${REDIS_HOST} ready"
-    sleep 2s
-done
-
-if [ ! -f "/opt/jumpserver/config.yml" ]; then
-    echo > /opt/jumpserver/config.yml
-fi
+cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml
 
 if [ ! -d "/opt/jumpserver/data/media/replay" ]; then
    mkdir -p /opt/jumpserver/data/media/replay
@@ -37,6 +30,8 @@ if [ ! -d "/opt/jumpserver/data/static" ]; then
     mkdir -p /opt/jumpserver/data/static
     chmod 755 -R /opt/jumpserver/data/static
 fi
+
+source ${cwd}/start_db.sh
 
 rm -f /opt/jumpserver/tmp/*.pid
 
@@ -60,12 +55,6 @@ fi
 
 export GIN_MODE=release
 
-cd /opt/jumpserver || exit 1
-./jms upgrade_db || {
-    echo -e "\033[31m Failed to change the table structure. \033[0m"
-    exit 1
-}
-
 echo
 echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
 if [ -f "/opt/readme.txt" ]; then
@@ -78,5 +67,4 @@ echo
 echo "LOG_LEVEL: ${LOG_LEVEL}"
 echo "JumpServer Logs:"
 
-/etc/init.d/nginx start
 /etc/init.d/supervisor start
