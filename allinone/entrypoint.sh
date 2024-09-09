@@ -21,17 +21,8 @@ done
 
 cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml
 
-if [ ! -d "/opt/jumpserver/data/media/replay" ]; then
-   mkdir -p /opt/jumpserver/data/media/replay
-   chmod 755 -R /opt/jumpserver/data/media/replay
-fi
 
-if [ ! -d "/opt/jumpserver/data/static" ]; then
-    mkdir -p /opt/jumpserver/data/static
-    chmod 755 -R /opt/jumpserver/data/static
-fi
-
-source ${cwd}/start_db.sh
+source ${cwd}/database.sh
 
 rm -f /opt/jumpserver/tmp/*.pid
 
@@ -43,7 +34,6 @@ if [ ! "${LOG_LEVEL}" ]; then
     export LOG_LEVEL=ERROR
 fi
 sed -i "s@root: INFO@root: ${LOG_LEVEL}@g" /opt/chen/config/application.yml
-sed -i "s@address: static://127.0.0.1:9090@address: static://127.0.0.1:9092@g" /opt/chen/config/application.yml
 
 if [ -f "/etc/init.d/cron" ]; then
   /etc/init.d/cron start

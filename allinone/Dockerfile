@@ -11,6 +11,7 @@ ARG TOOLS="                           \
         curl                          \
         vim                           \
         procps                        \
+        net-tools                     \
         sudo                          \
         logrotate                     \
         supervisor                    \
@@ -28,6 +29,9 @@ COPY --from=koko /usr /usr
 
 COPY --from=lion /opt /opt
 COPY --from=lion /usr /usr
+COPY --from=lion /lib /lib
+COPY --from=lion /lib32 /lib32
+COPY --from=lion /libx32 /libx32
 
 COPY --from=chen /opt /opt
 COPY --from=chen /usr /usr
@@ -37,6 +41,10 @@ COPY --from=web /opt /opt
 COPY --from=web /usr /usr
 COPY --from=web /etc/nginx /etc/nginx
 COPY --from=web /docker-entrypoint.d /docker-entrypoint.d
+COPY --from=web /docker-entrypoint.sh /opt/web/entrypoint.sh
+RUN useradd nginx \
+    && mkdir -p /var/log/nginx \
+    && mkdir -p /var/cache/nginx 
 
 COPY supervisord.conf /etc/supervisor/conf.d/
 
@@ -48,5 +56,5 @@ ENV LC_ALL=C.UTF-8
 
 WORKDIR /opt
 COPY entrypoint.sh .
-COPY start_db.sh .
+COPY database.sh .
 ENTRYPOINT ["./entrypoint.sh"]
