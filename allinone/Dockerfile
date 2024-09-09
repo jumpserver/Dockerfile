@@ -22,7 +22,7 @@ RUN set -ex \
 
 WORKDIR /opt
 
-ARG WISP_VERSION=v0.1.22
+ARG WISP_VERSION=v0.2.0
 RUN set -ex \
     && wget https://github.com/jumpserver/wisp/releases/download/${WISP_VERSION}/wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz \
     && tar -xf wisp-${WISP_VERSION}-linux-${TARGETARCH}.tar.gz -C /usr/local/bin/ --strip-components=1 \
@@ -127,9 +127,9 @@ RUN set -ex \
     && rm -f /opt/*.tar.gz
 
 RUN set -ex \
-    && STATIC_VERSION=$(curl -sSL https://github.com/jumpserver/web-static/raw/v3/VERSION) \
-    && wget -O /opt/prepare.sh https://github.com/jumpserver/web-static/raw/${STATIC_VERSION}/prepare.sh \
-    && chown root:root /opt/prepare.sh \
+    && wget https://github.com/jumpserver/docker-web/raw/${VERSION}/prepare.sh \
+    && wget https://github.com/jumpserver/docker-web/raw/${VERSION}/versions.txt \
+    && chown root:root prepare.sh versions.txt \
     && chmod 755 /opt/prepare.sh
 
 COPY readme.txt readme.txt
