@@ -37,9 +37,9 @@ RUN set -e \
     && rm -f /opt/*.tar.gz
 
 RUN set -e \
-    && STATIC_VERSION=$(curl -sSL https://github.com/jumpserver/web-static/raw/v3/VERSION) \
-    && wget -O /opt/prepare.sh https://github.com/jumpserver/web-static/raw/${STATIC_VERSION}/prepare.sh \
-    && chown root:root /opt/prepare.sh \
+    && wget --quiet https://github.com/jumpserver/docker-web/raw/${VERSION}/prepare.sh \
+    && wget --quiet https://github.com/jumpserver/docker-web/raw/${VERSION}/versions.txt \
+    && chown root:root prepare.sh versions.txt \
     && chmod 755 /opt/prepare.sh
 
 COPY web/entrypoint.sh .
