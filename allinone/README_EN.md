@@ -11,11 +11,13 @@ When migrating or upgrading the environment, please ensure that the SECRET_KEY i
 **Note: The all-in-one deployment method does not support Client-related features. It only supports usage on a pure B/S architecture web interface.**
 
 ```sh
-docker volume create jsdata
+docker volume create jsdata &> /dev/null
+docker volume create pgdata &> /dev/null
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
      -v jsdata:/opt/data \
+     -v pgdata:/var/lib/postgresql \
      -p 2222:2222 \
      -p 80:80 jumpserver/jms_all
 ```

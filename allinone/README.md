@@ -12,10 +12,12 @@ JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方�
 
 ```sh
 docker volume create jsdata
+docker volume create pgdata
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
      -v jsdata:/opt/data \
+     -v pgdata:/var/lib/postgresql \
      -p 2222:2222 \
      -p 80:80 jumpserver/jms_all
 ```

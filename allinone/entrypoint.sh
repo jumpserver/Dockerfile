@@ -31,7 +31,7 @@ function mv_dir_link(){
     dst=$2
 
     mkdir -p ${dst}
-    if [[ -d ${src} || ! -L ${src} ]];then
+    if [[ -d ${src} && ! -L ${src} ]];then
         if [[ ! -z "$(ls -A ${src})" ]];then
             mv ${src}/* ${dst}/
         fi
@@ -49,8 +49,6 @@ function prepare_data_persist() {
     
     mv_dir_link /var/log/nginx /opt/data/nginx
     mv_dir_link /var/lib/redis /opt/data/redis
-    mv_dir_link /var/lib/postgresql /opt/data/postgresql
-    chown postgres:postgres /var/lib/postgresql /opt/data/postgresql
 }
 
 function upgrade_db() {

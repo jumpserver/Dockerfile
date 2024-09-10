@@ -17,11 +17,13 @@
 This can be used for testing environments. For production environments, it is recommended to use the standard deployment.
 
 ```sh
-docker volume create jsdata
+docker volume create jsdata &> /dev/null
+docker volume create pgdata &> /dev/null
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
      -v jsdata:/opt/data \
+     -v pgdata:/var/lib/postgresql \
      -p 2222:2222 \
      -p 80:80 jumpserver/jms_all
 ```
