@@ -26,7 +26,7 @@ docker run --name jms_all \
      -p 80:80 jumpserver/jms_all
 ```
 
-更多 详见 allinone 目录 README
+更多 详见 allinone 目录 [README](allinone)
 
 ## 标准部署
 
