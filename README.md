@@ -12,21 +12,28 @@
 
 --------------------------
 
-## 环境要求
-- PostgreSQL >= 13 或 MariaDB Server >= 10.6 
-- Redis Server >= 6.0
 
-## 快速部署
+## all-in-one 快速部署
+测试环境可以使用，生产环境推荐使用 标准部署
+
 ```sh
-# 测试环境可以使用，生产环境推荐外置数据
 docker volume create jsdata
 docker run --name jms_all \
+     -e SECRET_KEY=PleaseChangeMe \
+     -e BOOTSTRAP_TOKEN=PleaseChangeMe \
      -v jsdata:/opt/data \
      -p 2222:2222 \
      -p 80:80 jumpserver/jms_all
 ```
 
-更多 详见 allinone 目录 [README](allinone)
+**初始账号**
+```bash
+默认账号: admin
+默认密码: ChangeMe
+```
+
+更多详见 allinone [README](allinone)
+
 
 ## 标准部署
 
@@ -39,4 +46,4 @@ https://docs.jumpserver.org/zh/v3/quick_start/
 
 JumpServer 支持 swarm 方式部署，但目前不太推荐用于生产环境，除非你对此熟悉 .
 
-详见 swarm 目录 [README](swarm)
+详见 swarm [README](swarm)

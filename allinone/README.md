@@ -13,12 +13,14 @@ JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方�
 ```sh
 docker volume create jsdata
 docker run --name jms_all \
+     -e SECRET_KEY=PleaseChangeMe \
+     -e BOOTSTRAP_TOKEN=PleaseChangeMe \
      -v jsdata:/opt/data \
      -p 2222:2222 \
      -p 80:80 jumpserver/jms_all
 ```
 
-### Standard start
+### 外置数据库
 
 使用外置 MySQL 数据库和 Redis:
 

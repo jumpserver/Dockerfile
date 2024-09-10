@@ -26,7 +26,6 @@ vi .env
 # 版本号可以自己根据项目的版本修改
 VERSION=v4.1.0
 
-# 构建参数, 支持 amd64, arm64, ppc64le, s390x
 TARGETARCH=amd64
 
 # Compose, Swarm 模式下修改 NETWORK_DRIVER=overlay
@@ -101,20 +100,6 @@ docker service update --replicas=4 jumpserver_lion  # 扩容 lion 到 2 个副�
 # ...
 ```
 
-## Build
-```sh
-# 如果希望手动构建镜像, 可以使用下面的命令
-cd Dockerfile
-cp config_example.conf .env
-vi .env
-```
-```vim
-# 构建参数, 支持 amd64/arm64
-TARGETARCH=amd64
-```
-```bash
-docker compose -f docker-compose-build.yml up
-```
 
 ## 初始账号
 - 默认账号: `admin`
