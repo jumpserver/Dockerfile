@@ -8,7 +8,7 @@ function init_pg() {
     DB_ENGINE=${DB_ENGINE:-postgresql}
     DB_HOST=${DB_HOST:-127.0.0.1}
     DB_PORT=${DB_PORT:-5432}
-    DB_USER=${DB_USER:-postgre}
+    DB_USER=${DB_USER:-postgres}
 
     export DB_NAME DB_PASSWORD DB_ENGINE DB_HOST DB_PORT DB_USER
 

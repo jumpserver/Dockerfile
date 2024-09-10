@@ -55,6 +55,7 @@ function prepare_data_persist() {
 }
 
 function upgrade_db() {
+    echo ">> Update database structure"
     cd /opt/jumpserver || exit 1
     ./jms upgrade_db || {
         echo -e "\033[31m Failed to change the table structure. \033[0m"
@@ -69,6 +70,17 @@ prepare_data_persist
 
 # start other service
 source ${cwd}/service.sh
+
+until check tcp://${DB_HOST}:${DB_PORT}; do
+    echo "wait for database ${DB_HOST} ready"
+    sleep 2s
+done
+
+until check tcp://${REDIS_HOST}:${REDIS_PORT}; do
+    echo "wait for redis ${REDIS_HOST} ready"
+    sleep 2s
+done
+
 upgrade_db
 
 echo
