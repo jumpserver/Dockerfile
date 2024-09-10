@@ -18,9 +18,12 @@ ARG TOOLS="                           \
         postgresql                    \
         openjdk-17-jre-headless       \
         redis                         \
+        nginx                         \
         wget"
 
-RUN apt-get update \
+ARG APT_MIRROR=http://mirrors.aliyun.com
+RUN sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    &&apt-get update \
     && apt-get install -y --no-install-recommends ${TOOLS} \
     && apt-get clean
 
@@ -38,7 +41,6 @@ COPY --from=chen /usr /usr
 COPY --from=chen /etc/alternatives /etc/alternatives
 
 COPY --from=web /opt /opt
-COPY --from=web /usr /usr
 COPY --from=web /etc/nginx /etc/nginx
 COPY --from=web /docker-entrypoint.d /docker-entrypoint.d
 COPY --from=web /docker-entrypoint.sh /opt/web/entrypoint.sh

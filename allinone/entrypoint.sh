@@ -32,8 +32,7 @@ function mv_dir_link(){
 
     mkdir -p ${dst}
     if [[ -d ${src} || ! -L ${src} ]];then
-        count=$(ls ${src} | wc -l)
-        if [[ "${count}" != "0" ]];then
+        if [[ ! -z "$(ls -A ${src})" ]];then
             mv ${src}/* ${dst}/
         fi
         rm -rf ${src}
