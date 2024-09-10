@@ -11,14 +11,22 @@ JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方�
 **注意: all-in-one 部署方式不支持 Client 相关功能, 仅支持在 纯 B/S 架构 Web 端使用。**
 
 ```sh
-docker compose up -d
+docker volume create jsdata
+docker volume create pgdata
+docker run --name jms_all \
+     -e SECRET_KEY=PleaseChangeMe \
+     -e BOOTSTRAP_TOKEN=PleaseChangeMe \
+     -v jsdata:/opt/data \
+     -v pgdata:/var/lib/postgresql \
+     -p 2222:2222 \
+     -p 80:80 jumpserver/jms_all
 ```
 
-### Standard start
+### 外置数据库
 
 使用外置 MySQL 数据库和 Redis:
 
-  - 外置数据库要求 MariaDB 版本大于等于 10.6；
+  - 外置数据库要求 MariaDB 版本大于等于 10.6 或者 PosgresSQL 13；
   - 外置 Redis 要求 Redis 版本大于等于 6.2。
 
 ```sh
@@ -66,16 +74,14 @@ flush privileges;
 
 **启动 JumpServer**
 ```bash
+docker volume create jsdata
+
 docker run --name jms_all -d \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
   -p 80:80 \
   -p 2222:2222 \
-  -p 30000-30100:30000-30100 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
-  -e LOG_LEVEL=ERROR \
+  -e LOG_LEVEL=INFO \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
   -e DB_USER=jumpserver \
@@ -85,12 +91,7 @@ docker run --name jms_all -d \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -v /opt/jumpserver/chen/data:/opt/chen/data \
-  -v /opt/jumpserver/web/data/logs:/var/log/nginx \
-  -v /opt/jumpserver/web/data/download:/opt/download \
+  -v jsdata:/opt/data \
   jumpserver/jms_all:v4.1.0
 ```
 
@@ -112,30 +113,7 @@ docker pull jumpserver/jms_all:v4.1.0
 # 删掉旧版本容器
 docker rm jms_all
 
-# 启动新版本
-docker run --name jms_all -d \
-  -p 80:80 \
-  -p 2222:2222 \
-  -p 30000-30100:30000-30100 \
-  -e SECRET_KEY=****** \                 # 自行修改成你的旧版本 SECRET_KEY, 丢失此 key 会导致数据无法解密
-  -e BOOTSTRAP_TOKEN=****** \            # 自行修改成你的旧版本 BOOTSTRAP_TOKEN
-  -e LOG_LEVEL=ERROR \
-  -e DB_HOST=192.168.x.x \               # 自行修改成你的旧版本 MySQL 服务器, 设置不对数据丢失
-  -e DB_PORT=3306 \
-  -e DB_USER=jumpserver \
-  -e DB_PASSWORD=****** \
-  -e DB_NAME=jumpserver \
-  -e REDIS_HOST=192.168.x.x \            # 自行修改成你的旧版本 Redis 服务器
-  -e REDIS_PORT=6379 \
-  -e REDIS_PASSWORD=****** \
-  --privileged=true \
-  -v /opt/jumpserver/core/data:/opt/jumpserver/data \
-  -v /opt/jumpserver/koko/data:/opt/koko/data \
-  -v /opt/jumpserver/lion/data:/opt/lion/data \
-  -v /opt/jumpserver/chen/data:/opt/chen/data \
-  -v /opt/jumpserver/web/data/logs:/var/log/nginx \
-  -v /opt/jumpserver/web/data/download:/opt/download \
-  jumpserver/jms_all:v4.1.0
+# 重新启动新版本
 ```
 
 **初始账号**

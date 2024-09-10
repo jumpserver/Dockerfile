@@ -1,70 +1,84 @@
 #!/bin/bash
 #
+
+cwd=$(dirname "$(realpath "$0")")
 action="${1}"
 
 if [[ "$action" == "bash" || "$action" == "sh" ]]; then
     bash
     exit 0
 fi
-
 echo
 
-if [ ! "${DB_HOST}" ] || [ ! "${DB_PORT}" ] || [ ! "${REDIS_HOST}" ] || [ ! "${REDIS_PORT}" ]; then
-    echo -e "\033[31m Please set database environment \033[0m"
-    exit 1
-fi
+function prepare_core() {
+    SECRET_KEY=${SECRET_KEY:-PleaseChangeMe}
+    BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN:-PleaseChangeMe}
+    CORE_HOST=${CORE_HOST:-"http://localhost:8080"}
+    LOG_LEVEL=${LOG_LEVEL:-INFO}
+    
+    export SECRET_KEY BOOTSTRAP_TOKEN CORE_HOST LOG_LEVEL
+    export PATH=/opt/py3/bin/:$PATH
+    
+    if [[ -f /opt/jumpserver/config.yml ]];then
+        echo > /opt/jumpserver/config.yml
+    fi
+    rm -f /opt/jumpserver/tmp/*.pid
+}
+
+
+function mv_dir_link(){
+    src=$1
+    dst=$2
+
+    mkdir -p ${dst}
+    if [[ -d ${src} && ! -L ${src} ]];then
+        if [[ ! -z "$(ls -A ${src})" ]];then
+            mv ${src}/* ${dst}/
+        fi
+        rm -rf ${src}
+    fi
+    if [[ ! -d ${src} ]];then
+        ln -s ${dst} ${src}
+    fi
+}
+
+function prepare_data_persist() {
+    for app in jumpserver koko lion chen;do
+        mv_dir_link /opt/$app/data /opt/data/${app}
+    done
+    
+    mv_dir_link /var/log/nginx /opt/data/nginx
+    mv_dir_link /var/lib/redis /opt/data/redis
+}
+
+function upgrade_db() {
+    echo ">> Update database structure"
+    cd /opt/jumpserver || exit 1
+    ./jms upgrade_db || {
+        echo -e "\033[31m Failed to change the table structure. \033[0m"
+        exit 1
+    }
+}
+
+export GIN_MODE=release
+
+prepare_core
+prepare_data_persist
+
+# start other service
+source ${cwd}/service.sh
 
 until check tcp://${DB_HOST}:${DB_PORT}; do
-    echo "wait for jms_mysql ${DB_HOST} ready"
+    echo "wait for database ${DB_HOST} ready"
     sleep 2s
 done
 
 until check tcp://${REDIS_HOST}:${REDIS_PORT}; do
-    echo "wait for jms_redis ${REDIS_HOST} ready"
+    echo "wait for redis ${REDIS_HOST} ready"
     sleep 2s
 done
 
-if [ ! -f "/opt/jumpserver/config.yml" ]; then
-    echo > /opt/jumpserver/config.yml
-fi
-
-if [ ! -d "/opt/jumpserver/data/media/replay" ]; then
-   mkdir -p /opt/jumpserver/data/media/replay
-   chmod 755 -R /opt/jumpserver/data/media/replay
-fi
-
-if [ ! -d "/opt/jumpserver/data/static" ]; then
-    mkdir -p /opt/jumpserver/data/static
-    chmod 755 -R /opt/jumpserver/data/static
-fi
-
-rm -f /opt/jumpserver/tmp/*.pid
-
-if [ ! "${CORE_HOST}" ]; then
-    export CORE_HOST=http://localhost:8080
-fi
-
-if [ ! "${LOG_LEVEL}" ]; then
-    export LOG_LEVEL=ERROR
-fi
-sed -i "s@root: INFO@root: ${LOG_LEVEL}@g" /opt/chen/config/application.yml
-sed -i "s@address: static://127.0.0.1:9090@address: static://127.0.0.1:9092@g" /opt/chen/config/application.yml
-
-if [ -f "/etc/init.d/cron" ]; then
-  /etc/init.d/cron start
-fi
-
-if [ "$(uname -m)" = "loongarch64" ]; then
-    export SECURITY_LOGIN_CAPTCHA_ENABLED=False
-fi
-
-export GIN_MODE=release
-
-cd /opt/jumpserver || exit 1
-./jms upgrade_db || {
-    echo -e "\033[31m Failed to change the table structure. \033[0m"
-    exit 1
-}
+upgrade_db
 
 echo
 echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
@@ -78,5 +92,4 @@ echo
 echo "LOG_LEVEL: ${LOG_LEVEL}"
 echo "JumpServer Logs:"
 
-/etc/init.d/nginx start
 /etc/init.d/supervisor start
