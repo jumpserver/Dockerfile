@@ -4,7 +4,7 @@ FROM jumpserver/lion:${version} AS lion
 FROM jumpserver/chen:${version} AS chen
 FROM jumpserver/web:${version} AS web
 
-FROM jumpserver/core:${version}
+FROM jumpserver/core:${version} AS core
 
 ARG TOOLS="                           \
         bash-completion               \
@@ -48,13 +48,18 @@ RUN useradd nginx \
 
 COPY supervisord.conf /etc/supervisor/conf.d/
 
-VOLUME /opt/jumpserver/data
-VOLUME /opt/koko/data
+FROM debian:bullseye-slim
+
+COPY --from=core / /
+
+VOLUME /opt/data
+VOLUME /opt/download
+VOLUME /var/log/nginx
 
 EXPOSE 80 2222
 ENV LC_ALL=C.UTF-8
 
 WORKDIR /opt
 COPY entrypoint.sh .
-COPY database.sh .
+COPY service.sh .
 ENTRYPOINT ["./entrypoint.sh"]

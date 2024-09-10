@@ -10,40 +10,66 @@ if [[ "$action" == "bash" || "$action" == "sh" ]]; then
 fi
 echo
 
-envs=("DB_PASSWORD" "REDIS_PASSWORD" "SECRET_KEY" "BOOTSTRAP_TOKEN")
-for var in "${envs[@]}"; do
-    if [[ -z "${!var}" ]];then
-        echo "WARN: No ${var} set use unsafe default val"
-        export "$var=PleaseChangeMe"
+function prepare_core() {
+    SECRET_KEY=${SECRET_KEY:-PleaseChangeMe}
+    BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN:-PleaseChangeMe}
+    CORE_HOST=${CORE_HOST:-"http://localhost:8080"}
+    LOG_LEVEL=${LOG_LEVEL:-INFO}
+    
+    export SECRET_KEY BOOTSTRAP_TOKEN CORE_HOST LOG_LEVEL
+    export PATH=/opt/py3/bin/:$PATH
+    
+    if [[ -f /opt/jumpserver/config.yml ]];then
+        echo > /opt/jumpserver/config.yml
     fi
-    echo "$var: ${!var}"
-done
-
-cp /opt/jumpserver/config_example.yml /opt/jumpserver/config.yml
+    rm -f /opt/jumpserver/tmp/*.pid
+}
 
 
-source ${cwd}/database.sh
+function mv_dir_link(){
+    src=$1
+    dst=$2
 
-rm -f /opt/jumpserver/tmp/*.pid
+    mkdir -p ${dst}
+    if [[ -d ${src} || ! -L ${src} ]];then
+        count=$(ls ${src} | wc -l)
+        if [[ "${count}" != "0" ]];then
+            mv ${src}/* ${dst}/
+        fi
+        rm -rf ${src}
+    fi
+    if [[ ! -d ${src} ]];then
+        ln -s ${dst} ${src}
+    fi
+}
 
-if [ ! "${CORE_HOST}" ]; then
-    export CORE_HOST=http://localhost:8080
-fi
+function prepare_data_persist() {
+    for app in jumpserver koko lion chen;do
+        mv_dir_link /opt/$app/data /opt/data/${app}
+    done
+    
+    mv_dir_link /var/log/nginx /opt/data/nginx
+    mv_dir_link /var/lib/redis /opt/data/redis
+    mv_dir_link /var/lib/postgresql /opt/data/postgresql
+    chown postgres:postgres /var/lib/postgresql /opt/data/postgresql
+}
 
-if [ ! "${LOG_LEVEL}" ]; then
-    export LOG_LEVEL=ERROR
-fi
-sed -i "s@root: INFO@root: ${LOG_LEVEL}@g" /opt/chen/config/application.yml
-
-if [ -f "/etc/init.d/cron" ]; then
-  /etc/init.d/cron start
-fi
-
-if [ "$(uname -m)" = "loongarch64" ]; then
-    export SECURITY_LOGIN_CAPTCHA_ENABLED=False
-fi
+function upgrade_db() {
+    cd /opt/jumpserver || exit 1
+    ./jms upgrade_db || {
+        echo -e "\033[31m Failed to change the table structure. \033[0m"
+        exit 1
+    }
+}
 
 export GIN_MODE=release
+
+prepare_core
+prepare_data_persist
+
+# start other service
+source ${cwd}/service.sh
+upgrade_db
 
 echo
 echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
