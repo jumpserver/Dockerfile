@@ -37,5 +37,6 @@ https://docs.jumpserver.org/zh/v3/quick_start/
 
 ## 集群部署
 
-JumpServer 支持 swarm 方式部署，但目前不太推荐用于生产环境，除非你对此熟悉 
-见 swarm 目录 README
+JumpServer 支持 swarm 方式部署，但目前不太推荐用于生产环境，除非你对此熟悉 .
+
+详见 swarm 目录 [README](swarm)
