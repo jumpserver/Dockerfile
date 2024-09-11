@@ -17,8 +17,8 @@
 测试环境可以使用，生产环境推荐使用 标准部署
 
 ```sh
-docker volume create jsdata &> /dev/null
-docker volume create pgdata &> /dev/null
+docker volume create jsdata
+docker volume create pgdata
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \

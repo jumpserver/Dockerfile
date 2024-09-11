@@ -17,8 +17,8 @@
 This can be used for testing environments. For production environments, it is recommended to use the standard deployment.
 
 ```sh
-docker volume create jsdata &> /dev/null
-docker volume create pgdata &> /dev/null
+docker volume create jsdata
+docker volume create pgdata
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
