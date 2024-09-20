@@ -33,6 +33,7 @@ COPY --from=lion /opt /opt
 COPY --from=lion /usr /usr
 COPY --from=lion /lib /lib
 COPY --from=lion /lib32 /lib32
+COPY --from=lion /libx32 /libx32
 
 COPY --from=chen /opt /opt
 COPY --from=chen /usr /usr
