@@ -1,7 +1,7 @@
 <p align="center">
   <a href="https://jumpserver.org"><img src="https://download.jumpserver.org/images/jumpserver-logo.svg" alt="JumpServer" width="300" /></a>
 </p>
-<h3 align="center">多云环境下更好用的堡垒机</h3>
+<h3 align="center">广受欢迎的开源堡垒机</h3>
 
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://img.shields.io/github/license/jumpserver/Dockerfile" alt="License: GPLv3"></a>
@@ -14,7 +14,6 @@
 
 
 ## all-in-one 快速部署
-测试环境可以使用，生产环境推荐使用 标准部署
 
 ```sh
 docker volume create jsdata &> /dev/null
@@ -34,18 +33,18 @@ docker run --name jms_all \
 默认密码: ChangeMe
 ```
 
-更多详见 allinone [README](allinone)
+更多详见： [README](allinone)
 
 
 ## 标准部署
 
-请使用 jumpserver installer 部署
+使用 JumpServer Installer 进行部署
 
-https://docs.jumpserver.org/zh/v3/quick_start/
+https://docs.jumpserver.org/zh/v4/quick_start/
 
 
 ## 集群部署
 
-JumpServer 支持 swarm 方式部署，但目前不太推荐用于生产环境，除非你对此熟悉 .
+JumpServer 支持 Swarm 方式部署，但目前不太推荐用于生产环境，除非你对此熟悉。
 
-详见 swarm [README](swarm)
+更多详见： [README](swarm)
