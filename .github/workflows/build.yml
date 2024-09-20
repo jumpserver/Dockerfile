@@ -41,7 +41,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            version=${{ env.version }}
+            version=${{ env.version }}-ce
           tags: |
             ${{ github.repository_owner }}/jms_${{ matrix.component }}:${{ env.version }}
             ${{ github.repository_owner }}/jms_${{ matrix.component }}:latest
