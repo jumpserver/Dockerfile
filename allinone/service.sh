@@ -17,16 +17,16 @@ function init_pg() {
         return
     fi
 
+    echo ">> Start database postgre"
+    chown -R postgres:postgres /var/lib/postgresql/13/main
+    pg_ctlcluster 13 main start
+    sleep 3
+    
     if [[ ! -f /var/lib/postgresql/13/main/inited.txt ]];then
         sudo -u postgres psql -c "ALTER USER postgres PASSWORD '$DB_PASSWORD';"
         sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
         touch /var/lib/postgresql/13/main/inited.txt
-    fi
-
-    echo ">> Start database postgre"
-    chown -R postgres:postgres /var/lib/postgresql/13/main
-    pg_ctlcluster 13 main start
-    
+    fi 
 }
 
 function init_ng(){
