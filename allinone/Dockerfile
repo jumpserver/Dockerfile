@@ -20,9 +20,7 @@ ARG TOOLS="                           \
         redis                         \
         wget"
 
-ARG APT_MIRROR=http://mirrors.aliyun.com
-RUN sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
-    &&apt-get update \
+RUN apt-get update \
     && apt-get install -y --no-install-recommends ${TOOLS} \
     && apt-get clean
 
