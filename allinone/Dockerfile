@@ -20,7 +20,9 @@ ARG TOOLS="                           \
         redis                         \
         wget"
 
-RUN apt-get update \
+ARG APT_MIRROR=http://deb.debian.org
+RUN sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+    && apt-get update \
     && apt-get install -y --no-install-recommends ${TOOLS} \
     && apt-get clean
 
