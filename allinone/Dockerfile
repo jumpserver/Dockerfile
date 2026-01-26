@@ -16,7 +16,7 @@ ARG TOOLS="                           \
         logrotate                     \
         supervisor                    \
         postgresql                    \
-        openjdk-17-jre-headless       \
+        openjdk-21-jre-headless       \
         redis                         \
         wget"
 
