@@ -11,21 +11,30 @@ function init_pg() {
     DB_USER=${DB_USER:-postgres}
 
     export DB_NAME DB_PASSWORD DB_ENGINE DB_HOST DB_PORT DB_USER
-
     if [[ ${DB_HOST} != "127.0.0.1" ]];then
         echo "External database skip start, ${DB_HOST}"
         return
     fi
 
+    PG_CLUSTER_INFO=$(pg_lsclusters --no-header | awk 'NR==1')
+    if [[ -z "$PG_CLUSTER_INFO" ]]; then
+        echo "No PostgreSQL cluster found"
+        return 1
+    fi
+
+    PG_VERSION=$(echo "$PG_CLUSTER_INFO" | awk '{print $1}')
+    PG_CLUSTER=$(echo "$PG_CLUSTER_INFO" | awk '{print $2}')
+    PG_DATA_DIR=$(echo "$PG_CLUSTER_INFO" | awk '{print $6}')
+
     echo ">> Start database postgre"
-    chown -R postgres:postgres /var/lib/postgresql/13/main
-    pg_ctlcluster 13 main start
+    chown -R postgres:postgres ${PG_DATA_DIR}
+    pg_ctlcluster ${PG_VERSION} ${PG_CLUSTER} start
     sleep 3
     
-    if [[ ! -f /var/lib/postgresql/13/main/inited.txt ]];then
+    if [[ ! -f ${PG_DATA_DIR}/inited.txt ]];then
         sudo -u postgres psql -c "ALTER USER postgres PASSWORD '$DB_PASSWORD';"
         sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
-        touch /var/lib/postgresql/13/main/inited.txt
+        touch ${PG_DATA_DIR}/inited.txt
     fi 
 }
 
