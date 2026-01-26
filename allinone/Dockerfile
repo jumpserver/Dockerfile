@@ -21,7 +21,7 @@ ARG TOOLS="                           \
         wget"
 
 ARG APT_MIRROR=http://deb.debian.org
-RUN sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list \
+RUN sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list.d/debian.sources \
     && apt-get update \
     && apt-get install -y --no-install-recommends ${TOOLS} \
     && apt-get clean
