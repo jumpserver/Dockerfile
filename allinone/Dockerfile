@@ -50,7 +50,7 @@ RUN useradd nginx \
 
 COPY supervisord.conf /etc/supervisor/conf.d/
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 COPY --from=core / /
 
