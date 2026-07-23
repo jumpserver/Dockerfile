@@ -60,6 +60,7 @@ VOLUME /var/log/nginx
 
 EXPOSE 80 2222
 ENV LC_ALL=C.UTF-8
+ENV ANSIBLE_DOCKER_ENABLED=false
 
 WORKDIR /opt
 COPY entrypoint.sh .
