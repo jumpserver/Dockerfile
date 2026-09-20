@@ -43,7 +43,7 @@ function mv_dir_link(){
 }
 
 function prepare_data_persist() {
-    for app in jumpserver koko lion chen;do
+    for app in jumpserver koko chen;do
         mv_dir_link /opt/$app/data /opt/data/${app}
     done
     

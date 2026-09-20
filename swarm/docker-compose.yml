@@ -1,6 +1,6 @@
 services:
   core:
-    image: jumpserver/jms_core:${VERSION}
+    image: jumpserver/core:${VERSION}-ce
     container_name: jms_core
     command: start web
     deploy:
@@ -28,7 +28,7 @@ services:
       - net
 
   celery:
-    image: jumpserver/jms_core:${VERSION}
+    image: jumpserver/core:${VERSION}-ce
     container_name: jms_celery
     command: start task
     deploy:
@@ -56,7 +56,7 @@ services:
       - net
 
   koko:
-    image: jumpserver/jms_koko:${VERSION}
+    image: jumpserver/koko:${VERSION}-ce
     container_name: jms_koko
     privileged: true
     deploy:
@@ -85,57 +85,8 @@ services:
     networks:
       - net
 
-  guacd:
-    image: jumpserver/guacd:1.5.5-bookworm
-    container_name: jms_guacd
-    user: root
-    deploy:
-      mode: replicated
-      replicas: 1
-      # resources:
-        # limits:
-          # cpus: "0.1"
-          # memory: 128M
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - "node.role==worker"
-    env_file: .env
-    volumes:
-      - ${VOLUME_DIR}/lion/data:/opt/lion/data
-    networks:
-      - net
-
-  lion:
-    image: jumpserver/jms_lion:${VERSION}
-    container_name: jms_lion
-    deploy:
-      mode: replicated
-      replicas: 1
-      # resources:
-        # limits:
-          # cpus: "0.1"
-          # memory: 128M
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - "node.role==worker"
-    env_file: .env
-    healthcheck:
-      test: "check http://localhost:8081/lion/health/"
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    volumes:
-      - ${VOLUME_DIR}/lion/data:/opt/lion/data
-    networks:
-      - net
-
   chen:
-    image: jumpserver/jms_chen:${VERSION}
+    image: jumpserver/chen:${VERSION}-ce
     container_name: jms_chen
     deploy:
       mode: replicated
@@ -162,7 +113,7 @@ services:
       - net
 
   web:
-    image: jumpserver/jms_web:${VERSION}
+    image: jumpserver/web:${VERSION}-ce
     container_name: jms_web
     deploy:
       mode: replicated

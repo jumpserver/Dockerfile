@@ -2,6 +2,10 @@
 
 This is the Dockerfile for JumpServer all-in-one deployment, a Docker image generation code for the JumpServer all-in-one deployment method.
 
+Koko serves graphical sessions through `/koko/lion/`. Its image includes guacd, which Supervisor starts in the all-in-one container. Graphical session recordings and files are stored in the Koko data directory.
+
+Before upgrading, handle any pending recordings and files you need to retain in `/opt/data/lion`; this directory is not automatically migrated to Koko.
+
 ## How to start
 
 When migrating or upgrading the environment, please ensure that the SECRET_KEY is consistent with the previous settings and not randomly generated. Otherwise, all encrypted fields in the database cannot be decrypted.
@@ -62,7 +66,6 @@ flush privileges;
 	-	REDIS_PASSWORD = xxxx             # Redis authentication password
 	-	VOLUME /opt/jumpserver/data       # Core persistent directory, stores video logs
 	-	VOLUME /opt/koko/data             # Koko persistent directory
-	-	VOLUME /opt/lion/data             # Lion persistent directory
 	-	VOLUME /opt/chen/data             # Chen persistent directory
 	-	VOLUME /var/log/nginx             # Nginx log persistent directory
 	-	VOLUME /opt/download              # APPLETS file persistent directory (files required for application publishing)
@@ -90,7 +93,7 @@ docker run --name jms_all -d \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
   -v jsdata:/opt/data \
-  jumpserver/jms_all:v4.1.0
+  jumpserver/jms_all:v5.0.0
 ```
 
 **Upgrade**
@@ -106,7 +109,7 @@ mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpse
 # Example: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
 
 # Pull the new version of the image
-docker pull jumpserver/jms_all:v4.1.0
+docker pull jumpserver/jms_all:v5.0.0
 
 # Remove the old version container
 docker rm jms_all

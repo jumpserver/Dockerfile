@@ -1,6 +1,5 @@
-ARG version=dev-ce
+ARG version=v5.0.0-ce
 FROM jumpserver/koko:${version} AS koko
-FROM jumpserver/lion:${version} AS lion
 FROM jumpserver/chen:${version} AS chen
 FROM jumpserver/web:${version} AS web
 
@@ -26,14 +25,9 @@ RUN sed -i "s@http://.*.debian.org@${APT_MIRROR}@g" /etc/apt/sources.list.d/debi
     && apt-get install -y --no-install-recommends ${TOOLS} \
     && apt-get clean
 
+# Koko includes guacd and its runtime libraries.
 COPY --from=koko /opt /opt
 COPY --from=koko /usr /usr
-
-COPY --from=lion /opt /opt
-COPY --from=lion /usr /usr
-COPY --from=lion /lib /lib
-COPY --from=lion /lib32 /lib32
-COPY --from=lion /libx32 /libx32
 
 COPY --from=chen /opt /opt
 COPY --from=chen /usr /usr

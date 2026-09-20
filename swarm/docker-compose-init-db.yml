@@ -1,6 +1,6 @@
 services:
   init_db:
-    image: jumpserver/jms_core:${VERSION}
+    image: jumpserver/core:${VERSION}-ce
     container_name: jms_init_db
     command: upgrade_db
     deploy:

@@ -4,14 +4,14 @@
 - 自行创建 MySQL 和 Redis, 参考上面环境要求说明
 - 自行创建持久化共享存储目录 ( 例如 NFS, GlusterFS, Ceph 等 )
 
+图形会话和 guacd 均由 Koko 容器提供，使用 Koko 数据目录。升级时请移除旧配置中的 `GUA_HOST=guacd`，使用 Koko 默认的本地 guacd；外置 guacd 的配置可以继续保留。
+
 ```sh
 # 在所有 Docker Swarm Worker 节点挂载 NFS 或者其他共享存储, 例如 /data/jumpserver
 # 注意: 需要手动创建所有需要挂载的持久化目录, Docker Swarm 模式不会自动创建所需的目录
 mkdir -p /data/jumpserver/core/data
 mkdir -p /data/jumpserver/chen/data
-mkdir -p /data/jumpserver/lion/data
 mkdir -p /data/jumpserver/koko/data
-mkdir -p /data/jumpserver/lion/data
 mkdir -p /data/jumpserver/web/data/logs
 mkdir -p /data/jumpserver/web/download
 ```
@@ -24,7 +24,7 @@ vi .env
 
 ```vim
 # 版本号可以自己根据项目的版本修改
-VERSION=v4.1.0
+VERSION=v5.0.0
 
 TARGETARCH=amd64
 
@@ -62,18 +62,13 @@ DOMAINS=
 # 组件通信
 CORE_HOST=http://core:8080
 
-# Lion
-GUACD_LOG_LEVEL=error
-GUA_HOST=guacd
-GUA_PORT=4822
-
 # Web
 HTTP_PORT=80
 SSH_PORT=2222
 
 ##
 # SECRET_KEY 保护签名数据的密匙, 首次安装请一定要修改并牢记, 后续升级和迁移不可更改, 否则将导致加密的数据不可解密。
-# BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko, lion, magnus, kael, chen ...
+# BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko, magnus, kael, chen ...
 ```
 ```sh
 # 生成 docker stack 部署所需文件
@@ -89,14 +84,13 @@ docker service ps jumpserver_init_db
 # 根据查到的 Worker 节点, 到对应节点查看初始化日志
 ```
 ```sh
-# 启动 JumpServer 应用
-docker stack deploy -c docker-stack.yml jumpserver
+# 启动 JumpServer 应用，并清理已移除的组件服务
+docker stack deploy --prune -c docker-stack.yml jumpserver
 docker service ls
 ```
 ```sh
 # 扩容缩容
 docker service update --replicas=2 jumpserver_koko  # 扩容 koko 到 2 个副本
-docker service update --replicas=4 jumpserver_lion  # 扩容 lion 到 2 个副本
 # ...
 ```
 

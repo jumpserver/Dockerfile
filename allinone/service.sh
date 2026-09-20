@@ -43,7 +43,6 @@ function init_ng(){
     echo """
 127.0.0.1 core 
 127.0.0.1 koko
-127.0.0.1 lion
 127.0.0.1 chen
     """ >> /etc/hosts
     mkdir -p /var/log/nginx
@@ -81,5 +80,4 @@ init_pg
 init_ng
 init_redis
 init_other
-
 

@@ -2,6 +2,10 @@
 
 JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方式的 Docker 镜像生成代码。
 
+图形会话由 Koko 提供，通过 `/koko/lion/` 访问；guacd 随 Koko 镜像打包，由 Supervisor 启动。图形会话录像和文件保存在 Koko 数据目录中。
+
+升级前请处理旧 `/opt/data/lion` 中未上传的录像及需要保留的文件；该目录不会自动迁移到 Koko。
+
 ## How to start
 
 环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密。
@@ -65,7 +69,6 @@ flush privileges;
 
     - VOLUME /opt/jumpserver/data       # Core 持久化目录, 存储录像日志
     - VOLUME /opt/koko/data             # Koko 持久化目录
-    - VOLUME /opt/lion/data             # Lion 持久化目录
     - VOLUME /opt/chen/data             # Chen 持久化目录
     - VOLUME /var/log/nginx             # Nginx 日志持久化目录
     - VOLUME /opt/download              # APPLETS 文件持久化目录 (应用发布机所需文件)
@@ -92,7 +95,7 @@ docker run --name jms_all -d \
   -e REDIS_PASSWORD=weakPassword \
   --privileged=true \
   -v jsdata:/opt/data \
-  jumpserver/jms_all:v4.1.0
+  jumpserver/jms_all:v5.0.0
 ```
 
 **升级**
@@ -108,7 +111,7 @@ mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpse
 # 例: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
 
 # 拉取新版本镜像
-docker pull jumpserver/jms_all:v4.1.0
+docker pull jumpserver/jms_all:v5.0.0
 
 # 删掉旧版本容器
 docker rm jms_all

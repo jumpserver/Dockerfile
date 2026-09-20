@@ -3,7 +3,7 @@ name: Build all-in-one
 on:
   push:
     tags:
-      - v4.*
+      - v5.*
 
 jobs:
   allinone:
