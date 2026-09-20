@@ -6,6 +6,10 @@ Koko serves graphical sessions through `/koko/lion/`. Its image includes guacd, 
 
 Before upgrading, handle any pending recordings and files you need to retain in `/opt/data/lion`; this directory is not automatically migrated to Koko.
 
+Kael provides AI services through `/kael/` and runs under Supervisor. The image includes its Node.js and Codex CLI dependencies, and its data persists in `/opt/data/kael`.
+
+Kael reuses `BOOTSTRAP_TOKEN` for component registration. Following the installer configuration, `CHAT_AI_DELEGATION_SECRET` is passed to Kael as `PLATFORM_DELEGATION_KEY` for delegated Core API requests. Export your existing `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) before starting, and keep it unchanged when upgrading. For a new installation, generate it with `openssl rand -hex 32` and save it securely. Configure the model service in Core.
+
 ## How to start
 
 When migrating or upgrading the environment, please ensure that the SECRET_KEY is consistent with the previous settings and not randomly generated. Otherwise, all encrypted fields in the database cannot be decrypted.
@@ -20,6 +24,7 @@ docker volume create pgdata &> /dev/null
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
+     -e CHAT_AI_DELEGATION_SECRET \
      -v jsdata:/opt/data \
      -v pgdata:/var/lib/postgresql \
      -p 2222:2222 \
@@ -54,6 +59,7 @@ flush privileges;
 
 	-	SECRET_KEY = xxxxx                # Generate a random string yourself, do not include special characters, length recommended to be at least 50
 	-	BOOTSTRAP_TOKEN = xxxxx           # Generate a random string yourself, do not include special characters, length recommended to be at least 24
+	-	CHAT_AI_DELEGATION_SECRET = xxxxx # Shared Core/Kael delegation signing key, at least 32 characters
 	-	LOG_LEVEL = ERROR                 # Log level, set to DEBUG for testing environments
 	-	DB_ENGINE = mysql                 # Use MySQL database
 	-	DB_HOST = mysql_host              # MySQL database IP address
@@ -67,6 +73,7 @@ flush privileges;
 	-	VOLUME /opt/jumpserver/data       # Core persistent directory, stores video logs
 	-	VOLUME /opt/koko/data             # Koko persistent directory
 	-	VOLUME /opt/chen/data             # Chen persistent directory
+	-	VOLUME /opt/kael/data             # Kael persistent directory
 	-	VOLUME /var/log/nginx             # Nginx log persistent directory
 	-	VOLUME /opt/download              # APPLETS file persistent directory (files required for application publishing)
 
@@ -82,6 +89,7 @@ docker run --name jms_all -d \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
+  -e CHAT_AI_DELEGATION_SECRET \
   -e LOG_LEVEL=INFO \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \

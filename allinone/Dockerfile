@@ -2,6 +2,7 @@ ARG version=v5.0.0-ce
 FROM jumpserver/koko:${version} AS koko
 FROM jumpserver/chen:${version} AS chen
 FROM jumpserver/web:${version} AS web
+FROM jumpserver/kael:${version} AS kael
 
 FROM jumpserver/core:${version} AS core
 
@@ -34,6 +35,9 @@ COPY --from=chen /opt /opt
 COPY --from=chen /usr /usr
 COPY --from=chen /etc/alternatives /etc/alternatives
 
+COPY --from=kael /opt /opt
+COPY --from=kael /usr /usr
+
 COPY --from=web /opt /opt
 COPY --from=web /usr /usr
 COPY --from=web /etc/nginx /etc/nginx
@@ -56,6 +60,7 @@ VOLUME /var/log/nginx
 EXPOSE 80 2222
 ENV LC_ALL=C.UTF-8
 ENV ANSIBLE_DOCKER_ENABLED=false
+ENV KAEL_ENABLED=1
 
 WORKDIR /opt
 COPY entrypoint.sh .

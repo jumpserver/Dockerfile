@@ -17,6 +17,7 @@ function prepare_core() {
     LOG_LEVEL=${LOG_LEVEL:-INFO}
     
     export SECRET_KEY BOOTSTRAP_TOKEN CORE_HOST LOG_LEVEL
+    export PLATFORM_DELEGATION_KEY="${CHAT_AI_DELEGATION_SECRET:-}"
     export PATH=/opt/py3/bin/:$PATH
     
     if [[ -f /opt/jumpserver/config.yml ]];then
@@ -43,7 +44,7 @@ function mv_dir_link(){
 }
 
 function prepare_data_persist() {
-    for app in jumpserver koko chen;do
+    for app in jumpserver koko chen kael;do
         mv_dir_link /opt/$app/data /opt/data/${app}
     done
     
