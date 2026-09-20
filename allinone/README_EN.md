@@ -8,7 +8,7 @@ Before upgrading, handle any pending recordings and files you need to retain in 
 
 Kael provides AI services through `/kael/` and runs under Supervisor. The image includes its Node.js and Codex CLI dependencies, and its data persists in `/opt/data/kael`.
 
-Kael reuses `BOOTSTRAP_TOKEN` for component registration. Following the installer configuration, `CHAT_AI_DELEGATION_SECRET` is passed to Kael as `PLATFORM_DELEGATION_KEY` for delegated Core API requests. Export your existing `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) before starting, and keep it unchanged when upgrading. For a new installation, generate it with `openssl rand -hex 32` and save it securely. Configure the model service in Core.
+Kael reuses `BOOTSTRAP_TOKEN` for component registration. By default, the signing key for delegated Core API requests is deterministically derived from `SECRET_KEY` using HMAC-SHA256 and passed to both Core and Kael. No extra configuration or key file is needed; keep `SECRET_KEY` unchanged across restarts and upgrades. An explicitly configured `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) takes precedence and must still be supplied when starting the container. Configure the model service in Core.
 
 ## How to start
 
@@ -24,7 +24,6 @@ docker volume create pgdata &> /dev/null
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
-     -e CHAT_AI_DELEGATION_SECRET \
      -v jsdata:/opt/data \
      -v pgdata:/var/lib/postgresql \
      -p 2222:2222 \
@@ -59,7 +58,7 @@ flush privileges;
 
 	-	SECRET_KEY = xxxxx                # Generate a random string yourself, do not include special characters, length recommended to be at least 50
 	-	BOOTSTRAP_TOKEN = xxxxx           # Generate a random string yourself, do not include special characters, length recommended to be at least 24
-	-	CHAT_AI_DELEGATION_SECRET = xxxxx # Shared Core/Kael delegation signing key, at least 32 characters
+	-	CHAT_AI_DELEGATION_SECRET = xxxxx # Optional override for the derived delegation signing key, at least 32 characters
 	-	LOG_LEVEL = ERROR                 # Log level, set to DEBUG for testing environments
 	-	DB_ENGINE = mysql                 # Use MySQL database
 	-	DB_HOST = mysql_host              # MySQL database IP address
@@ -89,7 +88,6 @@ docker run --name jms_all -d \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
-  -e CHAT_AI_DELEGATION_SECRET \
   -e LOG_LEVEL=INFO \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \

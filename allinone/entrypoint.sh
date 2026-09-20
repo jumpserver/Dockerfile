@@ -17,7 +17,12 @@ function prepare_core() {
     LOG_LEVEL=${LOG_LEVEL:-INFO}
     
     export SECRET_KEY BOOTSTRAP_TOKEN CORE_HOST LOG_LEVEL
-    export PLATFORM_DELEGATION_KEY="${CHAT_AI_DELEGATION_SECRET:-}"
+    if [[ -z "${CHAT_AI_DELEGATION_SECRET:-}" ]]; then
+        CHAT_AI_DELEGATION_SECRET=$(/opt/py3/bin/python -c \
+            'import hashlib, hmac, os; print(hmac.new(os.environ["SECRET_KEY"].encode(), b"jumpserver-chat-ai-delegation-v1", hashlib.sha256).hexdigest())') || return 1
+    fi
+    export CHAT_AI_DELEGATION_SECRET
+    export PLATFORM_DELEGATION_KEY="$CHAT_AI_DELEGATION_SECRET"
     export PATH=/opt/py3/bin/:$PATH
     
     if [[ -f /opt/jumpserver/config.yml ]];then
@@ -63,7 +68,7 @@ function upgrade_db() {
 
 export GIN_MODE=release
 
-prepare_core
+prepare_core || exit 1
 prepare_data_persist
 
 # start other service

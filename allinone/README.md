@@ -8,7 +8,7 @@ JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方�
 
 Kael 提供 AI 服务，通过 `/kael/` 访问，由 Supervisor 启动。镜像包含其所需的 Node.js 和 Codex CLI，数据持久化到 `/opt/data/kael`。
 
-Kael 复用 `BOOTSTRAP_TOKEN` 注册组件。委托调用 Core API 时，沿用 installer 的配置，将 `CHAT_AI_DELEGATION_SECRET` 传给 Kael 的 `PLATFORM_DELEGATION_KEY`。启动前请导出已有的 `CHAT_AI_DELEGATION_SECRET`（至少 32 字符），升级时保持一致；首次部署可用 `openssl rand -hex 32` 生成并妥善保存。模型服务在 Core 中配置。
+Kael 复用 `BOOTSTRAP_TOKEN` 注册组件。委托调用 Core API 所需的签名密钥默认由 `SECRET_KEY` 通过 HMAC-SHA256 确定性派生，并同时传给 Core 和 Kael，无需额外配置或保存密钥文件。重启、升级时保持 `SECRET_KEY` 不变即可。若已单独设置 `CHAT_AI_DELEGATION_SECRET`（至少 32 字符），则优先沿用该值，启动时仍需传入。模型服务在 Core 中配置。
 
 ## How to start
 
@@ -24,7 +24,6 @@ docker volume create pgdata
 docker run --name jms_all \
      -e SECRET_KEY=PleaseChangeMe \
      -e BOOTSTRAP_TOKEN=PleaseChangeMe \
-     -e CHAT_AI_DELEGATION_SECRET \
      -v jsdata:/opt/data \
      -v pgdata:/var/lib/postgresql \
      -p 2222:2222 \
@@ -59,7 +58,7 @@ flush privileges;
 
     - SECRET_KEY = xxxxx                # 自行生成随机的字符串, 不要包含特殊字符串, 长度推荐大于等于 50
     - BOOTSTRAP_TOKEN = xxxxx           # 自行生成随机的字符串, 不要包含特殊字符串, 长度推荐大于等于 24
-    - CHAT_AI_DELEGATION_SECRET = xxxxx # Core 与 Kael 的委托签名密钥, 至少 32 字符
+    - CHAT_AI_DELEGATION_SECRET = xxxxx # 可选, 覆盖默认派生的委托签名密钥, 至少 32 字符
     - LOG_LEVEL = ERROR                 # 日志等级, 测试环境推荐设置为 DEBUG
 
     - DB_ENGINE = mysql                 # 使用 MySQL 数据库
@@ -91,7 +90,6 @@ docker run --name jms_all -d \
   -p 2222:2222 \
   -e SECRET_KEY=xxxxxx \
   -e BOOTSTRAP_TOKEN=xxxxxx \
-  -e CHAT_AI_DELEGATION_SECRET \
   -e LOG_LEVEL=INFO \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
