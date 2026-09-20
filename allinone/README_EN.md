@@ -8,7 +8,7 @@ Before upgrading, handle any pending recordings and files you need to retain in 
 
 Kael provides AI services through `/kael/` and runs under Supervisor. The image includes its Node.js and Codex CLI dependencies, and its data persists in `/opt/data/kael`.
 
-Kael reuses `BOOTSTRAP_TOKEN` for component registration. By default, the signing key for delegated Core API requests is deterministically derived from `SECRET_KEY` using HMAC-SHA256 and passed to both Core and Kael. No extra configuration or key file is needed; keep `SECRET_KEY` unchanged across restarts and upgrades. An explicitly configured `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) takes precedence and must still be supplied when starting the container. Configure the model service in Core.
+Kael reuses `BOOTSTRAP_TOKEN` for component registration. By default, the signing key for delegated Core API requests is also deterministically derived from `BOOTSTRAP_TOKEN` using HMAC-SHA256 and passed to both Core and Kael. No extra configuration or key file is needed; keep `BOOTSTRAP_TOKEN` unchanged across restarts and upgrades to preserve this signing key. An explicitly configured `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) takes precedence and must still be supplied when starting the container. Configure the model service in Core.
 
 ## How to start
 

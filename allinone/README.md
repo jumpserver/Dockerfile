@@ -8,7 +8,7 @@ JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方�
 
 Kael 提供 AI 服务，通过 `/kael/` 访问，由 Supervisor 启动。镜像包含其所需的 Node.js 和 Codex CLI，数据持久化到 `/opt/data/kael`。
 
-Kael 复用 `BOOTSTRAP_TOKEN` 注册组件。委托调用 Core API 所需的签名密钥默认由 `SECRET_KEY` 通过 HMAC-SHA256 确定性派生，并同时传给 Core 和 Kael，无需额外配置或保存密钥文件。重启、升级时保持 `SECRET_KEY` 不变即可。若已单独设置 `CHAT_AI_DELEGATION_SECRET`（至少 32 字符），则优先沿用该值，启动时仍需传入。模型服务在 Core 中配置。
+Kael 复用 `BOOTSTRAP_TOKEN` 注册组件。委托调用 Core API 所需的签名密钥也默认由 `BOOTSTRAP_TOKEN` 通过 HMAC-SHA256 确定性派生，并同时传给 Core 和 Kael，无需额外配置或保存密钥文件。重启、升级时保持 `BOOTSTRAP_TOKEN` 不变即可保持该签名密钥不变。若已单独设置 `CHAT_AI_DELEGATION_SECRET`（至少 32 字符），则优先沿用该值，启动时仍需传入。模型服务在 Core 中配置。
 
 ## How to start
 

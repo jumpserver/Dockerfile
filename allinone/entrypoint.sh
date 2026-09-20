@@ -19,7 +19,7 @@ function prepare_core() {
     export SECRET_KEY BOOTSTRAP_TOKEN CORE_HOST LOG_LEVEL
     if [[ -z "${CHAT_AI_DELEGATION_SECRET:-}" ]]; then
         CHAT_AI_DELEGATION_SECRET=$(/opt/py3/bin/python -c \
-            'import hashlib, hmac, os; print(hmac.new(os.environ["SECRET_KEY"].encode(), b"jumpserver-chat-ai-delegation-v1", hashlib.sha256).hexdigest())') || return 1
+            'import hashlib, hmac, os; print(hmac.new(os.environ["BOOTSTRAP_TOKEN"].encode(), b"jumpserver-chat-ai-delegation-v1", hashlib.sha256).hexdigest())') || return 1
     fi
     export CHAT_AI_DELEGATION_SECRET
     export PLATFORM_DELEGATION_KEY="$CHAT_AI_DELEGATION_SECRET"
