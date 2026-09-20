@@ -13,13 +13,10 @@ jobs:
         component: [all]
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-qemu-action@v3
-        with:
-          image: tonistiigi/binfmt:qemu-v7.0.0-28
       - uses: docker/setup-buildx-action@v3
       - name: Get Version
         run: |
-          echo "version=$(basename ${GITHUB_REF})" >> $GITHUB_ENV
+          echo "version=${GITHUB_REF##*/}" >> "$GITHUB_ENV"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -39,7 +36,7 @@ jobs:
         with:
           context: ./allinone
           file: ./allinone/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           build-args: |
             version=${{ env.version }}-ce
