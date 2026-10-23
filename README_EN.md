@@ -28,6 +28,8 @@ docker run --name jms_all \
      -p 80:80 jumpserver/jms_all
 ```
 
+All-in-One runs Ansible tasks locally by default. For isolation in a separate executor container, use the standard Installer deployment. See [Ansible tasks](allinone/README_EN.md#ansible-tasks) for the setting to check when upgrading.
+
 For more details, see the all-in-one [README](allinone).
 
 ## Standard Deployment

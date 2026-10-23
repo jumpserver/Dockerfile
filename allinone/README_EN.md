@@ -30,6 +30,14 @@ docker run --name jms_all \
      -p 80:80 jumpserver/jms_all
 ```
 
+### Ansible tasks
+
+The image defaults to `ANSIBLE_DOCKER_ENABLED=false`. Ansible tasks, including account discovery, password changes, account push and verification, and Job Center jobs, run locally inside the All-in-One container using Core's Ansible environment. No additional executor, Docker socket mount, or `--privileged` flag is required.
+
+Settings saved in an existing database override the image default. After upgrading or migrating, disable "Docker isolation for Ansible" under System Settings > Feature Settings > Job Center unless a separate executor has already been configured.
+
+Local execution shares the container with Core and does not provide isolation in a separate execution container. For isolated execution, use the [JumpServer Installer](https://github.com/jumpserver/installer) to deploy a separate executor. Enabling the isolation setting alone does not create an executor.
+
 ### Standard start
 
 Using an external MySQL database and Redis:
@@ -97,7 +105,6 @@ docker run --name jms_all -d \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
-  --privileged=true \
   -v jsdata:/opt/data \
   jumpserver/jms_all:v5.0.0
 ```

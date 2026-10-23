@@ -30,6 +30,14 @@ docker run --name jms_all \
      -p 80:80 jumpserver/jms_all
 ```
 
+### Ansible 任务
+
+镜像默认设置 `ANSIBLE_DOCKER_ENABLED=false`，账号发现、改密、推送、校验及作业中心等 Ansible 任务直接在 All-in-One 容器内执行。镜像继承 Core 的 Ansible 环境，无需额外启动执行器、挂载 Docker socket 或开启 `--privileged`。
+
+已有数据库中保存的设置会覆盖镜像默认值。升级或迁移后，请在「系统设置 → 功能设置 → 作业中心」中关闭「Ansible Docker 隔离」，除非已经配置好独立执行器。
+
+本地执行与 Core 共享容器，不能提供独立执行容器的隔离能力。需要隔离时，建议使用 [JumpServer Installer](https://github.com/jumpserver/installer) 部署独立执行器；仅开启隔离开关不会自动创建执行器。
+
 ### 外置数据库
 
 使用外置 MySQL 数据库和 Redis:
@@ -99,7 +107,6 @@ docker run --name jms_all -d \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=weakPassword \
-  --privileged=true \
   -v jsdata:/opt/data \
   jumpserver/jms_all:v5.0.0
 ```

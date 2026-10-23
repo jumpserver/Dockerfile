@@ -23,6 +23,8 @@ docker run --name jms_all \
      -p 80:80 jumpserver/jms_all
 ```
 
+All-in-One 默认在容器内本地执行 Ansible 任务；需要独立执行器隔离时，建议使用标准 Installer 部署。升级时的开关说明见 [Ansible 任务](allinone/README.md#ansible-任务)。
+
 **初始账号**
 ```bash
 默认账号: admin
