@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - v4.*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build (for example, v4.10.20)
+        required: true
+        type: string
 
 jobs:
   allinone:
@@ -18,8 +24,15 @@ jobs:
           image: tonistiigi/binfmt:qemu-v7.0.0-28
       - uses: docker/setup-buildx-action@v3
       - name: Get Version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          echo "version=$(basename ${GITHUB_REF})" >> $GITHUB_ENV
+          version="${REQUESTED_VERSION:-${GITHUB_REF_NAME}}"
+          if [[ ! "$version" =~ ^v4\.[0-9]+\.[0-9]+([.-][a-zA-Z0-9.-]+)?$ ]]; then
+            echo "Invalid v4 version: $version" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_ENV"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -53,11 +66,23 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/github-script@v7
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.version }}
         with:
-          tag_name: ${{ env.version }}
-          release_name: Release ${{ env.version }}
-          draft: false
-          prerelease: false
+          script: |
+            const tag = process.env.VERSION;
+            try {
+              await github.rest.repos.getReleaseByTag({ ...context.repo, tag });
+              core.info(`Release ${tag} already exists; skipping creation.`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.repos.createRelease({
+                ...context.repo,
+                tag_name: tag,
+                target_commitish: context.sha,
+                name: `Release ${tag}`,
+                draft: false,
+                prerelease: false,
+              });
+            }
