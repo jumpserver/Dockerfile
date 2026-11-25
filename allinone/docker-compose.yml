@@ -1,0 +1,37 @@
+services:
+  jms_all:
+    image: jumpserver/jms_all:${VERSION:-v5.0.0}
+    container_name: jms_all
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Please set SECRET_KEY in .env}
+      BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:?BOOTSTRAP_TOKEN is required, see .env.example}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # CHAT_AI_DELEGATION_SECRET: ${CHAT_AI_DELEGATION_SECRET:-}
+      #
+      # Uncomment and fill in to use an external database / Redis
+      # DB_ENGINE: mysql
+      # DB_HOST: 192.168.1.10
+      # DB_PORT: 3306
+      # DB_USER: jumpserver
+      # DB_PASSWORD: nu4x599Wq7u0Bn8EABh3J91G
+      # DB_NAME: jumpserver
+      # REDIS_HOST: 192.168.1.10
+      # REDIS_PORT: 6379
+      # REDIS_PASSWORD: 8URXPL2x3HZMi7xoGTdk3Upj
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${SSH_PORT:-2222}:2222"
+    volumes:
+      - jsdata:/opt/data
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1/api/health/ >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+
+volumes:
+  jsdata:
+  pgdata:
