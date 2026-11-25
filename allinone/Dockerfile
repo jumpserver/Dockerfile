@@ -55,7 +55,6 @@ COPY --from=core / /
 
 VOLUME /opt/data
 VOLUME /opt/download
-VOLUME /var/log/nginx
 
 EXPOSE 80 2222
 ENV LC_ALL=C.UTF-8

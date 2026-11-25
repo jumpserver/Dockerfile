@@ -1,132 +1,223 @@
-# Dockerfile
+# JumpServer all-in-one
 
-JumpServer all-in-one Dockerfile，该项目是 JumpServer all-in-one 部署方式的 Docker 镜像生成代码。
+English · [简体中文](README.zh-hans.md) · [繁體中文](README.zh-hant.md)
 
-图形会话由 Koko 提供，通过 `/koko/lion/` 访问；guacd 随 Koko 镜像打包，由 Supervisor 启动。图形会话录像和文件保存在 Koko 数据目录中。
+Build and runtime files for the JumpServer all-in-one deployment. Core, Koko, Chen, Kael and Web run in a single container, with PostgreSQL and Redis bundled. It is intended for evaluation, testing and small deployments.
 
-升级前请处理旧 `/opt/data/lion` 中未上传的录像及需要保留的文件；该目录不会自动迁移到 Koko。
+> [!NOTE]
+> all-in-one does not support Client-related features and only works with the pure B/S web interface. For production, use the [JumpServer installer](https://docs.jumpserver.org/zh/v3/quick_start/).
 
-Kael 提供 AI 服务，通过 `/kael/` 访问，由 Supervisor 启动。镜像包含其所需的 Node.js 和 Codex CLI，数据持久化到 `/opt/data/kael`。
+## What's inside
 
-Kael 复用 `BOOTSTRAP_TOKEN` 注册组件。委托调用 Core API 所需的签名密钥也默认由 `BOOTSTRAP_TOKEN` 通过 HMAC-SHA256 确定性派生，并同时传给 Core 和 Kael，无需额外配置或保存密钥文件。重启、升级时保持 `BOOTSTRAP_TOKEN` 不变即可保持该签名密钥不变。若已单独设置 `CHAT_AI_DELEGATION_SECRET`（至少 32 字符），则优先沿用该值，启动时仍需传入。模型服务在 Core 中配置。
+| Component | Description | Port / Path |
+| --- | --- | --- |
+| Core | JumpServer core API and scheduler | `8080` inside the container |
+| Web | Nginx frontend and reverse proxy | `80` |
+| Koko | Character protocol connector; guacd is bundled for graphical sessions | `2222`, web path `/koko/lion/` |
+| Chen | Web database connector | web path `/chen/` |
+| Kael | AI service, registered with `BOOTSTRAP_TOKEN` | web path `/kael/` |
+| PostgreSQL | Bundled database, swappable for an external MySQL/PostgreSQL | `5432` |
+| Redis | Bundled cache, swappable for an external Redis | `6379` |
 
-## How to start
+PostgreSQL and Redis are started by the entrypoint; the remaining services run under Supervisor and are restarted automatically if they exit.
 
-环境迁移和更新升级请检查 SECRET_KEY 是否与之前设置一致, 不能随机生成, 否则数据库所有加密的字段均无法解密。
+## Prerequisites
 
-### Quick start
+- Docker is installed. The image is published for `linux/amd64` only.
+- The host can reach Docker Hub, or the image has been pulled in advance.
+- The first start initializes the database and runs `upgrade_db`, which can take a while.
 
-**注意: all-in-one 部署方式不支持 Client 相关功能, 仅支持在 纯 B/S 架构 Web 端使用。**
+## Quick start
+
+Start with the bundled PostgreSQL and Redis:
 
 ```sh
 docker volume create jsdata
 docker volume create pgdata
-docker run --name jms_all \
-     -e SECRET_KEY=PleaseChangeMe \
-     -e BOOTSTRAP_TOKEN=PleaseChangeMe \
-     -v jsdata:/opt/data \
-     -v pgdata:/var/lib/postgresql \
-     -p 2222:2222 \
-     -p 80:80 jumpserver/jms_all
+
+docker run -d --name jms_all \
+  -e SECRET_KEY=[API_KEY] \
+  -e BOOTSTRAP_TOKEN=PleaseChangeMe \
+  -v jsdata:/opt/data \
+  -v pgdata:/var/lib/postgresql \
+  -p 80:80 \
+  -p 2222:2222 \
+  jumpserver/jms_all:latest
 ```
 
-### 外置数据库
+Open `http://<server-ip>/` and sign in with:
 
-使用外置 MySQL 数据库和 Redis:
+- Username: `admin`
+- Password: `ChangeMe`
 
-  - 外置数据库要求 MariaDB 版本大于等于 10.6 或者 PosgresSQL 13；
-  - 外置 Redis 要求 Redis 版本大于等于 6.2。
+> [!IMPORTANT]
+> `SECRET_KEY` encrypts sensitive database fields. Replace it with a random alphanumeric string of at least 50 characters (no special characters) and keep it safe. It must not change after the first deployment, otherwise every encrypted field becomes undecryptable. Replace `BOOTSTRAP_TOKEN` with a random string of at least 24 characters and keep it unchanged across restarts and upgrades.
+
+Follow the startup log:
 
 ```sh
-# 自行部署 MySQL 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#mysql)
-# mysql 创建用户并赋予权限, 请自行替换 nu4x599Wq7u0Bn8EABh3J91G 为自己的密码
-mysql -u root -p
+docker logs -f jms_all
 ```
+
+## Docker Compose
+
+The repository ships a `docker-compose.yml` and `.env.example` for long-running deployments with fixed configuration:
+
+```sh
+cd allinone
+cp .env.example .env
+# Edit .env and at least change SECRET_KEY and BOOTSTRAP_TOKEN
+docker compose up -d
+```
+
+Compose creates the `jsdata` and `pgdata` named volumes automatically and uses the port settings described below.
+
+## External database and Redis
+
+all-in-one can also use an external database and cache. Requirements:
+
+- Database: MariaDB `>= 10.6` or PostgreSQL `>= 13`
+- Redis: `>= 6.2`
+
+Create the MySQL database and user (replace the password):
 
 ```mysql
 create database jumpserver default charset 'utf8';
-create user 'jumpserver'@'%' identified by 'nu4x599Wq7u0Bn8EABh3J91G';
+create user 'jumpserver'@'%' identified by '<your-db-password>';
 grant all on jumpserver.* to 'jumpserver'@'%';
 flush privileges;
 ```
 
+Pass the external endpoints at startup:
+
 ```sh
-# 自行部署 Redis 可以参考 (https://docs.jumpserver.org/zh/master/install/setup_by_lb/#redis)
-```
-
-**设置环境变量：**
-
-    - SECRET_KEY = xxxxx                # 自行生成随机的字符串, 不要包含特殊字符串, 长度推荐大于等于 50
-    - BOOTSTRAP_TOKEN = xxxxx           # 自行生成随机的字符串, 不要包含特殊字符串, 长度推荐大于等于 24
-    - CHAT_AI_DELEGATION_SECRET = xxxxx # 可选, 覆盖默认派生的委托签名密钥, 至少 32 字符
-    - LOG_LEVEL = ERROR                 # 日志等级, 测试环境推荐设置为 DEBUG
-
-    - DB_ENGINE = mysql                 # 使用 MySQL 数据库
-    - DB_HOST = mysql_host              # MySQL 数据库 IP 地址
-    - DB_PORT = 3306                    # MySQL 数据库 端口
-    - DB_USER = xxx                     # MySQL 数据库认证用户
-    - DB_PASSWORD = xxxx                # MySQL 数据库认证密码
-    - DB_NAME = jumpserver              # JumpServer 使用的数据库名称
-
-    - REDIS_HOST = redis_host           # 使用 Redis 缓存
-    - REDIS_PORT = 6379                 # Redis 服务器 IP 地址
-    - REDIS_PASSWORD = xxxx             # Redis 认证密码
-
-    - VOLUME /opt/jumpserver/data       # Core 持久化目录, 存储录像日志
-    - VOLUME /opt/koko/data             # Koko 持久化目录
-    - VOLUME /opt/chen/data             # Chen 持久化目录
-    - VOLUME /opt/kael/data             # Kael 持久化目录
-    - VOLUME /var/log/nginx             # Nginx 日志持久化目录
-    - VOLUME /opt/download              # APPLETS 文件持久化目录 (应用发布机所需文件)
-
-注意：自己上面设置的这些信息一定要记录下来，升级需要重新输入使用。
-
-**启动 JumpServer**
-```bash
-docker volume create jsdata
-
-docker run --name jms_all -d \
+docker run -d --name jms_all \
   -p 80:80 \
   -p 2222:2222 \
-  -e SECRET_KEY=xxxxxx \
+  -e SECRET_KEY=[API_KEY] \
   -e BOOTSTRAP_TOKEN=xxxxxx \
   -e LOG_LEVEL=INFO \
+  -e DB_ENGINE=mysql \
   -e DB_HOST=192.168.x.x \
   -e DB_PORT=3306 \
   -e DB_USER=jumpserver \
-  -e DB_PASSWORD=weakPassword \
+  -e DB_PASSWORD=<your-db-password> \
   -e DB_NAME=jumpserver \
   -e REDIS_HOST=192.168.x.x \
   -e REDIS_PORT=6379 \
-  -e REDIS_PASSWORD=weakPassword \
+  -e REDIS_PASSWORD=<your-redis-password> \
   --privileged=true \
   -v jsdata:/opt/data \
-  jumpserver/jms_all:v5.0.0
+  jumpserver/jms_all:latest
 ```
 
-**升级**
-```bash
-# 查询定义的 JumpServer 配置
+The `pgdata` volume is unnecessary with an external database. When `DB_HOST` or `REDIS_HOST` is not `127.0.0.1`, the container skips the corresponding bundled service.
+
+## Environment variables
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `SECRET_KEY` | `PleaseChangeMe` (must change) | Encryption key; at least 50 random alphanumeric characters, immutable after deployment |
+| `BOOTSTRAP_TOKEN` | `PleaseChangeMe` | Component registration token; at least 24 characters; keep it unchanged across restarts and upgrades |
+| `CHAT_AI_DELEGATION_SECRET` | Derived from `BOOTSTRAP_TOKEN` | Optional override for the AI delegation signing key, at least 32 characters |
+| `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING` or `ERROR` |
+| `CORE_HOST` | `http://localhost:8080` | Internal Core address |
+| `DB_ENGINE` | `postgresql` | `postgresql` or `mysql` |
+| `DB_HOST` | `127.0.0.1` | Database host |
+| `DB_PORT` | `5432` | Database port; usually `3306` for MySQL |
+| `DB_USER` | `postgres` | Database user |
+| `DB_PASSWORD` | `PleaseChangeMe` | Database password |
+| `DB_NAME` | `jumpserver` | Database name |
+| `REDIS_HOST` | `127.0.0.1` | Redis host |
+| `REDIS_PORT` | `6379` | Redis port |
+| `REDIS_PASSWORD` | `PleaseChangeMe` | Redis password |
+
+> [!TIP]
+> Record these values when you first deploy. You will need to pass the same values when upgrading or migrating.
+
+## Ports
+
+| Port | Description |
+| --- | --- |
+| `80/tcp` | Web entrypoint |
+| `2222/tcp` | Koko SSH gateway |
+
+## Persistence
+
+| Mount | Volume | Contents |
+| --- | --- | --- |
+| `/opt/data` | `jsdata` | Unified data directory: Core, Koko, Chen and Kael data, Nginx logs and Redis data |
+| `/var/lib/postgresql` | `pgdata` | Bundled PostgreSQL data directory |
+| `/opt/download` | — | Files for application publishing hosts (optional) |
+
+Directories under `/opt/data` are created and symlinked by the entrypoint. With the bundled database, back up both the `jsdata` and `pgdata` volumes; with an external database, back up that database as well.
+
+## Graphical sessions and AI service
+
+- Graphical sessions are served by Koko at `/koko/lion/`. guacd is packaged in the Koko image and started by Supervisor; recordings and files are kept in Koko's data directory.
+- Before upgrading, process any pending recordings or files in the legacy `/opt/data/lion` directory. It is not migrated to Koko automatically.
+- Kael provides the AI service at `/kael/`. The image includes its Node.js and Codex CLI dependencies, and data persists in `/opt/data/kael`.
+- Kael reuses `BOOTSTRAP_TOKEN` for registration. The signing key for delegated Core API requests is derived deterministically from `BOOTSTRAP_TOKEN` with HMAC-SHA256 and passed to both Core and Kael, so no extra configuration or key file is needed. Keep `BOOTSTRAP_TOKEN` unchanged across restarts and upgrades to preserve this key. An explicitly configured `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) takes precedence and must still be supplied at startup. Configure the model service in Core.
+
+## Upgrade
+
+```sh
+# 1. Record the current configuration
 docker exec -it jms_all env
 
-# 停止 JumpServer
+# 2. Back up data
+#    Bundled database: back up the jsdata and pgdata volumes
+#    External database: use mysqldump / pg_dump, for example
+#    Replace the DB_* values below with the ones printed above
+mysqldump -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > jumpserver-backup.sql
+
+# 3. Stop and remove the old container (volumes are kept)
 docker stop jms_all
-
-# 备份数据库, 下面用到的 DB-xxx 从上面的 docker exec -it jms_all env 结果获取
-mysqldump -h$DB_HOST -p$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > /opt/jumpserver-<版本号>.sql
-# 例: mysqldump -h192.168.100.11 -p3306 -ujumpserver -pnu4x599Wq7u0Bn8EABh3J91G jumpserver > /opt/jumpserver-v2.12.0.sql
-
-# 拉取新版本镜像
-docker pull jumpserver/jms_all:v5.0.0
-
-# 删掉旧版本容器
 docker rm jms_all
 
-# 重新启动新版本
+# 4. Pull the new version and start it with the same arguments
+docker pull jumpserver/jms_all:v5.0.0
 ```
 
-**初始账号**
-```bash
-默认账号: admin
-默认密码: ChangeMe
+The container runs `upgrade_db` automatically on startup. Always reuse the exact same `SECRET_KEY` and `BOOTSTRAP_TOKEN`.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Container exits right away | `docker logs jms_all`; check database/Redis connectivity and initialization |
+| Web UI unreachable | Check that port `80` is free and `curl -fsS http://127.0.0.1/api/health/` succeeds |
+| Database wait timeout | With an external database, check `DB_HOST` / `DB_PORT` connectivity and credentials |
+| Redis wait timeout | With an external Redis, check `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` |
+| Encrypted data unreadable after upgrade | `SECRET_KEY` differs from the first deployment; restore the original value |
+
+Open a shell inside the container:
+
+```sh
+docker exec -it jms_all bash
 ```
+
+To start a one-off container with a shell instead of the services, pass `bash` or `sh` as the command; the entrypoint detects it and opens a shell:
+
+```sh
+docker run --rm -it -v jsdata:/opt/data jumpserver/jms_all:latest bash
+```
+
+## Build the image
+
+```sh
+cd allinone
+
+# Build v5.0.0 by default
+./build.sh
+
+# Build another version; jumpserver/*:<version>-ce must exist
+./build.sh <version>
+```
+
+The build uses the `${version}-ce` tags of `jumpserver/core`, `koko`, `chen`, `kael` and `web`, and produces `jumpserver/jms_all:<version>`. Run `demo_run.sh` to start the locally built image on port `8085` (defaults to `v5.0.0`; pass a version to override).
+
+## Initial account
+
+- Username: `admin`
+- Password: `ChangeMe`

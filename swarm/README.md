@@ -1,20 +1,38 @@
-## 集群部署
+# Docker Swarm Cluster Deployment
 
-- Docker Swarm 集群环境
-- 自行创建 MySQL 和 Redis, 参考上面环境要求说明
-- 自行创建持久化共享存储目录 ( 例如 NFS, GlusterFS, Ceph 等 )
+[English](README.md) · [简体中文](README.zh-hans.md) · [繁體中文](README.zh-hant.md)
 
-图形会话和 guacd 均由 Koko 容器提供，使用 Koko 数据目录。升级时请移除旧配置中的 `GUA_HOST=guacd`，使用 Koko 默认的本地 guacd；外置 guacd 的配置可以继续保留。
+Deploy the JumpServer components with Docker Swarm. This suits horizontal scaling or environments that already run container infrastructure.
+
+The stack currently deploys Core, Celery, Chen, Koko and Web. Kael is not part of the Swarm stack.
+
+## Prerequisites
+
+- An initialized Docker Swarm cluster.
+- The same shared storage (NFS, GlusterFS, Ceph, etc.) mounted on every Worker node that may run JumpServer services.
+- An external database and Redis:
+  - Database: MariaDB `>= 10.6` or PostgreSQL `>= 13`;
+  - Redis: `>= 6.2`.
+- Graphical sessions and guacd are provided by the Koko container and use Koko's data directory.
+
+> [!NOTE]
+> When upgrading from an older version, remove `GUA_HOST=guacd` from `.env` and use Koko's local guacd. Keep the setting only if an external guacd is really required.
+
+## 1. Prepare shared storage
+
+Mount the shared storage on **all** Worker nodes (the example uses the default `/opt/jumpserver` from `config_example.conf`) and create the required directories manually:
 
 ```sh
-# 在所有 Docker Swarm Worker 节点挂载 NFS 或者其他共享存储, 例如 /data/jumpserver
-# 注意: 需要手动创建所有需要挂载的持久化目录, Docker Swarm 模式不会自动创建所需的目录
-mkdir -p /data/jumpserver/core/data
-mkdir -p /data/jumpserver/chen/data
-mkdir -p /data/jumpserver/koko/data
-mkdir -p /data/jumpserver/web/data/logs
-mkdir -p /data/jumpserver/web/download
+# Docker Swarm does not create mount directories automatically
+mkdir -p /opt/jumpserver/core/data
+mkdir -p /opt/jumpserver/chen/data
+mkdir -p /opt/jumpserver/koko/data
+mkdir -p /opt/jumpserver/web/data/logs
+mkdir -p /opt/jumpserver/web/download
 ```
+
+## 2. Prepare the configuration
+
 ```sh
 git clone --depth=1 https://github.com/jumpserver/Dockerfile.git
 cd Dockerfile/swarm
@@ -22,79 +40,75 @@ cp config_example.conf .env
 vi .env
 ```
 
-```vim
-# 版本号可以自己根据项目的版本修改
-VERSION=v5.0.0
+Settings to review:
 
-TARGETARCH=amd64
+| Setting | Description |
+| --- | --- |
+| `VERSION` | Image version, e.g. `v5.0.0`, which maps to `jumpserver/*:v5.0.0-ce` |
+| `VOLUME_DIR` | Shared storage directory; must match the directories created in step 1 |
+| `NETWORK_DRIVER` | Use `overlay` in Swarm mode |
+| `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` | External database connection |
+| `REDIS_HOST` / `REDIS_PORT` / `REDIS_PASSWORD` | External Redis connection |
+| `SECRET_KEY` | Encryption key; change it on first install and never change it afterwards |
+| `BOOTSTRAP_TOKEN` | Component registration token, used only when components register (koko, chen, etc.) |
+| `CORE_HOST` | Inter-component address, defaults to `http://core:8080` |
+| `HTTP_PORT` / `SSH_PORT` | Published web and SSH ports |
+| `DOMAINS` | Public domains, comma-separated |
 
-# Compose, Swarm 模式下修改 NETWORK_DRIVER=overlay
-COMPOSE_PROJECT_NAME=jms
-# COMPOSE_HTTP_TIMEOUT=3600
-# DOCKER_CLIENT_TIMEOUT=3600
-DOCKER_SUBNET=192.168.250.0/24
-NETWORK_DRIVER=overlay
+> [!IMPORTANT]
+> `SECRET_KEY` protects signed data and must not change after deployment, otherwise encrypted data cannot be decrypted. Keep `BOOTSTRAP_TOKEN` unchanged across restarts and scaling, otherwise components cannot register.
 
-# 持久化存储
-VOLUME_DIR=/opt/jumpserver
+## 3. Generate the stack files
 
-# 时区
-TZ=Asia/Shanghai
+`docker-compose*.yml` files are Compose format and must be converted into Swarm stack files:
 
-# MySQL
-DB_HOST=mysql
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=nu4x599Wq7u0Bn8EABh3J91G
-DB_NAME=jumpserver
-
-# Redis
-REDIS_HOST=redis
-REDIS_PORT=6379
-REDIS_PASSWORD=8URXPL2x3HZMi7xoGTdk3Upj
-
-# Core
-SECRET_KEY=B3f2w8P2PfxIAS7s4URrD9YmSbtqX4vXdPUL217kL9XPUOWrmy
-BOOTSTRAP_TOKEN=7Q11Vz6R2J6BLAdO
-LOG_LEVEL=ERROR
-DOMAINS=
-
-# 组件通信
-CORE_HOST=http://core:8080
-
-# Web
-HTTP_PORT=80
-SSH_PORT=2222
-
-##
-# SECRET_KEY 保护签名数据的密匙, 首次安装请一定要修改并牢记, 后续升级和迁移不可更改, 否则将导致加密的数据不可解密。
-# BOOTSTRAP_TOKEN 为组件认证使用的密钥, 仅组件注册时使用。组件指 koko, magnus, kael, chen ...
-```
 ```sh
-# 生成 docker stack 部署所需文件
-docker compose -f docker-compose-network.yml -f docker-compose-init-db.yml config | sed '/published:/ s/"//g' | sed "/name:/d" > docker-stack-init-db.yml
-docker compose -f docker-compose-network.yml -f docker-compose.yml config | sed '/published:/ s/"//g' | sed "/name:/d" > docker-stack.yml
+docker compose -f docker-compose-network.yml -f docker-compose-init-db.yml config \
+  | sed '/published:/ s/"//g' | sed "/name:/d" > docker-stack-init-db.yml
+
+docker compose -f docker-compose-network.yml -f docker-compose.yml config \
+  | sed '/published:/ s/"//g' | sed "/name:/d" > docker-stack.yml
 ```
+
+## 4. Initialize the database
+
 ```sh
-# 初始化数据库
 docker stack deploy -c docker-stack-init-db.yml jumpserver
 docker service ls
 docker service ps jumpserver_init_db
- 
-# 根据查到的 Worker 节点, 到对应节点查看初始化日志
 ```
+
+Use `docker service ps` to find the node running the job, then check the initialization log there to confirm the schema upgrade finished.
+
+## 5. Deploy the application
+
 ```sh
-# 启动 JumpServer 应用，并清理已移除的组件服务
 docker stack deploy --prune -c docker-stack.yml jumpserver
 docker service ls
 ```
+
+`--prune` removes component services that are no longer in the configuration. When deployment finishes, open `http://<node-ip>:<HTTP_PORT>/`.
+
+## Operations
+
 ```sh
-# 扩容缩容
-docker service update --replicas=2 jumpserver_koko  # 扩容 koko 到 2 个副本
-# ...
+# Scale koko to 2 replicas
+docker service update --replicas=2 jumpserver_koko
+
+# Follow service logs
+docker service logs -f jumpserver_core
+
+# Upgrade: edit VERSION in .env, regenerate the stack file, then deploy
+docker stack deploy --prune -c docker-stack.yml jumpserver
+
+# Tear down
+docker stack rm jumpserver
 ```
 
+> [!TIP]
+> The bundled `docker-compose-mariadb.yml` and `docker-compose-redis.yml` are for single-host Compose setups that need a quick database and cache. In Swarm mode, use your own database and Redis.
 
-## 初始账号
-- 默认账号: `admin`
-- 默认密码: `ChangeMe`
+## Initial account
+
+- Username: `admin`
+- Password: `ChangeMe`
