@@ -112,7 +112,7 @@ all-in-one 映像內整合以下服務：
 
 ## 反饋與貢獻
 
-問題反饋與功能建議請提交 [Issue](https://github.com/jumpserver/Dockerfile/issues)；歡迎通過 Pull Request 改進構建指令碼與文件。
+問題反饋與功能建議請提交 [Issue](https://github.com/jumpserver/jumpserver/issues)；歡迎通過 Pull Request 改進構建指令碼與文件。
 
 ## 許可證
 
