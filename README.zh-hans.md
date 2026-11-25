@@ -112,7 +112,7 @@ all-in-one 镜像内集成以下服务：
 
 ## 反馈与贡献
 
-问题反馈与功能建议请提交 [Issue](https://github.com/jumpserver/Dockerfile/issues)；欢迎通过 Pull Request 改进构建脚本与文档。
+问题反馈与功能建议请提交 [Issue](https://github.com/jumpserver/jumpserver/issues)；欢迎通过 Pull Request 改进构建脚本与文档。
 
 ## 许可证
 

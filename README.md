@@ -112,7 +112,7 @@ The all-in-one image bundles the following services:
 
 ## Contributing
 
-Please report bugs and feature requests via [Issues](https://github.com/jumpserver/Dockerfile/issues). Pull requests improving the build scripts and documentation are welcome.
+Please report bugs and feature requests via [Issues](https://github.com/jumpserver/jumpserver/issues). Pull requests improving the build scripts and documentation are welcome.
 
 ## License
 
