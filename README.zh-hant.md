@@ -116,4 +116,6 @@ all-in-one 映像內整合以下服務：
 
 ## 許可證
 
-本專案基於 [GPLv3](LICENSE) 許可協定開源。
+Copyright (c) 2014-2026 FIT2CLOUD, All rights reserved.
+
+本項目基於 GNU General Public License version 3（GPLv3）許可，與 [JumpServer 主倉庫](https://github.com/jumpserver/jumpserver)一致。完整許可文本請參閱 [LICENSE](LICENSE)。

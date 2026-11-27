@@ -116,4 +116,6 @@ Please report bugs and feature requests via [Issues](https://github.com/jumpserv
 
 ## License
 
-Licensed under the [GPLv3](LICENSE).
+Copyright (c) 2014-2026 FIT2CLOUD, All rights reserved.
+
+Licensed under the GNU General Public License version 3 (GPLv3), consistent with the [JumpServer main repository](https://github.com/jumpserver/jumpserver). See [LICENSE](LICENSE) for the full license text.
