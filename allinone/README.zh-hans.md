@@ -2,7 +2,7 @@
 
 [English](README.md) · 简体中文 · [繁體中文](README.zh-hant.md)
 
-JumpServer all-in-one 部署方式的镜像构建与运行文件。单个容器内运行 Core、Koko、Chen、Kael、Web，并内置 PostgreSQL 与 Redis，适合快速体验、测试和小规模部署。
+JumpServer all-in-one 部署方式的镜像构建与运行文件。单个容器内运行 Core、Web 和 KoKo（内含 Chen、guacd 和 Kael），并内置 PostgreSQL 与 Redis，适合快速体验、测试和小规模部署。
 
 > [!NOTE]
 > all-in-one 不支持 Client 相关功能，仅支持纯 B/S 架构的 Web 端使用。生产环境请使用 [JumpServer 安装包](https://docs.jumpserver.org/zh/v3/quick_start/) 进行标准部署。
@@ -14,12 +14,12 @@ JumpServer all-in-one 部署方式的镜像构建与运行文件。单个容器�
 | Core | JumpServer 核心 API 与调度服务 | 容器内 `8080` |
 | Web | Nginx 前端与反向代理 | `80` |
 | Koko | 字符协议连接器；镜像内置 guacd，提供图形会话 | `2222`，Web 入口 `/koko/lion/` |
-| Chen | Web 数据库连接器 | Web 入口 `/chen/` |
-| Kael | AI 服务，复用 `BOOTSTRAP_TOKEN` 注册组件 | Web 入口 `/kael/` |
+| Chen | KoKo 内置的数据库工作台 | API 路径 `/koko/chen/api/v1/` |
+| Kael | 随 KoKo 镜像交付的 AI 服务 | `/kael/` |
 | PostgreSQL | 内置数据库，支持切换为外置 MySQL/PostgreSQL | `5432` |
 | Redis | 内置缓存，支持切换为外置 Redis | `6379` |
 
-PostgreSQL 与 Redis 由入口脚本启动，其余服务由 Supervisor 拉起并在异常退出后自动重启。
+s6-overlay 管理容器进程。使用内置存储时，先启动 PostgreSQL 和 Redis；数据库迁移成功后启动 Core。Core 通过健康检查后，KoKo 初始化组件，Web 开始提供服务。
 
 ## 前置条件
 
@@ -35,7 +35,7 @@ PostgreSQL 与 Redis 由入口脚本启动，其余服务由 Supervisor 拉起�
 docker volume create jsdata
 docker volume create pgdata
 
-docker run -d --name jms_all \
+docker run -d --name jms_all --stop-timeout 90 \
   -e SECRET_KEY=[API_KEY] \
   -e BOOTSTRAP_TOKEN=PleaseChangeMe \
   -v jsdata:/opt/data \
@@ -57,6 +57,9 @@ docker run -d --name jms_all \
 
 ```sh
 docker logs -f jms_all
+# 查看服务状态
+docker exec jms_all /command/s6-rc -a list
+docker exec jms_all /command/s6-svstat /run/service/koko
 ```
 
 ## 使用 Docker Compose
@@ -93,7 +96,7 @@ flush privileges;
 启动时传入外置服务地址：
 
 ```sh
-docker run -d --name jms_all \
+docker run -d --name jms_all --stop-timeout 90 \
   -p 80:80 \
   -p 2222:2222 \
   -e SECRET_KEY=[API_KEY] \
@@ -121,6 +124,7 @@ docker run -d --name jms_all \
 | --- | --- | --- |
 | `SECRET_KEY` | `PleaseChangeMe`（必须修改） | 加密密钥，不少于 50 位随机字母数字串，部署后不可更改 |
 | `BOOTSTRAP_TOKEN` | `PleaseChangeMe` | 组件注册密钥，建议不少于 24 位，重启、升级时需保持一致，否则组件注册失败 |
+| `KAEL_ENABLED` | `1` | 设为 `0` 关闭 AI 进程和 Web 路由 |
 | `CHAT_AI_DELEGATION_SECRET` | 由 `BOOTSTRAP_TOKEN` 派生 | 可选，覆盖 AI 委托签名密钥，至少 32 字符 |
 | `LOG_LEVEL` | `INFO` | 日志等级，可选 `DEBUG`、`INFO`、`WARNING`、`ERROR` |
 | `CORE_HOST` | `http://localhost:8080` | Core 内部访问地址 |
@@ -156,12 +160,14 @@ docker run -d --name jms_all \
 
 ## 图形会话与 AI 服务
 
-- 图形会话由 Koko 提供，通过 `/koko/lion/` 访问。guacd 随 Koko 镜像打包，由 Supervisor 启动，图形会话录像和文件保存在 Koko 数据目录中。
+- 图形会话由 Koko 提供，通过 `/koko/lion/` 访问。guacd 随 Koko 镜像打包，由 s6 启动，图形会话录像和文件保存在 Koko 数据目录中。
 - 升级前请处理旧 `/opt/data/lion` 中未上传的录像及需要保留的文件，该目录不会自动迁移到 Koko。
-- Kael 提供 AI 服务，通过 `/kael/` 访问。镜像包含其所需的 Node.js 与 Codex CLI，数据持久化到 `/opt/data/kael`。
-- Kael 复用 `BOOTSTRAP_TOKEN` 注册组件。委托调用 Core API 所需的签名密钥默认由 `BOOTSTRAP_TOKEN` 通过 HMAC-SHA256 确定性派生，并同时传给 Core 和 Kael，无需额外配置或保存密钥文件。重启、升级时保持 `BOOTSTRAP_TOKEN` 不变即可保持该签名密钥不变。若已单独设置 `CHAT_AI_DELEGATION_SECRET`（至少 32 字符），则优先沿用该值，启动时仍需传入。模型服务在 Core 中配置。
+- Kael 使用 KoKo 自带的独立 Codex CLI，继续从 `/opt/data/kael` 读取组件身份和数据。
+- Kael 用 `BOOTSTRAP_TOKEN` 注册，随后用组件密钥访问 Core。升级时沿用已为 Core 配置的 `CHAT_AI_DELEGATION_SECRET`。
 
 ## 升级
+
+从 v5.2.x 或更早版本升级前，先结束 Chen 会话，等候审计和录像上传完成。保留旧 `/opt/data/chen` 以便恢复。KoKo 将新的工作台状态写入 `/opt/data/koko/chen`。
 
 ```sh
 # 1. 记录当前配置
@@ -174,11 +180,11 @@ docker exec -it jms_all env
 mysqldump -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > jumpserver-backup.sql
 
 # 3. 停止并删除旧容器（数据卷保留）
-docker stop jms_all
+docker stop -t 90 jms_all
 docker rm jms_all
 
 # 4. 拉取新版本并按原参数重新启动
-docker pull jumpserver/jms_all:v5.0.0
+docker pull jumpserver/jms_all:v5.3.0
 ```
 
 重新启动时会自动执行 `upgrade_db` 更新数据库结构。请务必使用与旧容器完全相同的 `SECRET_KEY` 和 `BOOTSTRAP_TOKEN`。
@@ -210,14 +216,17 @@ docker run --rm -it -v jsdata:/opt/data jumpserver/jms_all:latest bash
 ```sh
 cd allinone
 
-# 默认构建 v5.0.0
+# 默认构建 v5.3.0
 ./build.sh
 
 # 指定版本，需确保 jumpserver/*:<version>-ce 标签存在
 ./build.sh <version>
+
+# 检查构建镜像的启动、停机和数据卷复用
+./tests/smoke.sh jumpserver/jms_all:v5.3.0
 ```
 
-构建基于 `jumpserver/core`、`koko`、`chen`、`kael`、`web` 的 `${version}-ce` 镜像，最终产物为 `jumpserver/jms_all:<version>`。运行 `demo_run.sh` 可在 `8085` 端口启动本地构建的镜像（默认 `v5.0.0`，可传入版本号）。
+构建基于 `jumpserver/core`、`koko`、`web` 的 `${version}-ce` 镜像，最终产物为 `jumpserver/jms_all:<version>`。运行 `demo_run.sh` 可在 `8085` 端口启动本地构建的镜像（默认 `v5.3.0`，可传入版本号）。 构建 v5.2.x 或更早版本时，先切换到本仓库对应的发布标签。
 
 ## 初始账号
 

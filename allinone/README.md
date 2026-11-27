@@ -2,7 +2,7 @@
 
 English · [简体中文](README.zh-hans.md) · [繁體中文](README.zh-hant.md)
 
-Build and runtime files for the JumpServer all-in-one deployment. Core, Koko, Chen, Kael and Web run in a single container, with PostgreSQL and Redis bundled. It is intended for evaluation, testing and small deployments.
+Build and runtime files for the JumpServer all-in-one deployment. Core, Web and KoKo (including Chen, guacd and Kael) run in a single container, with PostgreSQL and Redis bundled. It is intended for evaluation, testing and small deployments.
 
 > [!NOTE]
 > all-in-one does not support Client-related features and only works with the pure B/S web interface. For production, use the [JumpServer installer](https://docs.jumpserver.org/zh/v3/quick_start/).
@@ -14,12 +14,12 @@ Build and runtime files for the JumpServer all-in-one deployment. Core, Koko, Ch
 | Core | JumpServer core API and scheduler | `8080` inside the container |
 | Web | Nginx frontend and reverse proxy | `80` |
 | Koko | Character protocol connector; guacd is bundled for graphical sessions | `2222`, web path `/koko/lion/` |
-| Chen | Web database connector | web path `/chen/` |
-| Kael | AI service, registered with `BOOTSTRAP_TOKEN` | web path `/kael/` |
+| Chen | SQL workbench built into KoKo | API at `/koko/chen/api/v1/` |
+| Kael | AI service bundled with KoKo | `/kael/` |
 | PostgreSQL | Bundled database, swappable for an external MySQL/PostgreSQL | `5432` |
 | Redis | Bundled cache, swappable for an external Redis | `6379` |
 
-PostgreSQL and Redis are started by the entrypoint; the remaining services run under Supervisor and are restarted automatically if they exit.
+s6-overlay supervises the services. With local storage it starts PostgreSQL and Redis first. The migration runs before Core starts. Once Core responds to its health check, KoKo initializes its services and Web starts.
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ Start with the bundled PostgreSQL and Redis:
 docker volume create jsdata
 docker volume create pgdata
 
-docker run -d --name jms_all \
+docker run -d --name jms_all --stop-timeout 90 \
   -e SECRET_KEY=[API_KEY] \
   -e BOOTSTRAP_TOKEN=PleaseChangeMe \
   -v jsdata:/opt/data \
@@ -57,6 +57,9 @@ Follow the startup log:
 
 ```sh
 docker logs -f jms_all
+# Check supervised services with
+docker exec jms_all /command/s6-rc -a list
+docker exec jms_all /command/s6-svstat /run/service/koko
 ```
 
 ## Docker Compose
@@ -91,7 +94,7 @@ flush privileges;
 Pass the external endpoints at startup:
 
 ```sh
-docker run -d --name jms_all \
+docker run -d --name jms_all --stop-timeout 90 \
   -p 80:80 \
   -p 2222:2222 \
   -e SECRET_KEY=[API_KEY] \
@@ -119,6 +122,7 @@ The `pgdata` volume is unnecessary with an external database. When `DB_HOST` or 
 | --- | --- | --- |
 | `SECRET_KEY` | `PleaseChangeMe` (must change) | Encryption key; at least 50 random alphanumeric characters, immutable after deployment |
 | `BOOTSTRAP_TOKEN` | `PleaseChangeMe` | Component registration token; at least 24 characters; keep it unchanged across restarts and upgrades |
+| `KAEL_ENABLED` | `1` | Set to `0` to disable the AI process and Web route |
 | `CHAT_AI_DELEGATION_SECRET` | Derived from `BOOTSTRAP_TOKEN` | Optional override for the AI delegation signing key, at least 32 characters |
 | `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING` or `ERROR` |
 | `CORE_HOST` | `http://localhost:8080` | Internal Core address |
@@ -154,12 +158,14 @@ Directories under `/opt/data` are created and symlinked by the entrypoint. With 
 
 ## Graphical sessions and AI service
 
-- Graphical sessions are served by Koko at `/koko/lion/`. guacd is packaged in the Koko image and started by Supervisor; recordings and files are kept in Koko's data directory.
+- Graphical sessions are served by Koko at `/koko/lion/`. guacd is packaged in the Koko image and started by s6; recordings and files are kept in Koko's data directory.
 - Before upgrading, process any pending recordings or files in the legacy `/opt/data/lion` directory. It is not migrated to Koko automatically.
-- Kael provides the AI service at `/kael/`. The image includes its Node.js and Codex CLI dependencies, and data persists in `/opt/data/kael`.
-- Kael reuses `BOOTSTRAP_TOKEN` for registration. The signing key for delegated Core API requests is derived deterministically from `BOOTSTRAP_TOKEN` with HMAC-SHA256 and passed to both Core and Kael, so no extra configuration or key file is needed. Keep `BOOTSTRAP_TOKEN` unchanged across restarts and upgrades to preserve this key. An explicitly configured `CHAT_AI_DELEGATION_SECRET` (at least 32 characters) takes precedence and must still be supplied at startup. Configure the model service in Core.
+- Kael uses the standalone Codex CLI bundled with KoKo. Its component identity and data stay in `/opt/data/kael`.
+- Kael registers with `BOOTSTRAP_TOKEN` and uses its component access key for Core requests. Keep any configured `CHAT_AI_DELEGATION_SECRET` for Core across upgrades.
 
 ## Upgrade
+
+Before upgrading from v5.2.x or earlier, close Chen sessions and wait for pending audits and recordings to upload. Keep the old `/opt/data/chen` directory for recovery. KoKo writes new workbench state to `/opt/data/koko/chen`.
 
 ```sh
 # 1. Record the current configuration
@@ -172,11 +178,11 @@ docker exec -it jms_all env
 mysqldump -h$DB_HOST -P$DB_PORT -u$DB_USER -p$DB_PASSWORD $DB_NAME > jumpserver-backup.sql
 
 # 3. Stop and remove the old container (volumes are kept)
-docker stop jms_all
+docker stop -t 90 jms_all
 docker rm jms_all
 
 # 4. Pull the new version and start it with the same arguments
-docker pull jumpserver/jms_all:v5.0.0
+docker pull jumpserver/jms_all:v5.3.0
 ```
 
 The container runs `upgrade_db` automatically on startup. Always reuse the exact same `SECRET_KEY` and `BOOTSTRAP_TOKEN`.
@@ -208,14 +214,17 @@ docker run --rm -it -v jsdata:/opt/data jumpserver/jms_all:latest bash
 ```sh
 cd allinone
 
-# Build v5.0.0 by default
+# Build v5.3.0 by default
 ./build.sh
 
 # Build another version; jumpserver/*:<version>-ce must exist
 ./build.sh <version>
+
+# Check startup, shutdown and volume reuse for the built image
+./tests/smoke.sh jumpserver/jms_all:v5.3.0
 ```
 
-The build uses the `${version}-ce` tags of `jumpserver/core`, `koko`, `chen`, `kael` and `web`, and produces `jumpserver/jms_all:<version>`. Run `demo_run.sh` to start the locally built image on port `8085` (defaults to `v5.0.0`; pass a version to override).
+The build uses the `${version}-ce` tags of `jumpserver/core`, `koko` and `web`, and produces `jumpserver/jms_all:<version>`. Run `demo_run.sh` to start the locally built image on port `8085` (defaults to `v5.3.0`; pass a version to override). For a v5.2.x or earlier build, check out the corresponding Dockerfile release tag.
 
 ## Initial account
 

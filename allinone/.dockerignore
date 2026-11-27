@@ -4,3 +4,4 @@ docker-compose.yml
 demo_run.sh
 build.sh
 .git
+tests/

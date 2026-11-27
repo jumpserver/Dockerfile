@@ -23,7 +23,7 @@ This repository maintains containerized deployment files for JumpServer and offe
 
 | Option | Description | Typical use |
 | --- | --- | --- |
-| [all-in-one](allinone) | Runs Core, Koko, Chen, Kael and Web in a single container, with PostgreSQL and Redis bundled | Evaluation, testing, small deployments |
+| [all-in-one](allinone) | Runs Core, Web and KoKo (including Chen, guacd and Kael) in a single container, with PostgreSQL and Redis bundled | Evaluation, testing, small deployments |
 | [Docker Swarm](swarm) | Orchestrates the official component images as a cluster; database and Redis must be provided | Clusters and horizontal scaling |
 
 > [!TIP]
@@ -64,8 +64,8 @@ The all-in-one image bundles the following services:
 | Core | JumpServer core API and scheduler | `8080` inside the container |
 | Web | Nginx frontend and reverse proxy | `80` |
 | Koko | Character protocol connector for SSH/SFTP sessions; guacd is bundled for graphical sessions | `2222`, web path `/koko/` |
-| Chen | Web database connector | web path `/chen/` |
-| Kael | AI service, registered with `BOOTSTRAP_TOKEN` | web path `/kael/` |
+| Chen | SQL workbench built into KoKo | API at `/koko/chen/api/v1/` |
+| Kael | AI service bundled with KoKo | `/kael/` |
 | PostgreSQL | Bundled database, swappable for an external one | `5432` |
 | Redis | Bundled cache, swappable for an external one | `6379` |
 
@@ -86,8 +86,8 @@ The all-in-one image bundles the following services:
 ├── allinone/            # all-in-one image build files and guide
 │   ├── Dockerfile
 │   ├── entrypoint.sh
-│   ├── service.sh
-│   ├── supervisord.conf
+│   ├── s6/
+│   ├── web-run
 │   ├── docker-compose.yml
 │   ├── .env.example
 │   ├── build.sh
@@ -106,7 +106,6 @@ The all-in-one image bundles the following services:
 
 - [jumpserver/jumpserver](https://github.com/jumpserver/jumpserver): The main JumpServer repository
 - [jumpserver/koko](https://github.com/jumpserver/koko): Character protocol connector
-- [jumpserver/chen](https://github.com/jumpserver/chen): Web database connector
 - [jumpserver/lina](https://github.com/jumpserver/lina): Web admin console
 - [jumpserver/luna](https://github.com/jumpserver/luna): Web terminal
 

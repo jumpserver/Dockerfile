@@ -1,13 +1,15 @@
 services:
   jms_all:
-    image: jumpserver/jms_all:${VERSION:-v5.0.0}
+    image: jumpserver/jms_all:${VERSION:-v5.3.0}
     container_name: jms_all
     restart: unless-stopped
+    stop_grace_period: 90s
     environment:
       SECRET_KEY: ${SECRET_KEY:?Please set SECRET_KEY in .env}
       BOOTSTRAP_TOKEN: ${BOOTSTRAP_TOKEN:?BOOTSTRAP_TOKEN is required, see .env.example}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      # CHAT_AI_DELEGATION_SECRET: ${CHAT_AI_DELEGATION_SECRET:-}
+      KAEL_ENABLED: ${KAEL_ENABLED:-1}
+      CHAT_AI_DELEGATION_SECRET: ${CHAT_AI_DELEGATION_SECRET:-}
       #
       # Uncomment and fill in to use an external database / Redis
       # DB_ENGINE: mysql

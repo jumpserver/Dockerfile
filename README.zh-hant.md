@@ -23,7 +23,7 @@
 
 | 方式 | 說明 | 適用場景 |
 | --- | --- | --- |
-| [all-in-one](allinone) | 單個容器內執行 Core、Koko、Chen、Kael、Web，並內建 PostgreSQL 與 Redis | 體驗、測試、小規模部署 |
+| [all-in-one](allinone) | 單個容器內執行 Core、Web 和 KoKo（內含 Chen、guacd 和 Kael），並內建 PostgreSQL 與 Redis | 體驗、測試、小規模部署 |
 | [Docker Swarm](swarm) | 使用官方拆分映像編排叢集服務，資料庫與 Redis 需自行準備 | 叢集部署、需要橫向擴容 |
 
 > [!TIP]
@@ -64,8 +64,8 @@ all-in-one 映像內整合以下服務：
 | Core | JumpServer 核心 API 與排程服務 | 容器內 `8080` |
 | Web | Nginx 前端與反向代理 | `80` |
 | Koko | 字元協定連接器，提供 SSH/SFTP 等會話；映像內建 guacd 提供圖形會話 | `2222`，Web 入口 `/koko/` |
-| Chen | Web 資料庫連接器 | Web 入口 `/chen/` |
-| Kael | AI 服務，複用 `BOOTSTRAP_TOKEN` 註冊 | Web 入口 `/kael/` |
+| Chen | KoKo 內建的資料庫工作台 | API 路徑 `/koko/chen/api/v1/` |
+| Kael | 隨 KoKo 映像提供的 AI 服務 | `/kael/` |
 | PostgreSQL | 內建資料庫，可通過環境變數切換為外接資料庫 | `5432` |
 | Redis | 內建快取，可替換為外接 Redis | `6379` |
 
@@ -86,8 +86,8 @@ all-in-one 映像內整合以下服務：
 ├── allinone/            # all-in-one 映像構建檔案與部署文件
 │   ├── Dockerfile
 │   ├── entrypoint.sh
-│   ├── service.sh
-│   ├── supervisord.conf
+│   ├── s6/
+│   ├── web-run
 │   ├── docker-compose.yml
 │   ├── .env.example
 │   ├── build.sh
@@ -106,7 +106,6 @@ all-in-one 映像內整合以下服務：
 
 - [jumpserver/jumpserver](https://github.com/jumpserver/jumpserver)：JumpServer 主倉庫
 - [jumpserver/koko](https://github.com/jumpserver/koko)：字元協定連接器
-- [jumpserver/chen](https://github.com/jumpserver/chen)：Web 資料庫連接器
 - [jumpserver/lina](https://github.com/jumpserver/lina)：Web 管理控制台
 - [jumpserver/luna](https://github.com/jumpserver/luna)：Web 終端
 

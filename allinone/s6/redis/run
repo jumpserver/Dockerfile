@@ -1,0 +1,5 @@
+#!/command/with-contenv sh
+set -eu
+cd -P /var/lib/redis
+exec s6-setuidgid redis redis-server /etc/redis/redis.conf \
+    --daemonize no --supervised no --pidfile "" --logfile "" --port "$REDIS_PORT" --requirepass "$REDIS_PASSWORD"

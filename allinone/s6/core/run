@@ -1,0 +1,4 @@
+#!/command/with-contenv sh
+set -eu
+cd /opt/jumpserver
+exec ./entrypoint.sh start all
