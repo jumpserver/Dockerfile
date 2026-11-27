@@ -1,0 +1,21 @@
+#!/command/with-contenv sh
+set -eu
+
+if [ -e /etc/s6-overlay/s6-rc.d/storage-ready/dependencies.d/postgresql ]; then
+    until pg_isready -q -h /var/run/postgresql -p "$DB_PORT"; do sleep 1; done
+    if [ ! -f "$PG_DATA_DIR/inited.txt" ]; then
+        s6-setuidgid postgres psql -X -v ON_ERROR_STOP=1 -h /var/run/postgresql -p "$DB_PORT" -d postgres <<'SQL'
+\getenv db_user DB_USER
+\getenv db_password DB_PASSWORD
+\getenv db_name DB_NAME
+SELECT format('CREATE ROLE %I LOGIN', :'db_user') WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = :'db_user') \gexec
+ALTER ROLE :"db_user" PASSWORD :'db_password';
+SELECT format('CREATE DATABASE %I OWNER %I', :'db_name', :'db_user') WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = :'db_name') \gexec
+SQL
+        touch "$PG_DATA_DIR/inited.txt"
+    fi
+fi
+
+for address in "${DB_HOST}:${DB_PORT}" "${REDIS_HOST}:${REDIS_PORT}"; do
+    until check "tcp://$address"; do sleep 2; done
+done

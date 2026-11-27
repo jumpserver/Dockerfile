@@ -1,0 +1,1 @@
+/command/with-contenv /bin/sh -ec "cd /opt/jumpserver && exec ./jms upgrade_db"

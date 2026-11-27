@@ -1,101 +1,66 @@
 #!/bin/bash
-#
+set -euo pipefail
 
-cwd=$(dirname "$(realpath "$0")")
-action="${1}"
-
-if [[ "$action" == "bash" || "$action" == "sh" ]]; then
-    bash
-    exit 0
-fi
-echo
-
-function prepare_core() {
-    SECRET_KEY=${SECRET_KEY:-PleaseChangeMe}
-    BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN:-PleaseChangeMe}
-    CORE_HOST=${CORE_HOST:-"http://localhost:8080"}
-    LOG_LEVEL=${LOG_LEVEL:-INFO}
-    
-    export SECRET_KEY BOOTSTRAP_TOKEN CORE_HOST LOG_LEVEL
-    if [[ -z "${CHAT_AI_DELEGATION_SECRET:-}" ]]; then
-        CHAT_AI_DELEGATION_SECRET=$(/opt/py3/bin/python -c \
-            'import hashlib, hmac, os; print(hmac.new(os.environ["BOOTSTRAP_TOKEN"].encode(), b"jumpserver-chat-ai-delegation-v1", hashlib.sha256).hexdigest())') || return 1
-    fi
-    export CHAT_AI_DELEGATION_SECRET
-    export PLATFORM_DELEGATION_KEY="$CHAT_AI_DELEGATION_SECRET"
-    export PATH=/opt/py3/bin/:$PATH
-    
-    if [[ -f /opt/jumpserver/config.yml ]];then
-        echo > /opt/jumpserver/config.yml
-    fi
-    rm -f /opt/jumpserver/tmp/*.pid
-}
-
-
-function mv_dir_link(){
-    src=$1
-    dst=$2
-
-    mkdir -p ${dst}
-    if [[ -d ${src} && ! -L ${src} ]];then
-        if [[ ! -z "$(ls -A ${src})" ]];then
-            mv ${src}/* ${dst}/
-        fi
-        rm -rf ${src}
-    fi
-    if [[ ! -d ${src} ]];then
-        ln -s ${dst} ${src}
-    fi
-}
-
-function prepare_data_persist() {
-    for app in jumpserver koko chen kael;do
-        mv_dir_link /opt/$app/data /opt/data/${app}
-    done
-    
-    mv_dir_link /var/log/nginx /opt/data/nginx
-    mv_dir_link /var/lib/redis /opt/data/redis
-}
-
-function upgrade_db() {
-    echo ">> Update database structure"
-    cd /opt/jumpserver || exit 1
-    ./jms upgrade_db || {
-        echo -e "\033[31m Failed to change the table structure. \033[0m"
-        exit 1
-    }
-}
-
-export GIN_MODE=release
-
-prepare_core || exit 1
-prepare_data_persist
-
-# start other service
-source ${cwd}/service.sh
-
-until check tcp://${DB_HOST}:${DB_PORT}; do
-    echo "wait for database ${DB_HOST} ready"
-    sleep 2s
-done
-
-until check tcp://${REDIS_HOST}:${REDIS_PORT}; do
-    echo "wait for redis ${REDIS_HOST} ready"
-    sleep 2s
-done
-
-upgrade_db
-
-echo
-echo "Time: $(date "+%Y-%m-%d %H:%M:%S")"
-if [ -f "/opt/readme.txt" ]; then
-  sed -i "s@VERSION:.*@VERSION: ${VERSION}@g" /opt/readme.txt
-  cat /opt/readme.txt
-  rm -f /opt/readme.txt
+if [[ ${1:-} == bash || ${1:-} == sh ]]; then
+    exec "$@"
 fi
 
-echo
-echo "LOG_LEVEL: ${LOG_LEVEL}"
-echo "JumpServer Logs:"
+export SECRET_KEY=${SECRET_KEY:-PleaseChangeMe} BOOTSTRAP_TOKEN=${BOOTSTRAP_TOKEN:-PleaseChangeMe}
+export CORE_HOST=${CORE_HOST:-http://localhost:8080} LOG_LEVEL=${LOG_LEVEL:-INFO} GIN_MODE=release
+export DB_HOST=${DB_HOST:-127.0.0.1} DB_PORT=${DB_PORT:-5432} DB_ENGINE=${DB_ENGINE:-postgresql}
+export DB_NAME=${DB_NAME:-jumpserver} DB_USER=${DB_USER:-postgres} DB_PASSWORD=${DB_PASSWORD:-PleaseChangeMe}
+export REDIS_HOST=${REDIS_HOST:-127.0.0.1} REDIS_PORT=${REDIS_PORT:-6379} REDIS_PASSWORD=${REDIS_PASSWORD:-PleaseChangeMe}
 
-/etc/init.d/supervisor start
+# Preserve Core's signing key across upgrades from the Supervisor image.
+if [[ -z ${CHAT_AI_DELEGATION_SECRET:-} ]]; then
+    CHAT_AI_DELEGATION_SECRET=$(/opt/py3/bin/python -c \
+        'import hashlib, hmac, os; print(hmac.new(os.environ["BOOTSTRAP_TOKEN"].encode(), b"jumpserver-chat-ai-delegation-v1", hashlib.sha256).hexdigest())')
+fi
+export CHAT_AI_DELEGATION_SECRET
+
+persist_dir() {
+    local src=$1 dst=$2
+    mkdir -p "$dst"
+    if [[ -L $src ]]; then
+        [[ "$src" -ef "$dst" ]] || { echo "Unexpected data link: $src" >&2; exit 1; }
+        return
+    fi
+    if [[ -d $src ]]; then
+        # Seed missing files (including dotfiles), leaving an existing volume's data in place.
+        find "$src" -mindepth 1 -maxdepth 1 -exec cp -a --update=none -t "$dst" -- {} +
+        rm -r -- "$src"
+    fi
+    ln -s "$dst" "$src"
+}
+
+(umask 077; mkdir -p /opt/data/kael)
+for app in jumpserver koko kael; do
+    persist_dir "/opt/$app/data" "/opt/data/$app"
+done
+persist_dir /var/log/nginx /opt/data/nginx
+persist_dir /var/lib/redis /opt/data/redis
+mkdir -p /var/cache/nginx
+grep -qxF '127.0.0.1 core koko' /etc/hosts || echo '127.0.0.1 core koko' >> /etc/hosts
+if [[ -f /opt/jumpserver/config.yml ]]; then
+    : > /opt/jumpserver/config.yml
+fi
+rm -f /opt/jumpserver/tmp/*.pid
+
+# s6-rc compiles the graph at /init. Only add the local daemons when selected.
+deps=/etc/s6-overlay/s6-rc.d/storage-ready/dependencies.d
+if [[ $DB_HOST == 127.0.0.1 && $DB_ENGINE == postgresql ]]; then
+    read -r PG_VERSION PG_CLUSTER _ _ _ PG_DATA_DIR _ < <(pg_lsclusters --no-header)
+    export PG_VERSION PG_CLUSTER PG_DATA_DIR
+    chown -R postgres:postgres "$PG_DATA_DIR"
+    touch "$deps/postgresql"
+else
+    rm -f "$deps/postgresql"
+fi
+if [[ $REDIS_HOST == 127.0.0.1 ]]; then
+    chown -R redis:redis /opt/data/redis
+    touch "$deps/redis"
+else
+    rm -f "$deps/redis"
+fi
+
+exec /init

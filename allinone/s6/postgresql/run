@@ -1,0 +1,2 @@
+#!/command/with-contenv sh
+exec s6-setuidgid postgres pg_ctlcluster --foreground -o "-p $DB_PORT" "$PG_VERSION" "$PG_CLUSTER" start

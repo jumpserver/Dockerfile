@@ -23,7 +23,7 @@
 
 | 方式 | 说明 | 适用场景 |
 | --- | --- | --- |
-| [all-in-one](allinone) | 单个容器内运行 Core、Koko、Chen、Kael、Web，并内置 PostgreSQL 与 Redis | 体验、测试、小规模部署 |
+| [all-in-one](allinone) | 单个容器内运行 Core、Web 和 KoKo（内含 Chen、guacd 和 Kael），并内置 PostgreSQL 与 Redis | 体验、测试、小规模部署 |
 | [Docker Swarm](swarm) | 使用官方拆分镜像编排集群服务，数据库与 Redis 需自行准备 | 集群部署、需要横向扩容 |
 
 > [!TIP]
@@ -64,8 +64,8 @@ all-in-one 镜像内集成以下服务：
 | Core | JumpServer 核心 API 与调度服务 | 容器内 `8080` |
 | Web | Nginx 前端与反向代理 | `80` |
 | Koko | 字符协议连接器，提供 SSH/SFTP 等会话；镜像内置 guacd 提供图形会话 | `2222`，Web 入口 `/koko/` |
-| Chen | Web 数据库连接器 | Web 入口 `/chen/` |
-| Kael | AI 服务，复用 `BOOTSTRAP_TOKEN` 注册 | Web 入口 `/kael/` |
+| Chen | KoKo 内置的数据库工作台 | API 路径 `/koko/chen/api/v1/` |
+| Kael | 随 KoKo 镜像交付的 AI 服务 | `/kael/` |
 | PostgreSQL | 内置数据库，可通过环境变量切换为外置数据库 | `5432` |
 | Redis | 内置缓存，可替换为外置 Redis | `6379` |
 
@@ -86,8 +86,8 @@ all-in-one 镜像内集成以下服务：
 ├── allinone/            # all-in-one 镜像构建文件与部署文档
 │   ├── Dockerfile
 │   ├── entrypoint.sh
-│   ├── service.sh
-│   ├── supervisord.conf
+│   ├── s6/
+│   ├── web-run
 │   ├── docker-compose.yml
 │   ├── .env.example
 │   ├── build.sh
@@ -106,7 +106,6 @@ all-in-one 镜像内集成以下服务：
 
 - [jumpserver/jumpserver](https://github.com/jumpserver/jumpserver)：JumpServer 主仓库
 - [jumpserver/koko](https://github.com/jumpserver/koko)：字符协议连接器
-- [jumpserver/chen](https://github.com/jumpserver/chen)：Web 数据库连接器
 - [jumpserver/lina](https://github.com/jumpserver/lina)：Web 管理控制台
 - [jumpserver/luna](https://github.com/jumpserver/luna)：Web 终端
 
